@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Aidify_assigment
+namespace Aidify_assigment.Admin.Users
 {
 
 
-    public partial class Default
+    public partial class List
     {
     }
 }

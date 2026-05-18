@@ -7,7 +7,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using System.Web.SessionState;
 
-namespace Aidify_assigment
+namespace LearnerDash
 {
     public class Global : HttpApplication
     {

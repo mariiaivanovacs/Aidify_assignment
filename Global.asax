@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Aidify_assigment.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="LearnerDash.Global" Language="C#" %>

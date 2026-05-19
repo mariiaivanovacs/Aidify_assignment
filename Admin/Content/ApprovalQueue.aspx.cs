@@ -5,9 +5,9 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace Aidify_assigment
+namespace Aidify_assigment.Admin.Content
 {
-    public partial class SiteMaster : MasterPage
+    public partial class ApprovalQueue : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {

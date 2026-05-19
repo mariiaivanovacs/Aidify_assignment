@@ -7,38 +7,56 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Aidify_assigment
+namespace Aidify_assigment.Public
 {
 
 
-    public partial class SiteMaster
+    public partial class Contact
     {
 
         /// <summary>
-        /// Navbar1 control.
+        /// txtName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Aidify_assigment.Controls.Navbar Navbar1;
+        protected global::System.Web.UI.WebControls.TextBox txtName;
 
         /// <summary>
-        /// MainContent control.
+        /// txtEmail control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
+        protected global::System.Web.UI.WebControls.TextBox txtEmail;
 
         /// <summary>
-        /// Footer1 control.
+        /// txtSubject control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Aidify_assigment.Controls.Footer Footer1;
+        protected global::System.Web.UI.WebControls.TextBox txtSubject;
+
+        /// <summary>
+        /// txtMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtMessage;
+
+        /// <summary>
+        /// btnSend control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSend;
     }
 }

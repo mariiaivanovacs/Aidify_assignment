@@ -76,8 +76,6 @@
     <PackageReference Include="WebGrease" Version="1.6.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="About.aspx" />
-    <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -167,21 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
-    <Compile Include="About.aspx.cs">
-      <DependentUpon>About.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="About.aspx.designer.cs">
-      <DependentUpon>About.aspx</DependentUpon>
-    </Compile>
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Contact.aspx.cs">
-      <DependentUpon>Contact.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Contact.aspx.designer.cs">
-      <DependentUpon>Contact.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -302,4 +286,200 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Content Include="Admin\Dashboard.aspx" />
+    <Compile Include="Admin\Dashboard.aspx.cs">
+      <DependentUpon>Dashboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Dashboard.aspx.designer.cs">
+      <DependentUpon>Dashboard.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Admin\Roles.aspx" />
+    <Compile Include="Admin\Roles.aspx.cs">
+      <DependentUpon>Roles.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Roles.aspx.designer.cs">
+      <DependentUpon>Roles.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Admin\Analytics.aspx" />
+    <Compile Include="Admin\Analytics.aspx.cs">
+      <DependentUpon>Analytics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Analytics.aspx.designer.cs">
+      <DependentUpon>Analytics.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Admin\AuditLogs.aspx" />
+    <Compile Include="Admin\AuditLogs.aspx.cs">
+      <DependentUpon>AuditLogs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\AuditLogs.aspx.designer.cs">
+      <DependentUpon>AuditLogs.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Admin\AI_Insights.aspx" />
+    <Compile Include="Admin\AI_Insights.aspx.cs">
+      <DependentUpon>AI_Insights.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\AI_Insights.aspx.designer.cs">
+      <DependentUpon>AI_Insights.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Admin\Users\List.aspx" />
+    <Compile Include="Admin\Users\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Users\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Admin\Users\Edit.aspx" />
+    <Compile Include="Admin\Users\Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Users\Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Admin\Content\ApprovalQueue.aspx" />
+    <Compile Include="Admin\Content\ApprovalQueue.aspx.cs">
+      <DependentUpon>ApprovalQueue.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Content\ApprovalQueue.aspx.designer.cs">
+      <DependentUpon>ApprovalQueue.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Admin\Content\ManagePublicPages.aspx" />
+    <Compile Include="Admin\Content\ManagePublicPages.aspx.cs">
+      <DependentUpon>ManagePublicPages.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Content\ManagePublicPages.aspx.designer.cs">
+      <DependentUpon>ManagePublicPages.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Auth\Login.aspx" />
+    <Compile Include="Auth\Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Auth\Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Auth\Register.aspx" />
+    <Compile Include="Auth\Register.aspx.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Auth\Register.aspx.designer.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Auth\Logout.aspx" />
+    <Compile Include="Auth\Logout.aspx.cs">
+      <DependentUpon>Logout.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Auth\Logout.aspx.designer.cs">
+      <DependentUpon>Logout.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Auth\ConfirmEmail.aspx" />
+    <Compile Include="Auth\ConfirmEmail.aspx.cs">
+      <DependentUpon>ConfirmEmail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Auth\ConfirmEmail.aspx.designer.cs">
+      <DependentUpon>ConfirmEmail.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Auth\ForgotPassword.aspx" />
+    <Compile Include="Auth\ForgotPassword.aspx.cs">
+      <DependentUpon>ForgotPassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Auth\ForgotPassword.aspx.designer.cs">
+      <DependentUpon>ForgotPassword.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Auth\ResetPassword.aspx" />
+    <Compile Include="Auth\ResetPassword.aspx.cs">
+      <DependentUpon>ResetPassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Auth\ResetPassword.aspx.designer.cs">
+      <DependentUpon>ResetPassword.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Public\About.aspx" />
+    <Compile Include="Public\About.aspx.cs">
+      <DependentUpon>About.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Public\About.aspx.designer.cs">
+      <DependentUpon>About.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Public\Contact.aspx" />
+    <Compile Include="Public\Contact.aspx.cs">
+      <DependentUpon>Contact.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Public\Contact.aspx.designer.cs">
+      <DependentUpon>Contact.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Public\FAQ.aspx" />
+    <Compile Include="Public\FAQ.aspx.cs">
+      <DependentUpon>FAQ.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Public\FAQ.aspx.designer.cs">
+      <DependentUpon>FAQ.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Public\EmergencyAwareness.aspx" />
+    <Compile Include="Public\EmergencyAwareness.aspx.cs">
+      <DependentUpon>EmergencyAwareness.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Public\EmergencyAwareness.aspx.designer.cs">
+      <DependentUpon>EmergencyAwareness.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Public\PreviewModules.aspx" />
+    <Compile Include="Public\PreviewModules.aspx.cs">
+      <DependentUpon>PreviewModules.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Public\PreviewModules.aspx.designer.cs">
+      <DependentUpon>PreviewModules.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Public\PreviewQuiz.aspx" />
+    <Compile Include="Public\PreviewQuiz.aspx.cs">
+      <DependentUpon>PreviewQuiz.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Public\PreviewQuiz.aspx.designer.cs">
+      <DependentUpon>PreviewQuiz.aspx</DependentUpon>
+    </Compile>
+    <Content Include="Controls\Navbar.ascx" />
+    <Compile Include="Controls\Navbar.ascx.cs">
+      <DependentUpon>Navbar.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Navbar.ascx.designer.cs">
+      <DependentUpon>Navbar.ascx</DependentUpon>
+    </Compile>
+    <Content Include="Controls\Footer.ascx" />
+    <Compile Include="Controls\Footer.ascx.cs">
+      <DependentUpon>Footer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Footer.ascx.designer.cs">
+      <DependentUpon>Footer.ascx</DependentUpon>
+    </Compile>
+    <Content Include="Content\aidify.css" />
+    <Content Include="Images\APU Outside Campus.jpg" />
+    <Content Include="Images\Access pic.jpg" />
+    <Content Include="Images\Emergency info.jpg" />
+    <Content Include="Images\Modules.jpg" />
+    <Content Include="Images\Quiz.jpg" />
+    <Content Include="Images\auth-bg.jpg" />
+    <Content Include="Images\firstaid-hero.jpg" />
+    <Content Include="Images\medical-about.jpg" />
+    <Content Include="Images\tips.jpg" />
+  </ItemGroup>
 </Project>

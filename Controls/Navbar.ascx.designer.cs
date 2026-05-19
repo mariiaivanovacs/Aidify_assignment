@@ -7,38 +7,47 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Aidify_assigment
+namespace Aidify_assigment.Controls
 {
 
 
-    public partial class SiteMaster
+    public partial class Navbar
     {
 
         /// <summary>
-        /// Navbar1 control.
+        /// pnlVisitor control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Aidify_assigment.Controls.Navbar Navbar1;
+        protected global::System.Web.UI.WebControls.Panel pnlVisitor;
 
         /// <summary>
-        /// MainContent control.
+        /// pnlLearner control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
+        protected global::System.Web.UI.WebControls.Panel pnlLearner;
 
         /// <summary>
-        /// Footer1 control.
+        /// pnlInstructor control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Aidify_assigment.Controls.Footer Footer1;
+        protected global::System.Web.UI.WebControls.Panel pnlInstructor;
+
+        /// <summary>
+        /// pnlAdmin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlAdmin;
     }
 }

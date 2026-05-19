@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Aidify_assigment
+namespace Aidify_assigment.Auth
 {
 
 
-    public partial class Default
+    public partial class ForgotPassword
     {
     }
 }

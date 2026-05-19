@@ -13,5 +13,10 @@ namespace Aidify_assigment.Auth
         {
 
         }
+
+        protected void TextBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

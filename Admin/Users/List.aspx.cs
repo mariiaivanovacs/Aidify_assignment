@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using System;
+using Aidify_assigment;
 
 namespace Aidify_assigment.Admin.Users
 {
-    public partial class List : System.Web.UI.Page
+    public partial class List : BaseRolePage
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
+        protected override string RequiredRole => Constants.RoleAdmin;
 
-        }
+        protected void Page_Load(object sender, EventArgs e) { }
     }
 }

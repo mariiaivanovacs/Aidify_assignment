@@ -496,4 +496,7 @@
     <None Include="database\02_SeedRoles.sql" />
     <None Include="database\03_SeedDemoContent.sql" />
     <None Include="Web.config.example" />
+
+    <Compile Include="DAL\AdminRepository.cs" />
+    <Compile Include="Services\ReportService.cs" />
 </Project>

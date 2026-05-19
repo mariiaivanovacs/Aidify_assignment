@@ -482,4 +482,18 @@
     <Content Include="Images\medical-about.jpg" />
     <Content Include="Images\tips.jpg" />
   </ItemGroup>
+
+    <Compile Include="Security\Constants.cs" />
+    <Compile Include="Security\BaseRolePage.cs" />
+    <Compile Include="Security\AuthHelper.cs" />
+    <Compile Include="DAL\DbHelper.cs" />
+    <Compile Include="DAL\UserRepository.cs" />
+    <Compile Include="Services\AuthService.cs" />
+    <Compile Include="Services\EmailService.cs" />
+    <Compile Include="Services\AuditService.cs" />
+    <Compile Include="Services\NotificationService.cs" />
+    <None Include="database\01_Schema.sql" />
+    <None Include="database\02_SeedRoles.sql" />
+    <None Include="database\03_SeedDemoContent.sql" />
+    <None Include="Web.config.example" />
 </Project>

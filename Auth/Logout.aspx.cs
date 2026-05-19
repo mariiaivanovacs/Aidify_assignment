@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Security;
 
 namespace Aidify_assigment.Auth
@@ -7,12 +7,10 @@ namespace Aidify_assigment.Auth
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            Session.Clear();
             Session.Abandon();
-
             FormsAuthentication.SignOut();
-
-            Response.Redirect("~/Default.aspx");
+            Response.Redirect("~/Default.aspx", false);
+            Context.ApplicationInstance.CompleteRequest();
         }
     }
 }

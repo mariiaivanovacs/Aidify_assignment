@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Aidify_assigment;
 
 namespace Aidify_assigment.Controls
 {
@@ -6,17 +7,12 @@ namespace Aidify_assigment.Controls
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            string role = "";
+            var role = Session[Constants.SessionRole] as string ?? string.Empty;
 
-            if (Session["Role"] != null)
-            {
-                role = Session["Role"].ToString();
-            }
-
-            pnlVisitor.Visible = role == "";
-            pnlLearner.Visible = role == "Learner";
-            pnlInstructor.Visible = role == "Instructor";
-            pnlAdmin.Visible = role == "Admin";
+            pnlVisitor.Visible    = string.IsNullOrEmpty(role);
+            pnlLearner.Visible    = role == Constants.RoleLearner;
+            pnlInstructor.Visible = role == Constants.RoleInstructor;
+            pnlAdmin.Visible      = role == Constants.RoleAdmin;
         }
     }
 }

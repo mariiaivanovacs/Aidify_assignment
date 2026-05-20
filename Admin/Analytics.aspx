@@ -431,7 +431,7 @@
                 <div class="analytics-card">
                     <span class="mini-label">Total Enrollments</span>
                     <div class="d-flex align-items-baseline gap-2">
-                        <div class="stat-number">12,842</div>
+                        <div class="stat-number" id="anTotalUsers">—</div>
                         <small class="text-danger fw-bold">↑ 12%</small>
                     </div>
                 </div>
@@ -440,7 +440,7 @@
                 <div class="analytics-card">
                     <span class="mini-label">Avg. Quiz Score</span>
                     <div class="d-flex align-items-baseline gap-2">
-                        <div class="stat-number">86.4%</div>
+                        <div class="stat-number" id="anActiveLearners">—</div>
                         <small class="text-danger fw-bold">↑ 3%</small>
                     </div>
                 </div>
@@ -458,7 +458,7 @@
                 <div class="analytics-card">
                     <span class="mini-label">Active Learners</span>
                     <div class="d-flex align-items-baseline gap-2">
-                        <div class="stat-number">2,105</div>
+                        <div class="stat-number" id="anTotalAttempts">—</div>
                         <small class="text-danger fw-bold">↑ 8%</small>
                     </div>
                 </div>
@@ -475,24 +475,7 @@
                         <h3>Performance Trends</h3>
                         <small class="text-muted fw-bold">2024 Performance</small>
                     </div>
-                    <div class="fake-bar-chart">
-                        <div class="bar" style="height:60%;"></div>
-                        <div class="bar" style="height:75%;"></div>
-                        <div class="bar" style="height:85%;"></div>
-                        <div class="bar" style="height:70%;"></div>
-                        <div class="bar" style="height:92%;"></div>
-                        <div class="bar" style="height:80%;"></div>
-                        <div class="bar" style="height:88%;"></div>
-                    </div>
-                    <div class="chart-labels">
-                        <span>JAN</span>
-                        <span>FEB</span>
-                        <span>MAR</span>
-                        <span>APR</span>
-                        <span>MAY</span>
-                        <span>JUN</span>
-                        <span>JUL</span>
-                    </div>
+                    <canvas id="chartAttempts" style="max-height:240px;"></canvas>
                 </div>
             </div>
 
@@ -501,41 +484,11 @@
                 <div class="chart-card">
                     <h3 class="mb-4">Popular Modules</h3>
 
-                    <div class="ranking-row">
-                        <div class="ranking-info">
-                            <span>Basic Life Support</span>
-                            <span>4.8k students</span>
-                        </div>
-                        <div class="ranking-track">
-                            <div class="ranking-fill" style="width:92%;"></div>
-                        </div>
+                    <div id="popularModulesContainer">
+                        <p class="text-muted small">Loading…</p>
                     </div>
-
-                    <div class="ranking-row">
-                        <div class="ranking-info">
-                            <span>Choking Emergency</span>
-                            <span>3.2k students</span>
-                        </div>
-                        <div class="ranking-track">
-                            <div class="ranking-fill" style="width:65%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="ranking-row">
-                        <div class="ranking-info">
-                            <span>Severe Bleeding</span>
-                            <span>2.9k students</span>
-                        </div>
-                        <div class="ranking-track">
-                            <div class="ranking-fill" style="width:58%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="ranking-row" style="margin-bottom:24px;">
-                        <div class="ranking-info">
-                            <span>Burns and Scalds</span>
-                            <span>1.5k students</span>
-                        </div>
+                    <div style="display:none;"><!-- replaced static rows -->
+                        <div class="ranking-row" style="margin-bottom:24px;">
                         <div class="ranking-track">
                             <div class="ranking-fill" style="width:30%;"></div>
                         </div>
@@ -603,5 +556,81 @@
         <p class="text-muted small mb-0 text-center">© 2026 Aidify Admin Panel. Educational use only.</p>
     </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function () {
+    $.ajax({
+        type: 'POST', url: 'Analytics.aspx/GetAnalyticsData',
+        data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
+        success: function (r) {
+            var d = r.d;
+
+            // Stat cards
+            document.getElementById('anTotalUsers').textContent     = d.totalUsers.toLocaleString();
+            document.getElementById('anActiveLearners').textContent = d.activeLearners.toLocaleString();
+            document.getElementById('anTotalAttempts').textContent  = d.totalAttempts.toLocaleString();
+
+            // Bar chart — quiz attempts per module (top 7)
+            var labels = [], values = [];
+            for (var i = 0; i < d.attemptsByModule.length; i++) {
+                labels.push(d.attemptsByModule[i].title);
+                values.push(d.attemptsByModule[i].attempts);
+            }
+            new Chart(document.getElementById('chartAttempts'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Quiz Attempts',
+                        data: values,
+                        backgroundColor: 'rgba(229,57,53,0.75)',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+
+            // Popular Modules ranking bars
+            var container = document.getElementById('popularModulesContainer');
+            if (!d.popularModules || d.popularModules.length === 0) {
+                container.innerHTML = '<p class="text-muted small">No enrolment data yet.</p>';
+                return;
+            }
+            var maxEnrol = d.popularModules[0].enrolments || 1;
+            var html = '';
+            for (var j = 0; j < d.popularModules.length; j++) {
+                var m   = d.popularModules[j];
+                var pct = Math.round(m.enrolments / maxEnrol * 100);
+                html +=
+                    '<div class="ranking-row">' +
+                    '<div class="ranking-info">' +
+                        '<span>' + esc(m.title) + '</span>' +
+                        '<span>' + m.enrolments + ' enrolled</span>' +
+                    '</div>' +
+                    '<div class="ranking-track">' +
+                        '<div class="ranking-fill" data-width="' + pct + '" style="width:0%"></div>' +
+                    '</div>' +
+                    '</div>';
+            }
+            container.innerHTML = html;
+            // Animate bars
+            container.querySelectorAll('.ranking-fill[data-width]').forEach(function (el) {
+                el.style.width = el.getAttribute('data-width') + '%';
+            });
+        },
+        error: function () {
+            console.warn('Analytics data failed to load.');
+        }
+    });
+});
+function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
 
 </asp:Content>

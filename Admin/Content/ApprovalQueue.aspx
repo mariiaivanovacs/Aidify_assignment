@@ -361,10 +361,11 @@
             </div>
         </div>
 
-        <!-- Cards -->
-        <div class="row g-4">
+        <!-- Cards — populated from DB via WebMethod -->
+        <div class="row g-4" id="moduleCardsContainer">
+            <div class="col-12 text-center text-muted py-5">Loading pending modules…</div>
 
-            <!-- Card 1 — large CPR -->
+            <!-- Card 1 — large CPR (removed — replaced by JS) -->
             <div class="col-lg-8">
                 <div class="approval-card p-4 h-100">
                     <div class="d-flex gap-3 mb-3">
@@ -506,6 +507,62 @@
 
     </div>
 </main>
+
+<script type="text/javascript">
+function loadPendingModules() {
+    $.ajax({
+        type: 'POST', url: 'ApprovalQueue.aspx/GetPendingModules',
+        data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
+        success: function (r) {
+            var modules   = r.d;
+            var container = document.getElementById('moduleCardsContainer');
+            if (!modules || modules.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted py-5">' +
+                    '<i class="bi bi-check-circle fs-1 d-block mb-3"></i>' +
+                    'No modules awaiting review — inbox is clear!</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < modules.length; i++) {
+                var m  = modules[i];
+                var dt = new Date(parseInt(m.submittedAt.replace('/Date(', '').replace(')/', '')));
+                var dateStr = dt.toISOString().slice(0, 10);
+                html +=
+                    '<div class="col-lg-6">' +
+                    '<div class="approval-card p-4 h-100">' +
+                        '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                            '<span class="badge-category text-danger">Pending Review</span>' +
+                            '<small class="text-muted">Submitted: ' + esc(dateStr) + '</small>' +
+                        '</div>' +
+                        '<h3 class="h5 fw-bold mb-1">' + esc(m.title) + '</h3>' +
+                        '<p class="text-muted small mb-1">Difficulty: <strong>' + esc(m.difficultyLevel || '—') + '</strong></p>' +
+                        '<p class="text-muted small mb-3">Author: <strong>' + esc(m.createdByName) + '</strong></p>' +
+                        '<div class="d-flex flex-wrap gap-2">' +
+                            '<a href="ApprovalQueue.aspx?action=approve&id=' + m.moduleId + '" ' +
+                               'class="btn-sm-approve" onclick="return confirm(\'Approve ' + esc(m.title.replace(/'/g,"")) + '?\');">' +
+                                '<i class="bi bi-check-circle"></i> Approve' +
+                            '</a>' +
+                            '<a href="ApprovalQueue.aspx?action=reject&id=' + m.moduleId + '" ' +
+                               'class="btn-sm-outline-danger" onclick="return confirm(\'Reject and return to Draft?\');">' +
+                                '<i class="bi bi-x-circle"></i> Reject' +
+                            '</a>' +
+                        '</div>' +
+                    '</div>' +
+                    '</div>';
+            }
+            container.innerHTML = html;
+        },
+        error: function () {
+            document.getElementById('moduleCardsContainer').innerHTML =
+                '<div class="col-12 text-danger text-center py-5">Failed to load pending modules.</div>';
+        }
+    });
+}
+function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+$(document).ready(loadPendingModules);
+</script>
 
 <!-- ── FOOTER ── -->
 <footer class="approval-footer">

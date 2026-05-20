@@ -199,6 +199,7 @@
 
                                 <h3 class="h5 fw-bold mb-0">
                                     System Admin
+                                    <span class="badge bg-danger-subtle text-danger ms-2" id="countAdmin">—</span>
                                 </h3>
 
                             </div>
@@ -242,6 +243,7 @@
 
                             <h3 class="h5 fw-bold mb-0">
                                 Instructor
+                                <span class="badge bg-danger-subtle text-danger ms-2" id="countInstructor">—</span>
                             </h3>
 
                         </div>
@@ -287,6 +289,7 @@
 
                             <h3 class="h5 fw-bold mb-0">
                                 Learner
+                                <span class="badge bg-danger-subtle text-danger ms-2" id="countLearner">—</span>
                             </h3>
 
                         </div>
@@ -448,5 +451,20 @@
             <p class="text-muted small mb-0 text-center">© 2026 Aidify Admin Panel. Educational use only.</p>
         </div>
     </footer>
+
+<script type="text/javascript">
+$(document).ready(function () {
+    $.ajax({
+        type: 'POST', url: 'Roles.aspx/GetRoleCounts',
+        data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
+        success: function (r) {
+            var d = r.d;
+            document.getElementById('countAdmin').textContent      = d.adminCount + ' user(s)';
+            document.getElementById('countInstructor').textContent = d.instructorCount + ' user(s)';
+            document.getElementById('countLearner').textContent    = d.learnerCount + ' user(s)';
+        }
+    });
+});
+</script>
 
 </asp:Content>

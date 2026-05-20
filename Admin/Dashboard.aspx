@@ -541,7 +541,7 @@
                                 <small class="text-success fw-bold">+12% ↑</small>
                             </div>
                             <span>Total active users</span>
-                            <h2>14,285</h2>
+                            <h2 id="statTotalUsers">—</h2>
                             <p>Registered learners and staff</p>
                         </div>
                     </div>
@@ -555,7 +555,7 @@
                                 <small class="text-success fw-bold">+5% ↑</small>
                             </div>
                             <span>Module completion rate</span>
-                            <h2>68.4%</h2>
+                            <h2 id="statActiveLearners">—</h2>
                             <div class="progress mt-2" style="height: 6px;">
                                 <div class="progress-bar bg-danger" style="width: 68%;"></div>
                             </div>
@@ -571,7 +571,7 @@
                                 <small class="text-muted fw-bold">Stable</small>
                             </div>
                             <span>System Uptime</span>
-                            <h2>99.98%</h2>
+                            <h2 id="statTotalAttempts">—</h2>
                             <p>All systems operational</p>
                         </div>
                     </div>
@@ -585,7 +585,7 @@
                                 <small class="text-danger fw-bold">Priority</small>
                             </div>
                             <span>Critical Alerts</span>
-                            <h2>3 Active</h2>
+                            <h2 id="statPendingModules">—</h2>
                             <p>Needs admin review</p>
                         </div>
                     </div>
@@ -616,6 +616,21 @@
                         error: function () {
                             document.getElementById('aiInsightText').textContent =
                                 'AI insight unavailable at the moment.';
+                        }
+                    });
+                </script>
+
+                <script type="text/javascript">
+                    $.ajax({
+                        type: 'POST', url: 'Dashboard.aspx/GetStats',
+                        data: '{}', contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function (r) {
+                            var d = r.d;
+                            document.getElementById('statTotalUsers').textContent     = d.totalUsers.toLocaleString();
+                            document.getElementById('statActiveLearners').textContent = d.activeLearners.toLocaleString();
+                            document.getElementById('statTotalAttempts').textContent  = d.totalAttempts.toLocaleString();
+                            document.getElementById('statPendingModules').textContent = d.pendingModules + ' Pending';
                         }
                     });
                 </script>

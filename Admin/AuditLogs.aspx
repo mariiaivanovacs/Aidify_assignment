@@ -436,65 +436,8 @@
                         </tr>
                     </thead>
 
-                    <tbody>
-
-                        <tr>
-                            <td class="ps-4 py-3">
-                                <div class="fw-medium">2026-11-20</div>
-                                <small class="text-muted">14:22:05 UTC</small>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="audit-avatar" style="background:#959efd;color:#27308a;">JD</div>
-                                    <span class="fw-medium">john_doe_99</span>
-                                </div>
-                            </td>
-                            <td>Module Update</td>
-                            <td><span class="badge-success-custom">Success</span></td>
-                            <td class="text-muted">192.168.1.1</td>
-                            <td class="text-end pe-4">
-                                <a href="#" class="text-danger fw-semibold text-decoration-none">View JSON</a>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td class="ps-4 py-3">
-                                <div class="fw-medium">2026-11-20</div>
-                                <small class="text-muted">14:18:12 UTC</small>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="audit-avatar" style="background:#ffdad6;color:#93000a;">SA</div>
-                                    <span class="fw-medium">sys_admin</span>
-                                </div>
-                            </td>
-                            <td>Security Config</td>
-                            <td><span class="badge-danger-custom">Failed</span></td>
-                            <td class="text-muted">45.23.1.88</td>
-                            <td class="text-end pe-4">
-                                <a href="#" class="text-danger fw-semibold text-decoration-none">View Error</a>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td class="ps-4 py-3">
-                                <div class="fw-medium">2026-11-20</div>
-                                <small class="text-muted">13:55:40 UTC</small>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="audit-avatar" style="background:#d8f3e7;color:#0a6640;">MK</div>
-                                    <span class="fw-medium">m_kingston</span>
-                                </div>
-                            </td>
-                            <td>User Login</td>
-                            <td><span class="badge-success-custom">Success</span></td>
-                            <td class="text-muted">210.12.94.3</td>
-                            <td class="text-end pe-4">
-                                <a href="#" class="text-danger fw-semibold text-decoration-none">View Session</a>
-                            </td>
-                        </tr>
-
+                    <tbody id="auditTableBody">
+                        <tr><td colspan="6" class="text-center text-muted py-4">Loading audit logs…</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -588,5 +531,54 @@
         <p class="text-muted small mb-0 text-center">© 2026 Aidify Admin Panel. Educational use only.</p>
     </div>
 </footer>
+
+<script type="text/javascript">
+$(document).ready(function () {
+    $.ajax({
+        type: 'POST', url: 'AuditLogs.aspx/GetAuditLogs',
+        data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
+        success: function (r) {
+            var logs = r.d;
+            var body = document.getElementById('auditTableBody');
+            if (!logs || logs.length === 0) {
+                body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No audit logs found.</td></tr>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < logs.length; i++) {
+                var l = logs[i];
+                var dt = new Date(parseInt(l.timestamp.replace('/Date(', '').replace(')/', '')));
+                var dateStr = dt.toISOString().slice(0, 10);
+                var timeStr = dt.toISOString().slice(11, 19) + ' UTC';
+                html +=
+                    '<tr>' +
+                    '<td class="ps-4 py-3">' +
+                        '<div class="fw-medium">' + dateStr + '</div>' +
+                        '<small class="text-muted">' + timeStr + '</small>' +
+                    '</td>' +
+                    '<td>' +
+                        '<div class="d-flex align-items-center gap-2">' +
+                        '<div class="audit-avatar" style="background:#ffe2de;color:#93000a;">' + esc(l.actorInitials) + '</div>' +
+                        '<span class="fw-medium">' + esc(l.actorName) + '</span>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td>' + esc(l.action) + '</td>' +
+                    '<td><span class="badge-success-custom">' + esc(l.targetEntity || '—') + '</span></td>' +
+                    '<td class="text-muted">' + esc(l.iPAddress || '—') + '</td>' +
+                    '<td class="text-end pe-4"><span class="text-muted small">#' + l.auditId + '</span></td>' +
+                    '</tr>';
+            }
+            body.innerHTML = html;
+        },
+        error: function () {
+            document.getElementById('auditTableBody').innerHTML =
+                '<tr><td colspan="6" class="text-danger text-center py-4">Failed to load audit logs.</td></tr>';
+        }
+    });
+});
+function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
 
 </asp:Content>

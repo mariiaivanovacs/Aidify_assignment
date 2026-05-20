@@ -253,60 +253,14 @@
                             </tr>
                         </thead>
 
-                        <tbody>
-                            <tr>
-                                <td class="ps-4">
-                                    <span class="avatar-circle bg-info-subtle text-info">SJ</span>
-                                    <strong>Dr. Sarah Jenkins</strong><br />
-                                    <small class="text-muted ms-5">s.jenkins@aidify.edu</small>
-                                </td>
-                                <td><span class="role-badge role-instructor">Instructor</span></td>
-                                <td><span class="status-dot bg-success"></span>Active</td>
-                                <td><small class="text-muted">2 hours ago</small></td>
-                                <td class="text-end pe-4">
-                                    <a href="Edit.aspx" class="text-dark me-3"><i class="bi bi-eye"></i></a>
-                                    <a href="Edit.aspx" class="text-dark me-3"><i class="bi bi-pencil"></i></a>
-                                    <a href="#" class="text-danger"><i class="bi bi-person-x"></i></a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="ps-4">
-                                    <span class="avatar-circle bg-danger-subtle text-danger">MA</span>
-                                    <strong>Marcus Aris</strong><br />
-                                    <small class="text-muted ms-5">marcus.a@gmail.com</small>
-                                </td>
-                                <td><span class="role-badge role-learner">Learner</span></td>
-                                <td><span class="status-dot bg-warning"></span>Pending</td>
-                                <td><small class="text-muted">Never</small></td>
-                                <td class="text-end pe-4">
-                                    <a href="Edit.aspx" class="text-dark me-3"><i class="bi bi-eye"></i></a>
-                                    <a href="Edit.aspx" class="text-dark me-3"><i class="bi bi-pencil"></i></a>
-                                    <a href="#" class="text-danger"><i class="bi bi-person-x"></i></a>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="ps-4">
-                                    <span class="avatar-circle bg-success-subtle text-success">RC</span>
-                                    <strong>Robert Chen</strong><br />
-                                    <small class="text-muted ms-5">r.chen@aidify.admin</small>
-                                </td>
-                                <td><span class="role-badge role-admin">Admin</span></td>
-                                <td><span class="status-dot bg-success"></span>Active</td>
-                                <td><small class="text-muted">15 mins ago</small></td>
-                                <td class="text-end pe-4">
-                                    <a href="Edit.aspx" class="text-dark me-3"><i class="bi bi-eye"></i></a>
-                                    <a href="Edit.aspx" class="text-dark me-3"><i class="bi bi-pencil"></i></a>
-                                    <a href="#" class="text-danger"><i class="bi bi-person-x"></i></a>
-                                </td>
-                            </tr>
+                        <tbody id="userTableBody">
+                            <tr><td colspan="5" class="text-center text-muted py-4">Loading users…</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="p-4 bg-light border-top d-flex justify-content-between align-items-center">
-                    <small class="text-muted">Showing <strong>1 - 5</strong> of 1,284 users</small>
+                    <small class="text-muted" id="userCountLabel">Loading…</small>
 
                     <div>
                         <button type="button" class="btn btn-sm btn-light border" disabled>Previous</button>
@@ -375,5 +329,71 @@
             <p class="text-muted small mb-0 text-center">© 2026 Aidify Admin Panel. Educational use only.</p>
         </div>
     </footer>
+
+<script type="text/javascript">
+function loadUsers() {
+    $.ajax({
+        type: 'POST', url: 'List.aspx/GetUsers',
+        data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
+        success: function (r) {
+            var users = r.d;
+            var body  = document.getElementById('userTableBody');
+            var label = document.getElementById('userCountLabel');
+            if (!users || users.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No users found.</td></tr>';
+                label.textContent = 'No users';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < users.length; i++) {
+                var u      = users[i];
+                var active = u.isActive;
+                var dotCss = active ? 'bg-success' : 'bg-secondary';
+                var status = active ? 'Active' : 'Disabled';
+                var toggleLabel = active ? 'Disable' : 'Enable';
+                html +=
+                    '<tr>' +
+                    '<td class="ps-4">' +
+                        '<span class="avatar-circle bg-danger-subtle text-danger">' + esc(u.initials) + '</span>' +
+                        '<strong>' + esc(u.fullName) + '</strong><br/>' +
+                        '<small class="text-muted ms-5">' + esc(u.email) + '</small>' +
+                    '</td>' +
+                    '<td><span class="role-badge ' + esc(u.roleBadgeCss) + '">' + esc(u.roleName) + '</span></td>' +
+                    '<td><span class="status-dot ' + dotCss + '"></span>' + status + '</td>' +
+                    '<td><small class="text-muted">—</small></td>' +
+                    '<td class="text-end pe-4">' +
+                        '<a href="Edit.aspx?userId=' + u.userId + '" class="text-dark me-3"><i class="bi bi-pencil"></i></a>' +
+                        '<a href="#" class="' + (active ? 'text-danger' : 'text-success') + '" ' +
+                           'onclick="toggleUser(' + u.userId + ',' + (!active) + ');return false;">' +
+                           '<i class="bi bi-person-' + (active ? 'x' : 'check') + '"></i> ' + toggleLabel +
+                        '</a>' +
+                    '</td>' +
+                    '</tr>';
+            }
+            body.innerHTML  = html;
+            label.innerHTML = 'Showing <strong>' + users.length + '</strong> user(s)';
+        },
+        error: function () {
+            document.getElementById('userTableBody').innerHTML =
+                '<tr><td colspan="5" class="text-danger text-center py-4">Failed to load users.</td></tr>';
+        }
+    });
+}
+
+function toggleUser(userId, makeActive) {
+    $.ajax({
+        type: 'POST', url: 'List.aspx/SetUserActive',
+        data: JSON.stringify({ userId: userId, active: makeActive }),
+        contentType: 'application/json; charset=utf-8', dataType: 'json',
+        success: function () { loadUsers(); }
+    });
+}
+
+function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+$(document).ready(loadUsers);
+</script>
 
 </asp:Content>

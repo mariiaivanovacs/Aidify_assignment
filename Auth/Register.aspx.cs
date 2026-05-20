@@ -1,4 +1,4 @@
-// REQUIRES: BCrypt.Net-Next NuGet package (install via VS NuGet Manager)
+﻿// REQUIRES: BCrypt.Net-Next NuGet package (install via VS NuGet Manager)
 using System;
 using System.Configuration;
 using Aidify_assigment;
@@ -19,15 +19,22 @@ namespace Aidify_assigment.Auth
         {
             if (!Page.IsValid) return;
 
+            if (!CheckBox1.Checked)
+            {
+                lblError.Text = "⚠ You must agree to the Terms and Privacy Policy.";
+                lblError.Visible = true;
+                return;
+            }
+
             string fullName = txtFullName.Text.Trim();
-            string email    = txtEmail.Text.Trim().ToLower();
+            string email = txtEmail.Text.Trim().ToLower();
             string password = txtPassword.Text;
-            var auth        = new AuthService();
+            var auth = new AuthService();
 
             try
             {
                 int userId = auth.RegisterUser(fullName, email, password);
-                string token   = auth.CreateEmailToken(userId, "Confirm", expiryHours: 24);
+                string token = auth.CreateEmailToken(userId, "Confirm", expiryHours: 24);
                 string siteUrl = ConfigurationManager.AppSettings["SiteUrl"]
                                  ?? Request.Url.GetLeftPart(System.UriPartial.Authority);
                 string link = siteUrl + ResolveUrl("~/Auth/ConfirmEmail.aspx") + "?t=" + token;
@@ -40,16 +47,16 @@ namespace Aidify_assigment.Auth
                     $"<p><a href='{link}'>Confirm my account</a></p>");
 
                 pnlSuccess.Visible = true;
-                lblError.Visible   = false;
+                lblError.Visible = false;
             }
             catch (InvalidOperationException ex)
             {
-                lblError.Text    = ex.Message;
+                lblError.Text = ex.Message;
                 lblError.Visible = true;
             }
             catch
             {
-                lblError.Text    = "An unexpected error occurred. Please try again.";
+                lblError.Text = "An unexpected error occurred. Please try again.";
                 lblError.Visible = true;
             }
         }

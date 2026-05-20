@@ -181,15 +181,15 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="stat-card">
                         <small class="text-muted fw-bold">TOTAL USERS</small>
-                        <h3>1,284</h3>
-                        <small class="text-muted">↗ 12% from last month</small>
+                        <h3 id="ulStatTotal">—</h3>
+                        <small class="text-muted">All registered accounts</small>
                     </div>
                 </div>
 
                 <div class="col-md-6 col-lg-3">
                     <div class="stat-card">
                         <small class="text-muted fw-bold">ACTIVE LEARNERS</small>
-                        <h3>942</h3>
+                        <h3 id="ulStatLearners">—</h3>
                         <div class="progress mt-2" style="height: 5px;">
                             <div class="progress-bar bg-secondary" style="width: 74%;"></div>
                         </div>
@@ -199,7 +199,7 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="stat-card">
                         <small class="text-muted fw-bold">PENDING APPROVALS</small>
-                        <h3>18</h3>
+                        <h3 id="ulStatPending">—</h3>
                         <small class="text-danger">Requires attention</small>
                     </div>
                 </div>
@@ -207,7 +207,7 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="stat-card">
                         <small class="text-muted fw-bold">AVG. COMPLETION</small>
-                        <h3>86%</h3>
+                        <h3 id="ulStatCompletion">—</h3>
                         <small class="text-muted">Platform target met</small>
                     </div>
                 </div>
@@ -393,7 +393,21 @@ function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-$(document).ready(loadUsers);
+$(document).ready(function() {
+    loadUsers();
+    // populate the 4 stat cards
+    $.ajax({
+        type:'POST', url:'List.aspx/GetUserStats',
+        data:'{}', contentType:'application/json; charset=utf-8', dataType:'json',
+        success: function(r) {
+            var d = r.d;
+            document.getElementById('ulStatTotal').textContent      = d.totalUsers.toLocaleString();
+            document.getElementById('ulStatLearners').textContent   = d.activeLearners.toLocaleString();
+            document.getElementById('ulStatPending').textContent    = d.pendingModules;
+            document.getElementById('ulStatCompletion').textContent = d.completionRate + '%';
+        }
+    });
+});
 </script>
 
 </asp:Content>

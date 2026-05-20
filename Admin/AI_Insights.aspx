@@ -419,6 +419,93 @@
     </div>
 </main>
 
+<!-- ── AI DECISION SUPPORT CHAT ── -->
+<section class="container mb-5">
+    <div class="ai-card" style="border-radius:16px;padding:28px;">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-chat-dots-fill" style="color:#E53935;font-size:22px;"></i>
+            <h2 class="h5 fw-bold mb-0">AI Decision Support</h2>
+        </div>
+        <p class="text-muted small mb-3">
+            Ask a natural-language question about platform performance.
+            The AI analyses anonymised aggregate data — no personal data is ever sent.
+        </p>
+
+        <div id="aiChatHistory"
+             style="min-height:80px;max-height:260px;overflow-y:auto;
+                    background:#f9f9f9;border:1px solid #e2e2e2;
+                    border-radius:10px;padding:16px;margin-bottom:14px;font-size:14px;">
+            <p class="text-muted mb-0">Your conversation will appear here.</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <input type="text" id="txtAIQuestion" class="form-control"
+                   placeholder="e.g. Which module has the lowest completion rate?"
+                   maxlength="300" style="border-radius:10px;" />
+            <button onclick="askAI()" class="btn btn-aidify px-4 fw-bold"
+                    style="background:#E53935;border-color:#E53935;color:#fff;
+                           border-radius:10px;white-space:nowrap;">
+                Ask AI
+            </button>
+        </div>
+        <div id="aiChatError" class="text-danger small mt-2" style="display:none;"></div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function askAI() {
+        var input   = document.getElementById('txtAIQuestion');
+        var q       = input.value.trim();
+        if (!q) return;
+
+        var history  = document.getElementById('aiChatHistory');
+        var errDiv   = document.getElementById('aiChatError');
+        errDiv.style.display = 'none';
+
+        // Append user message
+        history.innerHTML += '<div class="mb-2"><strong style="color:#E53935;">You:</strong> ' +
+                             escapeHtml(q) + '</div>';
+        history.innerHTML += '<div id="aiThinking" class="mb-2 text-muted fst-italic">AI is thinking…</div>';
+        history.scrollTop  = history.scrollHeight;
+        input.value = '';
+
+        // Call the WebMethod
+        $.ajax({
+            type:        'POST',
+            url:         'AI_Insights.aspx/AskAI',
+            data:        JSON.stringify({ question: q }),
+            contentType: 'application/json; charset=utf-8',
+            dataType:    'json',
+            success: function (data) {
+                var thinking = document.getElementById('aiThinking');
+                if (thinking) thinking.remove();
+                history.innerHTML += '<div class="mb-2"><strong style="color:#4B50C7;">Aidify AI:</strong> ' +
+                                     escapeHtml(data.d) + '</div>';
+                history.scrollTop = history.scrollHeight;
+            },
+            error: function () {
+                var thinking = document.getElementById('aiThinking');
+                if (thinking) thinking.remove();
+                errDiv.style.display = '';
+                errDiv.textContent = 'AI service unavailable. Please try again later.';
+            }
+        });
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var input = document.getElementById('txtAIQuestion');
+        if (input) input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') askAI();
+        });
+    });
+</script>
+
 <!-- ── FOOTER ── -->
 <footer class="ai-footer">
     <div class="container">

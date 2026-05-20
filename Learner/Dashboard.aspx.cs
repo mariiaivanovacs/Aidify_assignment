@@ -5,15 +5,17 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace LearnerDash.Learner
+namespace Aidify_assigment.Learner
 {
-    public partial class Dashboard : System.Web.UI.Page
+    public partial class Dashboard : BaseRolePage
     {
+        protected override string RequiredRole => Constants.RoleLearner;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                lblWelcome.Text = "Welcome back, Manoj" + User.Identity.Name;
+                lblWelcome.Text = "Welcome back, " + AuthHelper.GetName();
 
                 var courses = new[]
                 {

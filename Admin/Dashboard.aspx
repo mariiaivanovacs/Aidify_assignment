@@ -592,6 +592,34 @@
 
                 </div>
 
+                <!-- AI Daily Insight Card -->
+                <div class="admin-card mb-4" id="aiInsightCard">
+                    <div class="admin-card-header">
+                        <div>
+                            <h4><i class="bi bi-stars text-danger me-2"></i>AI Daily Insight</h4>
+                            <small class="text-muted">Powered by Gemini · refreshes every 24 h</small>
+                        </div>
+                    </div>
+                    <p id="aiInsightText" class="text-muted fst-italic mb-0">Loading insight…</p>
+                </div>
+
+                <script type="text/javascript">
+                    $.ajax({
+                        type:        'POST',
+                        url:         'Dashboard.aspx/GetDailySummary',
+                        data:        '{}',
+                        contentType: 'application/json; charset=utf-8',
+                        dataType:    'json',
+                        success: function (data) {
+                            document.getElementById('aiInsightText').textContent = data.d;
+                        },
+                        error: function () {
+                            document.getElementById('aiInsightText').textContent =
+                                'AI insight unavailable at the moment.';
+                        }
+                    });
+                </script>
+
                 <!-- Chart + Alerts -->
                 <div class="row g-4 mb-4">
                     <div class="col-lg-8">

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace LearnerDash.Learner
+namespace Aidify_assigment.Learner
 {
 
 

@@ -499,4 +499,13 @@
 
     <Compile Include="DAL\AdminRepository.cs" />
     <Compile Include="Services\ReportService.cs" />
+
+    <Compile Include="AI\GeminiClient.cs" />
+    <Compile Include="Services\AIContentService.cs" />
+    <Compile Include="Services\AIInsightsService.cs" />
+    <Compile Include="DAL\QuizRepository.cs" />
+    <Compile Include="ViewModels\GeneratedQuestion.cs" />
+
+    <Content Include="AI\Prompts\QuizGenerator.txt" />
+    <Content Include="AI\Prompts\AdminInsights.txt" />
 </Project>

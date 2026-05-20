@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Dashboard.aspx.cs" Inherits="LearnerDash.Learner.Dashboard" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Dashboard.aspx.cs" Inherits="Aidify_assigment.Learner.Dashboard" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
 <div class="container-fluid px-4 py-4">
@@ -35,7 +35,8 @@
                             </div>
                             <div class="progress" style="height:8px; border-radius:8px;">
                                 <div class="progress-bar bg-primary" role="progressbar"
-                                     style='width:<%# Eval("ProgressPct") %>%;'></div>
+                                     data-pct='<%# Eval("ProgressPct") %>'
+                                     style="width:0%"></div>
                             </div>
                             <small class="text-muted mt-1 d-block"><%# Eval("ProgressPct") %>% complete</small>
                         </div>
@@ -84,5 +85,11 @@
     </div>
 
 </div>
+
+<script type="text/javascript">
+    document.querySelectorAll('.progress-bar[data-pct]').forEach(function (bar) {
+        bar.style.width = bar.getAttribute('data-pct') + '%';
+    });
+</script>
 
 </asp:Content>

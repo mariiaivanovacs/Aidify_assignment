@@ -30,6 +30,11 @@
 
                 <div class="col-lg-9">
 
+                    <!-- Live FAQs from database -->
+                    <div id="liveFaqContainer" class="mb-4">
+                        <div class="text-muted py-3">Loading FAQs…</div>
+                    </div>
+
                     <div id="platform" class="faqx-category">
                         <h2><i class="bi bi-grid"></i> Platform</h2>
 
@@ -139,5 +144,33 @@
 
         </div>
     </section>
+
+<script type="text/javascript">
+$.ajax({
+    type:'POST', url:'FAQ.aspx/GetFAQs', data:'{}',
+    contentType:'application/json; charset=utf-8', dataType:'json',
+    success: function(r) {
+        var faqs = r.d;
+        var c = document.getElementById('liveFaqContainer');
+        if (!faqs || faqs.length === 0) { c.innerHTML = ''; return; }
+        var html = '<h2 class="h5 fw-bold mb-3"><i class="bi bi-question-circle"></i> From the Knowledge Base</h2>' +
+                   '<div class="accordion" id="accordionLive">';
+        for (var i = 0; i < faqs.length; i++) {
+            var f = faqs[i], id = 'liveF' + f.faqId;
+            html += '<div class="accordion-item">' +
+                '<h2 class="accordion-header">' +
+                '<button class="accordion-button' + (i>0?' collapsed':'') + '" type="button" ' +
+                'data-bs-toggle="collapse" data-bs-target="#' + id + '">' +
+                esc(f.question) + '</button></h2>' +
+                '<div id="' + id + '" class="accordion-collapse collapse' + (i===0?' show':'') + '" data-bs-parent="#accordionLive">' +
+                '<div class="accordion-body">' + esc(f.answer) + '</div></div></div>';
+        }
+        html += '</div>';
+        c.innerHTML = html;
+    },
+    error: function() { document.getElementById('liveFaqContainer').innerHTML = ''; }
+});
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
 
 </asp:Content>

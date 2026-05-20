@@ -743,8 +743,8 @@
                 <div class="instructor-card">
                     <div class="instructor-avatar">M</div>
                     <div>
-                        <div class="instructor-name">Dr. Sarah Mitchell</div>
-                        <div class="instructor-role">Lead Medical Instructor</div>
+                        <div class="instructor-name"><%: Aidify_assigment.AuthHelper.GetName() %></div>
+                        <div class="instructor-role"><%: Aidify_assigment.AuthHelper.GetRole() %></div>
                     </div>
                 </div>
 

@@ -747,8 +747,8 @@
                     <span class="material-symbols-outlined" style="font-size:18px;color:#916f6b;">notifications</span>
 
                     <div>
-                        <div class="profile-name">Dr. Sarah Mitchell</div>
-                        <div class="profile-role">Lead Medical Instructor</div>
+                        <div class="profile-name"><%: Aidify_assigment.AuthHelper.GetName() %></div>
+                        <div class="profile-role"><%: Aidify_assigment.AuthHelper.GetRole() %></div>
                     </div>
 
                     <div class="avatar">M</div>

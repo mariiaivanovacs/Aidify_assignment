@@ -644,8 +644,8 @@
             <!-- Sidebar -->
             <aside class="module-sidebar">
                 <div class="instructor-block">
-                    <div class="instructor-name">Dr. Sarah Mitchell</div>
-                    <div class="instructor-role">Lead Medical Instructor</div>
+                    <div class="instructor-name"><%: Aidify_assigment.AuthHelper.GetName() %></div>
+                    <div class="instructor-role"><%: Aidify_assigment.AuthHelper.GetRole() %></div>
                     <div class="verified-line">
                         <span class="material-symbols-outlined" style="font-size:13px;font-variation-settings:'FILL' 1;">verified</span>
                         Verified Educator

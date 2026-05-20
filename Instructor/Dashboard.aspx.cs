@@ -1,69 +1,64 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using Aidify_assigment;
 
 namespace Aidify_assigment.Instructor
 {
-    public partial class Dashboard : System.Web.UI.Page
+    public partial class Dashboard : BaseRolePage
     {
+        protected override string RequiredRole => Constants.RoleInstructor;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                lblWelcomeInstructor.Text = "Welcome back, Instructor! Here is your latest activity.";
-                // lblPendingDiscussions.Text = "5";
-
-                var modules = new List<ModuleSummary>
-                {
-                    new ModuleSummary
-                    {
-                        Title = "CPR Fundamentals",
-                        Description = "Core life-saving techniques for adult and pediatric CPR.",
-                        Level = "Beginner",
-                        Status = "Published",
-                        LessonCount = 6,
-                        LearnerCount = 124,
-                        LastUpdated = "today"
-                    },
-                    new ModuleSummary
-                    {
-                        Title = "Choking & Airway Emergencies",
-                        Description = "Assess and manage airway obstruction scenarios.",
-                        Level = "Intermediate",
-                        Status = "Pending Review",
-                        LessonCount = 4,
-                        LearnerCount = 76,
-                        LastUpdated = "yesterday"
-                    },
-                    new ModuleSummary
-                    {
-                        Title = "Trauma Response",
-                        Description = "Immediate care protocols for bleeding, fractures, and shock.",
-                        Level = "Advanced",
-                        Status = "Draft",
-                        LessonCount = 8,
-                        LearnerCount = 52,
-                        LastUpdated = "2 days ago"
-                    }
-                };
-
-                rptMyModules.DataSource = modules;
-                rptMyModules.DataBind();
+                int userId = AuthHelper.GetUserId();
+                lblWelcomeInstructor.Text = "Welcome back, " + AuthHelper.GetName() + "! Here is your latest activity.";
+                lnkCreateModule.NavigateUrl    = "~/Instructor/Modules/Edit.aspx";
+                lnkGenerateWithAI.NavigateUrl  = "~/Instructor/Quizzes/GenerateWithAI.aspx";
+                BindModules(userId);
             }
+        }
+
+        private void BindModules(int userId)
+        {
+            var rows = new List<ModuleSummary>();
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+                var cmd = new SqlCommand(@"
+                    SELECT  m.ModuleId, m.Title, m.Description, m.DifficultyLevel, m.Status,
+                            (SELECT COUNT(*) FROM Lessons  l WHERE l.ModuleId = m.ModuleId)           AS LessonCount,
+                            (SELECT COUNT(*) FROM Enrollments e WHERE e.ModuleId = m.ModuleId)        AS LearnerCount,
+                            m.CreatedAt
+                    FROM    Modules m
+                    WHERE   m.CreatedBy = @UserId AND m.IsDeleted = 0
+                    ORDER BY m.CreatedAt DESC", conn);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        rows.Add(new ModuleSummary {
+                            ModuleId     = (int)r["ModuleId"],
+                            Title        = r["Title"].ToString(),
+                            Description  = r["Description"] == DBNull.Value ? "" : r["Description"].ToString(),
+                            Level        = r["DifficultyLevel"] == DBNull.Value ? "—" : r["DifficultyLevel"].ToString(),
+                            Status       = r["Status"].ToString(),
+                            LessonCount  = (int)r["LessonCount"],
+                            LearnerCount = (int)r["LearnerCount"],
+                            LastUpdated  = ((DateTime)r["CreatedAt"]).ToString("dd MMM yyyy")
+                        });
+            }
+            rptMyModules.DataSource = rows.Count > 0 ? (object)rows : new[] {
+                new ModuleSummary { Title = "No modules yet — create your first one!", Status = "Draft", Level = "—", LessonCount = 0, LearnerCount = 0, LastUpdated = "—" }
+            };
+            rptMyModules.DataBind();
         }
 
         private class ModuleSummary
         {
-            public string Title { get; set; }
-            public string Description { get; set; }
-            public string Level { get; set; }
-            public string Status { get; set; }
-            public int LessonCount { get; set; }
-            public int LearnerCount { get; set; }
-            public string LastUpdated { get; set; }
+            public int    ModuleId, LessonCount, LearnerCount;
+            public string Title, Description, Level, Status, LastUpdated;
         }
     }
 }

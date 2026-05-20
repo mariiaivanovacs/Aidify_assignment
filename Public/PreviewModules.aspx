@@ -14,7 +14,13 @@
 
     <section class="module-section">
         <div class="container">
-            <div class="row">
+            <!-- Real modules from DB -->
+            <div class="row" id="liveModulesRow">
+                <div class="col-12 text-center text-muted py-3">Loading modules…</div>
+            </div>
+
+            <!-- Static fallback content kept below -->
+            <div class="row" style="display:none;">
 
                 <!-- Burns -->
                 <div class="col-md-4">
@@ -145,5 +151,33 @@
 
         </div>
     </section>
+
+<script type="text/javascript">
+$.ajax({
+    type:'POST', url:'PreviewModules.aspx/GetPreviewModules', data:'{}',
+    contentType:'application/json; charset=utf-8', dataType:'json',
+    success: function(r) {
+        var modules = r.d;
+        var row = document.getElementById('liveModulesRow');
+        if (!modules || modules.length === 0) {
+            row.innerHTML = '<div class="col-12 text-center text-muted py-3">No published modules yet. Check back soon!</div>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < modules.length; i++) {
+            var m = modules[i];
+            html += '<div class="col-md-4"><div class="module-card">' +
+                '<h4>' + esc(m.title) + '</h4>' +
+                '<p>' + esc(m.description) + '</p>' +
+                '<span>' + esc(m.difficulty) + '</span>' +
+                '<a href="../Auth/Register.aspx" class="btn btn-sm btn-aidify mt-3">Register to Access</a>' +
+                '</div></div>';
+        }
+        row.innerHTML = html;
+    },
+    error: function() { document.getElementById('liveModulesRow').innerHTML = ''; }
+});
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
 
 </asp:Content>

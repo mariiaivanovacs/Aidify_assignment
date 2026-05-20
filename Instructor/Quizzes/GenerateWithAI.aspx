@@ -898,8 +898,8 @@
             <div class="instructor-mini">
                 <div class="avatar">M</div>
                 <div>
-                    <div class="mini-name">Dr. Sarah Mitchell</div>
-                    <div class="mini-role">Lead Medical Instructor</div>
+                    <div class="mini-name"><%: Aidify_assigment.AuthHelper.GetName() %></div>
+                    <div class="mini-role"><%: Aidify_assigment.AuthHelper.GetRole() %></div>
                 </div>
             </div>
         </aside>

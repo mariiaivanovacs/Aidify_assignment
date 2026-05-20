@@ -42,15 +42,15 @@
             <div class="row text-center">
                 <div class="col-md-4">
                     <div class="stat-card">
-                        <h2>4+</h2>
-                        <p>Preview Modules</p>
+                        <h2 id="statTotalModules">4+</h2>
+                        <p>Published Modules</p>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="stat-card">
-                        <h2>10+</h2>
-                        <p>Practice Questions</p>
+                        <h2 id="statTotalAttempts">10+</h2>
+                        <p>Quiz Attempts</p>
                     </div>
                 </div>
 
@@ -72,42 +72,8 @@
                 <p>Explore selected first aid topics before registering for full access.</p>
             </div>
 
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="module-card">
-                        <h4>CPR Awareness</h4>
-                        <p>Learn basic CPR awareness and emergency response steps.</p>
-                        <span>Beginner • 30 mins</span>
-                        <a href="Public/PreviewModules.aspx" class="btn btn-sm btn-aidify mt-3">Preview</a>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="module-card">
-                        <h4>Burns</h4>
-                        <p>Understand basic burn response and safety precautions.</p>
-                        <span>Beginner • 20 mins</span>
-                        <a href="Public/PreviewModules.aspx" class="btn btn-sm btn-aidify mt-3">Preview</a>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="module-card">
-                        <h4>Choking</h4>
-                        <p>Learn how to identify choking emergencies and respond safely.</p>
-                        <span>Beginner • 25 mins</span>
-                        <a href="Public/PreviewModules.aspx" class="btn btn-sm btn-aidify mt-3">Preview</a>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="module-card locked-card">
-                        <h4>Fractures</h4>
-                        <p>Learn basic fracture care and when to seek professional help.</p>
-                        <span>Locked • Register to unlock</span>
-                        <a href="Auth/Register.aspx" class="btn btn-sm btn-outline-aidify mt-3">Register</a>
-                    </div>
-                </div>
+            <div class="row" id="homeModuleRow">
+                <div class="col-12 text-center text-muted py-3">Loading modules…</div>
             </div>
         </div>
     </section>
@@ -148,5 +114,34 @@
             </div>
         </div>
     </section>
+
+<script type="text/javascript">
+$.ajax({
+    type:'POST', url:'Default.aspx/GetHomeData', data:'{}',
+    contentType:'application/json; charset=utf-8', dataType:'json',
+    success: function(r) {
+        var d = r.d;
+        document.getElementById('statTotalModules').textContent  = d.modules.length + '+';
+        document.getElementById('statTotalAttempts').textContent = d.totalAttempts > 0 ? d.totalAttempts + '+' : '10+';
+        var row = document.getElementById('homeModuleRow');
+        if (!d.modules || d.modules.length === 0) {
+            row.innerHTML = '<div class="col-12 text-center text-muted py-3">No modules available yet.</div>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < d.modules.length; i++) {
+            var m = d.modules[i];
+            html += '<div class="col-md-4"><div class="module-card">' +
+                '<h4>' + esc(m.title) + '</h4>' +
+                '<p>' + esc(m.description) + '</p>' +
+                '<span>' + esc(m.difficulty) + '</span>' +
+                '<a href="Public/PreviewModules.aspx?moduleId=' + m.moduleId + '" class="btn btn-sm btn-aidify mt-3">Preview</a>' +
+                '</div></div>';
+        }
+        row.innerHTML = html;
+    }
+});
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
 
 </asp:Content>

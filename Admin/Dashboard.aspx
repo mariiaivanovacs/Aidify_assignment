@@ -423,8 +423,8 @@
                     <i class="bi bi-bell fs-5"></i>
 
                     <div class="text-end d-none d-md-block">
-                        <div class="fw-bold">Dr. Sarah Chen</div>
-                        <small class="text-muted">System Administrator</small>
+                        <div class="fw-bold"><%: Aidify_assigment.AuthHelper.GetName() %></div>
+                        <small class="text-muted"><%: Aidify_assigment.AuthHelper.GetRole() %></small>
                     </div>
 
                     <div class="admin-avatar">A</div>

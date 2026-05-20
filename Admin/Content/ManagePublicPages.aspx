@@ -274,7 +274,7 @@
                 </div>
                 <div class="border-top pt-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <small class="text-muted">Last updated: <strong>Oct 24, 2026</strong></small>
+                        <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Default.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
                             <button class="btn btn-aidify">
                                 <i class="bi bi-pencil-square me-1"></i> Edit
@@ -305,7 +305,7 @@
                 </div>
                 <div class="border-top pt-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <small class="text-muted">Last updated: <strong>Nov 02, 2026</strong></small>
+                        <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/About.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
                             <button class="btn btn-aidify">
                                 <i class="bi bi-pencil-square me-1"></i> Edit
@@ -336,7 +336,7 @@
                 </div>
                 <div class="border-top pt-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <small class="text-muted">Last updated: <strong>Oct 12, 2026</strong></small>
+                        <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/FAQ.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
                             <button class="btn btn-aidify">
                                 <i class="bi bi-pencil-square me-1"></i> Edit
@@ -367,7 +367,7 @@
                 </div>
                 <div class="border-top pt-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <small class="text-muted">Last updated: <strong>Sep 30, 2026</strong></small>
+                        <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/Contact.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
                             <button class="btn btn-aidify">
                                 <i class="bi bi-pencil-square me-1"></i> Edit
@@ -398,7 +398,7 @@
                 </div>
                 <div class="border-top pt-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <small class="text-muted">Last updated: <strong>Nov 10, 2026</strong></small>
+                        <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/EmergencyAwareness.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
                             <button class="btn btn-aidify">
                                 <i class="bi bi-pencil-square me-1"></i> Edit
@@ -429,7 +429,7 @@
                 </div>
                 <div class="border-top pt-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <small class="text-muted">Last updated: <strong>Oct 28, 2026</strong></small>
+                        <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/PreviewModules.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
                             <button class="btn btn-aidify">
                                 <i class="bi bi-pencil-square me-1"></i> Edit
@@ -460,7 +460,7 @@
                 </div>
                 <div class="border-top pt-4">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <small class="text-muted">Last updated: <strong>Nov 15, 2026</strong></small>
+                        <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/PreviewQuiz.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
                             <button class="btn btn-aidify">
                                 <i class="bi bi-pencil-square me-1"></i> Edit

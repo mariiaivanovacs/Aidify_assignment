@@ -29,6 +29,30 @@ namespace Aidify_assigment.Admin
             };
         }
 
+        // Returns the last 5 audit log entries for the Recent Activity table.
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(UseHttpGet = false)]
+        public static object GetRecentActivity()
+        {
+            if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
+                return null;
+            var logs = new AdminRepository().GetAuditLogs(withinHours: 168);
+            int take = System.Math.Min(5, logs.Count);
+            var result = new System.Collections.Generic.List<object>();
+            for (int i = 0; i < take; i++)
+            {
+                var l = logs[i];
+                result.Add(new {
+                    action        = l.Action,
+                    targetEntity  = l.TargetEntity,
+                    timestamp     = l.Timestamp,
+                    actorName     = l.ActorName,
+                    actorInitials = l.ActorInitials
+                });
+            }
+            return result;
+        }
+
         // Called via $.ajax() from the AI summary card on the dashboard.
         // Returns the daily insight string (cached 24 h server-side).
         [WebMethod(EnableSession = true)]

@@ -635,6 +635,39 @@
                     });
                 </script>
 
+                <script type="text/javascript">
+                $.ajax({
+                    type:'POST', url:'Dashboard.aspx/GetRecentActivity',
+                    data:'{}', contentType:'application/json; charset=utf-8', dataType:'json',
+                    success: function(r) {
+                        var rows = r.d, body = document.getElementById('activityTableBody');
+                        if (!rows || rows.length === 0) {
+                            body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No activity yet.</td></tr>';
+                            return;
+                        }
+                        var chips = ['bg-primary-subtle text-primary','bg-danger-subtle text-danger',
+                                     'bg-success-subtle text-success','bg-warning-subtle text-warning',
+                                     'bg-info-subtle text-info'];
+                        var html = '';
+                        for (var i = 0; i < rows.length; i++) {
+                            var l = rows[i];
+                            var dt = new Date(parseInt(l.timestamp.replace('/Date(','').replace(')/',''))).toLocaleTimeString();
+                            var chip = chips[i % chips.length];
+                            html += '<tr>' +
+                                '<td><span class="user-chip ' + chip + '">' + esc(l.actorInitials) + '</span>' +
+                                '<strong>' + esc(l.actorName) + '</strong></td>' +
+                                '<td>' + esc(l.action) + '</td>' +
+                                '<td>' + esc(l.targetEntity || '—') + '</td>' +
+                                '<td>' + dt + '</td>' +
+                                '<td><span class="badge bg-success-subtle text-success">Done</span></td>' +
+                                '<td><i class="bi bi-three-dots-vertical"></i></td></tr>';
+                        }
+                        body.innerHTML = html;
+                    }
+                });
+                function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+                </script>
+
                 <!-- Chart + Alerts -->
                 <div class="row g-4 mb-4">
                     <div class="col-lg-8">
@@ -737,48 +770,8 @@
                                 </tr>
                             </thead>
 
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <span class="user-chip bg-primary-subtle text-primary">MK</span>
-                                        <strong>Mark Kovacs</strong>
-                                        <br />
-                                        <small class="text-muted ms-5">m.kovacs@email.com</small>
-                                    </td>
-                                    <td>Module Completed</td>
-                                    <td><span class="badge bg-light text-dark border">Basic CPR 101</span></td>
-                                    <td>10:24 AM</td>
-                                    <td><span class="badge bg-success-subtle text-success">Success</span></td>
-                                    <td><i class="bi bi-three-dots-vertical"></i></td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <span class="user-chip bg-danger-subtle text-danger">AS</span>
-                                        <strong>Anita Singh</strong>
-                                        <br />
-                                        <small class="text-muted ms-5">anita.s@hospital.org</small>
-                                    </td>
-                                    <td>New User Registered</td>
-                                    <td>—</td>
-                                    <td>09:15 AM</td>
-                                    <td><span class="badge bg-info-subtle text-info">Pending Ver.</span></td>
-                                    <td><i class="bi bi-three-dots-vertical"></i></td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <span class="user-chip bg-info-subtle text-info">JD</span>
-                                        <strong>James Doe</strong>
-                                        <br />
-                                        <small class="text-muted ms-5">james@provider.net</small>
-                                    </td>
-                                    <td>Certification Failed</td>
-                                    <td><span class="badge bg-light text-dark border">Advanced Trauma</span></td>
-                                    <td>08:50 AM</td>
-                                    <td><span class="badge bg-danger-subtle text-danger">Retry Available</span></td>
-                                    <td><i class="bi bi-three-dots-vertical"></i></td>
-                                </tr>
+                            <tbody id="activityTableBody">
+                                <tr><td colspan="6" class="text-center text-muted py-3">Loading activity…</td></tr>
                             </tbody>
                         </table>
                     </div>

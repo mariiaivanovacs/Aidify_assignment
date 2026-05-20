@@ -12,6 +12,16 @@ namespace Aidify_assigment.Admin
 
         protected void Page_Load(object sender, EventArgs e) { }
 
+        // Returns real active-learner count for the stat mini-box.
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(UseHttpGet = false)]
+        public static int? GetActiveLearners()
+        {
+            if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
+                return null;
+            return new AdminRepository().GetPlatformStats().ActiveLearners;
+        }
+
         // Called via jQuery $.ajax() from the chat widget in AI_Insights.aspx.
         // Returns plain-text AI answer wrapped in {"d": "..."} by ASP.NET.
         [WebMethod(EnableSession = true)]

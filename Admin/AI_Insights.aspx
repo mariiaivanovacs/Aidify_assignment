@@ -400,7 +400,7 @@
                     <div class="stat-mini-label">Active Learners</div>
                     <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-people-fill" style="color:#4B50C7;"></i>
-                        <span class="h5 mb-0 fw-bold">1,284 Online</span>
+                        <span class="h5 mb-0 fw-bold" id="aiActiveLearners">— Online</span>
                     </div>
                 </div>
             </div>
@@ -526,5 +526,13 @@
         <p class="text-muted small mb-0 text-center">© 2026 Aidify Admin Panel. Educational use only.</p>
     </div>
 </footer>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $.ajax({type:"POST",url:"AI_Insights.aspx/GetActiveLearners",data:"{}",
+    contentType:"application/json; charset=utf-8",dataType:"json",
+    success:function(r){if(r.d!=null)document.getElementById("aiActiveLearners").textContent=r.d.toLocaleString()+" Online";}});
+});
+</script>
 
 </asp:Content>

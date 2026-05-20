@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using System.Drawing;
 
 namespace Aidify_assigment.Auth
 {
@@ -12,6 +8,19 @@ namespace Aidify_assigment.Auth
         protected void Page_Load(object sender, EventArgs e)
         {
 
+        }
+
+        protected void btnVerify_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCode.Text))
+            {
+                lblMessage.ForeColor = Color.Red;
+                lblMessage.Text = "Please enter the verification code.";
+                return;
+            }
+
+            lblMessage.ForeColor = Color.Green;
+            lblMessage.Text = "Email verified successfully.";
         }
     }
 }

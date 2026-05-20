@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using System.Drawing;
 
 namespace Aidify_assigment.Auth
 {
@@ -12,6 +8,19 @@ namespace Aidify_assigment.Auth
         protected void Page_Load(object sender, EventArgs e)
         {
 
+        }
+
+        protected void btnReset_Click(object sender, EventArgs e)
+        {
+            if (txtNewPassword.Text != txtConfirmPassword.Text)
+            {
+                lblMessage.ForeColor = Color.Red;
+                lblMessage.Text = "Passwords do not match.";
+                return;
+            }
+
+            lblMessage.ForeColor = Color.Green;
+            lblMessage.Text = "Password reset successfully.";
         }
     }
 }

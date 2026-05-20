@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using System.Drawing;
 
 namespace Aidify_assigment.Auth
 {
@@ -12,6 +8,12 @@ namespace Aidify_assigment.Auth
         protected void Page_Load(object sender, EventArgs e)
         {
 
+        }
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            lblMessage.ForeColor = System.Drawing.Color.Green;
+            lblMessage.Text = "If this email exists in our system, a reset link will be sent.";
         }
     }
 }

@@ -1,6 +1,9 @@
 // PASSWORD HASHING: currently using plain-text comparison for development.
 // See HASHING_GUIDE.md to add BCrypt when ready — no other files need changing.
 using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Net.Http;
 
 namespace Aidify_assigment
 {
@@ -32,6 +35,31 @@ namespace Aidify_assigment
         public bool IsAccountLocked(string email)
         {
             return _repo.GetRecentFailCount(email, withinMinutes: 15) >= 5;
+        }
+
+        // reCAPTCHA v2 server-side verify. Returns true in dev when key is a placeholder.
+        public bool VerifyRecaptcha(string responseToken)
+        {
+            string secret = ConfigurationManager.AppSettings["RecaptchaSecretKey"] ?? "";
+            if (string.IsNullOrEmpty(secret) || secret.StartsWith("YOUR_"))
+                return true;  // dev mode: skip check
+            if (string.IsNullOrWhiteSpace(responseToken)) return false;
+            try
+            {
+                using (var http = new HttpClient())
+                {
+                    var resp = http.PostAsync(
+                        "https://www.google.com/recaptcha/api/siteverify",
+                        new FormUrlEncodedContent(new[] {
+                            new KeyValuePair<string,string>("secret",   secret),
+                            new KeyValuePair<string,string>("response", responseToken)
+                        })).GetAwaiter().GetResult();
+                    var json   = resp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    var parsed = Newtonsoft.Json.Linq.JObject.Parse(json);
+                    return parsed["success"]?.Value<bool>() ?? false;
+                }
+            }
+            catch { return true; }  // network failure → don't block users
         }
 
         public string CreateEmailToken(int userId, string purpose, int expiryHours = 24)

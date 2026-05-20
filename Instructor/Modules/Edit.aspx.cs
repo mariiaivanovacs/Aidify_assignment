@@ -65,7 +65,10 @@ namespace Aidify_assigment.Instructor.Modules
             string title  = txtModuleTitle.Text.Trim();
             string desc   = txtModuleDescription.Text.Trim();
             string diff   = ddlDifficulty.SelectedValue;
-            string status = ddlModuleStatus.SelectedValue;
+            // Map the UI "Submit for Review" option to the DB constant
+            string rawStatus = ddlModuleStatus.SelectedValue;
+            bool   submitting = rawStatus == "Submit for Review";
+            string status = submitting ? Constants.StatusPending : rawStatus;
             string cover  = null;
 
             if (fuCoverImage.HasFile)
@@ -124,7 +127,15 @@ namespace Aidify_assigment.Instructor.Modules
             }
 
             lblModuleStatus.CssClass = "text-success d-block";
-            lblModuleStatus.Text     = "Module saved successfully.";
+            lblModuleStatus.Text = submitting
+                ? "Module submitted for admin review."
+                : "Module saved successfully.";
+
+            // Notify all admins when instructor submits for review
+            if (submitting && ModuleId > 0)
+                NotifyAdmins("Module Pending Review",
+                    "\"" + title + "\" has been submitted for review.",
+                    "~/Admin/Content/ApprovalQueue.aspx");
         }
 
         protected void btnSaveAndAddLesson_Click(object sender, EventArgs e)
@@ -132,6 +143,21 @@ namespace Aidify_assigment.Instructor.Modules
             btnSaveModule_Click(sender, e);
             if (ModuleId > 0 && lblModuleStatus.Text.Contains("successfully"))
                 Response.Redirect("~/Instructor/Lessons/Edit.aspx?moduleId=" + ModuleId, false);
+        }
+
+        private static void NotifyAdmins(string title, string body, string url)
+        {
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+                var cmd = new SqlCommand(@"
+                    SELECT u.UserId FROM Users u
+                    JOIN   Roles r ON r.RoleId = u.RoleId
+                    WHERE  r.RoleName = 'Admin' AND u.IsActive = 1", conn);
+                using (var r = cmd.ExecuteReader())
+                    while (r.Read())
+                        NotificationService.Push((int)r["UserId"], title, body, url);
+            }
         }
 
         protected void btnCancel_Click(object sender, EventArgs e)

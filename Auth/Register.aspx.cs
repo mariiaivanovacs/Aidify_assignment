@@ -27,9 +27,17 @@ namespace Aidify_assigment.Auth
             }
 
             string fullName = txtFullName.Text.Trim();
-            string email = txtEmail.Text.Trim().ToLower();
+            string email    = txtEmail.Text.Trim().ToLower();
             string password = txtPassword.Text;
-            var auth = new AuthService();
+            var auth        = new AuthService();
+
+            // reCAPTCHA check — silently passes if secret key is still the dev placeholder
+            if (!auth.VerifyRecaptcha(Request.Form["g-recaptcha-response"]))
+            {
+                lblError.Text    = "Please complete the CAPTCHA.";
+                lblError.Visible = true;
+                return;
+            }
 
             try
             {

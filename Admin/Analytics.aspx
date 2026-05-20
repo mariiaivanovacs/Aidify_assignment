@@ -383,10 +383,10 @@
                 </p>
             </div>
             <div class="col-md-4 d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
-                <button class="btn-export-csv">
-                    <i class="bi bi-download"></i> Export CSV
-                </button>
-                <button class="btn-export-pdf">
+                <a href="Analytics.aspx?export=users_csv" class="btn-export-csv">
+                    <i class="bi bi-download"></i> Export Users CSV
+                </a>
+                <button class="btn-export-pdf" disabled title="PDF export requires Rotativa NuGet (install via VS)">
                     <i class="bi bi-file-earmark-pdf"></i> Export PDF
                 </button>
             </div>
@@ -449,7 +449,7 @@
                 <div class="analytics-card">
                     <span class="mini-label">Completion Rate</span>
                     <div class="d-flex align-items-baseline gap-2">
-                        <div class="stat-number">74.2%</div>
+                        <div class="stat-number" id="anCompletionRate">—</div>
                         <small class="text-muted fw-bold">Steady</small>
                     </div>
                 </div>
@@ -567,9 +567,10 @@ $(document).ready(function () {
             var d = r.d;
 
             // Stat cards
-            document.getElementById('anTotalUsers').textContent     = d.totalUsers.toLocaleString();
-            document.getElementById('anActiveLearners').textContent = d.activeLearners.toLocaleString();
-            document.getElementById('anTotalAttempts').textContent  = d.totalAttempts.toLocaleString();
+            document.getElementById('anTotalUsers').textContent      = d.totalUsers.toLocaleString();
+            document.getElementById('anActiveLearners').textContent  = d.activeLearners.toLocaleString();
+            document.getElementById('anTotalAttempts').textContent   = d.totalAttempts.toLocaleString();
+            document.getElementById('anCompletionRate').textContent  = d.completionRate + '%';
 
             // Bar chart — quiz attempts per module (top 7)
             var labels = [], values = [];

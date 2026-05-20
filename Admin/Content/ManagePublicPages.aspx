@@ -276,12 +276,12 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Default.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-aidify">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-outline-secondary">
+                            <a href="~/Default.aspx" target="_blank" class="btn btn-aidify">
+                                <i class="bi bi-pencil-square me-1"></i> View Page
+                            </a>
+                            <a href="~/Default.aspx" target="_blank" class="btn btn-outline-secondary">
                                 <i class="bi bi-eye me-1"></i> Preview
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -307,12 +307,12 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/About.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-aidify">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-outline-secondary">
+                            <a href="~/Public/About.aspx" target="_blank" class="btn btn-aidify">
+                                <i class="bi bi-pencil-square me-1"></i> View Page
+                            </a>
+                            <a href="~/Public/About.aspx" target="_blank" class="btn btn-outline-secondary">
                                 <i class="bi bi-eye me-1"></i> Preview
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -338,12 +338,12 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/FAQ.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-aidify">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-outline-secondary">
+                            <a href="~/Public/FAQ.aspx" target="_blank" class="btn btn-aidify">
+                                <i class="bi bi-pencil-square me-1"></i> View Page
+                            </a>
+                            <a href="~/Public/FAQ.aspx" target="_blank" class="btn btn-outline-secondary">
                                 <i class="bi bi-eye me-1"></i> Preview
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -369,12 +369,12 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/Contact.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-aidify">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-outline-secondary">
+                            <a href="~/Public/Contact.aspx" target="_blank" class="btn btn-aidify">
+                                <i class="bi bi-pencil-square me-1"></i> View Page
+                            </a>
+                            <a href="~/Public/Contact.aspx" target="_blank" class="btn btn-outline-secondary">
                                 <i class="bi bi-eye me-1"></i> Preview
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -400,12 +400,12 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/EmergencyAwareness.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-aidify">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-outline-secondary">
+                            <a href="~/Public/EmergencyAwareness.aspx" target="_blank" class="btn btn-aidify">
+                                <i class="bi bi-pencil-square me-1"></i> View Page
+                            </a>
+                            <a href="~/Public/EmergencyAwareness.aspx" target="_blank" class="btn btn-outline-secondary">
                                 <i class="bi bi-eye me-1"></i> Preview
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -431,12 +431,12 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/PreviewModules.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-aidify">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-outline-secondary">
+                            <a href="~/Public/PreviewModules.aspx" target="_blank" class="btn btn-aidify">
+                                <i class="bi bi-pencil-square me-1"></i> View Page
+                            </a>
+                            <a href="~/Public/PreviewModules.aspx" target="_blank" class="btn btn-outline-secondary">
                                 <i class="bi bi-eye me-1"></i> Preview
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -462,12 +462,12 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <small class="text-muted">Last updated: <strong><%: System.IO.File.GetLastWriteTime(Server.MapPath("~/Public/PreviewQuiz.aspx")).ToString("MMM dd, yyyy") %></strong></small>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-aidify">
-                                <i class="bi bi-pencil-square me-1"></i> Edit
-                            </button>
-                            <button class="btn btn-outline-secondary">
+                            <a href="~/Public/PreviewQuiz.aspx" target="_blank" class="btn btn-aidify">
+                                <i class="bi bi-pencil-square me-1"></i> View Page
+                            </a>
+                            <a href="~/Public/PreviewQuiz.aspx" target="_blank" class="btn btn-outline-secondary">
                                 <i class="bi bi-eye me-1"></i> Preview
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

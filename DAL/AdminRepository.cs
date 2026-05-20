@@ -23,6 +23,7 @@ namespace Aidify_assigment
         public string StatusLabel  { get; set; }
         public string Initials     { get; set; }
         public string RoleBadgeCss { get; set; }
+        public string LastActive   { get; set; }
     }
 
     public class AuditLogDto
@@ -86,7 +87,10 @@ namespace Aidify_assigment
             {
                 conn.Open();
                 var cmd = new SqlCommand(@"
-                    SELECT u.UserId, u.FullName, u.Email, r.RoleName, u.IsActive
+                    SELECT u.UserId, u.FullName, u.Email, r.RoleName, u.IsActive,
+                           (SELECT MAX(lh.Timestamp)
+                            FROM   LoginHistory lh
+                            WHERE  lh.UserId = u.UserId AND lh.Success = 1) AS LastLogin
                     FROM   Users u
                     JOIN   Roles r ON r.RoleId = u.RoleId
                     WHERE  (@Search IS NULL OR u.FullName LIKE @Search OR u.Email LIKE @Search)
@@ -327,10 +331,23 @@ namespace Aidify_assigment
             };
             dto.StatusLabel  = dto.IsActive ? "Active" : "Disabled";
             dto.Initials     = Initials(dto.FullName);
+            dto.LastActive   = r["LastLogin"] == DBNull.Value
+                ? "Never"
+                : RelativeTime((DateTime)r["LastLogin"]);
             dto.RoleBadgeCss = dto.RoleName == Constants.RoleAdmin      ? "role-admin"
                              : dto.RoleName == Constants.RoleInstructor  ? "role-instructor"
                              : "role-learner";
             return dto;
+        }
+
+        private static string RelativeTime(DateTime utc)
+        {
+            var diff = DateTime.UtcNow - utc;
+            if (diff.TotalMinutes < 2)   return "Just now";
+            if (diff.TotalMinutes < 60)  return (int)diff.TotalMinutes + " mins ago";
+            if (diff.TotalHours  < 24)   return (int)diff.TotalHours   + " hours ago";
+            if (diff.TotalDays   < 7)    return (int)diff.TotalDays    + " days ago";
+            return utc.ToLocalTime().ToString("dd MMM yyyy");
         }
 
         private static string Initials(string name)

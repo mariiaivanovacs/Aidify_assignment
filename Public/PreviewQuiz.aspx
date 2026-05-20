@@ -90,97 +90,9 @@
                             </div>
                         </div>
 
-                        <!-- Question 1 -->
-                        <div class="quiz-question-card">
-                            <h3>
-                                What should you do first before helping someone in an emergency?
-                            </h3>
-
-                            <div class="quiz-options">
-
-                                <label>
-                                    <input type="radio" name="q1" />
-                                    Check that the scene is safe.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q1" />
-                                    Move the person immediately.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q1" />
-                                    Give them food or drink.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q1" />
-                                    Leave the area without calling for help.
-                                </label>
-
-                            </div>
-                        </div>
-
-                        <!-- Question 2 -->
-                        <div class="quiz-question-card">
-                            <h3>
-                                Which action is important when calling emergency services?
-                            </h3>
-
-                            <div class="quiz-options">
-
-                                <label>
-                                    <input type="radio" name="q2" />
-                                    Give clear location and situation details.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q2" />
-                                    Speak as fast as possible without details.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q2" />
-                                    Hang up immediately after calling.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q2" />
-                                    Wait until the person feels better.
-                                </label>
-
-                            </div>
-                        </div>
-
-                        <!-- Question 3 -->
-                        <div class="quiz-question-card">
-                            <h3>
-                                What is the purpose of basic first aid awareness?
-                            </h3>
-
-                            <div class="quiz-options">
-
-                                <label>
-                                    <input type="radio" name="q3" />
-                                    To provide safe initial support before professional help arrives.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q3" />
-                                    To replace doctors and emergency responders.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q3" />
-                                    To avoid calling emergency services.
-                                </label>
-
-                                <label>
-                                    <input type="radio" name="q3" />
-                                    To perform advanced medical procedures.
-                                </label>
-
-                            </div>
+                        <!-- Questions loaded from DB via WebMethod -->
+                        <div id="previewQuestionsContainer">
+                            <p class="text-muted">Loading questions…</p>
                         </div>
 
                         <!-- Submit Button -->
@@ -241,18 +153,47 @@
     </section>
 
     <script>
+        var questionsLoaded = false;
 
         function showQuiz() {
-
             document.getElementById("quizSection").style.display = "block";
-
-            document.getElementById("quizSection")
-                .scrollIntoView({
-                    behavior: "smooth"
-                });
-
+            document.getElementById("quizSection").scrollIntoView({ behavior: "smooth" });
+            if (!questionsLoaded) loadPreviewQuestions();
         }
 
+        function loadPreviewQuestions() {
+            $.ajax({
+                type: 'POST', url: 'PreviewQuiz.aspx/GetPreviewQuestions',
+                data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
+                success: function (r) {
+                    questionsLoaded = true;
+                    var qs = r.d;
+                    var container = document.getElementById('previewQuestionsContainer');
+                    if (!qs || qs.length === 0) {
+                        container.innerHTML = '<p class="text-muted">No preview questions available yet.</p>';
+                        return;
+                    }
+                    var html = '';
+                    for (var i = 0; i < qs.length; i++) {
+                        var q = qs[i];
+                        html += '<div class="quiz-question-card"><h3>' + esc(q.questionText) + '</h3><div class="quiz-options">';
+                        for (var j = 0; j < q.options.length; j++) {
+                            html += '<label><input type="radio" name="pq' + q.questionId + '" value="' + j + '" /> ' + esc(q.options[j]) + '</label>';
+                        }
+                        html += '</div></div>';
+                    }
+                    container.innerHTML = html;
+                },
+                error: function () {
+                    document.getElementById('previewQuestionsContainer').innerHTML =
+                        '<p class="text-muted">Could not load questions. Please try again.</p>';
+                }
+            });
+        }
+
+        function esc(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
     </script>
 
 </asp:Content>

@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Web.UI.WebControls;
 using Aidify_assigment;
 
@@ -30,6 +31,13 @@ namespace Aidify_assigment.Admin.Users
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Handle force-reset postback before the IsPostBack guard
+            if (IsPostBack && Request.Form["forceReset"] == "1")
+            {
+                HandleForceReset();
+                return;
+            }
+
             if (IsPostBack) return;
 
             ShowFlash();
@@ -83,6 +91,39 @@ namespace Aidify_assigment.Admin.Users
             catch
             {
                 SetFlash("An error occurred. Please try again.", "danger");
+            }
+
+            DoRedirect();
+        }
+
+        private void HandleForceReset()
+        {
+            int userId;
+            if (!int.TryParse(Request.QueryString["userId"], out userId)) { DoRedirect(); return; }
+
+            try
+            {
+                var user = _repo.GetUserById(userId);
+                if (user == null) { SetFlash("User not found.", "danger"); DoRedirect(); return; }
+
+                var auth   = new AuthService();
+                string token   = auth.CreateEmailToken(userId, "Reset", expiryHours: 24);
+                string siteUrl = ConfigurationManager.AppSettings["SiteUrl"]
+                                 ?? Request.Url.GetLeftPart(UriPartial.Authority);
+                string link = siteUrl + ResolveUrl("~/Auth/ResetPassword.aspx") + "?t=" + token;
+
+                EmailService.Send(user.Email,
+                    "Your Aidify password has been reset by an administrator",
+                    $"<p>Hi {Server.HtmlEncode(user.FullName)},</p>" +
+                    $"<p>An administrator has initiated a password reset for your account.</p>" +
+                    $"<p><a href='{link}'>Click here to set a new password</a> (link valid for 24 hours).</p>");
+
+                AuditService.Log(AuthHelper.GetUserId(), "ForceResetPassword", "Users", userId);
+                SetFlash("Password reset email sent to " + user.Email + ".", "success");
+            }
+            catch
+            {
+                SetFlash("Could not send reset email. Check SMTP settings.", "danger");
             }
 
             DoRedirect();

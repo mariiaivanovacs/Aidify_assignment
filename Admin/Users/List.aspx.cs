@@ -30,7 +30,8 @@ namespace Aidify_assigment.Admin.Users
                     roleName    = u.RoleName,
                     roleBadgeCss= u.RoleBadgeCss,
                     isActive    = u.IsActive,
-                    initials    = u.Initials
+                    initials    = u.Initials,
+                    lastActive  = u.LastActive
                 })
                 .ToList();
         }

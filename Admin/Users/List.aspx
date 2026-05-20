@@ -360,7 +360,7 @@ function loadUsers() {
                     '</td>' +
                     '<td><span class="role-badge ' + esc(u.roleBadgeCss) + '">' + esc(u.roleName) + '</span></td>' +
                     '<td><span class="status-dot ' + dotCss + '"></span>' + status + '</td>' +
-                    '<td><small class="text-muted">—</small></td>' +
+                    '<td><small class="text-muted">' + esc(u.lastActive) + '</small></td>' +
                     '<td class="text-end pe-4">' +
                         '<a href="Edit.aspx?userId=' + u.userId + '" class="text-dark me-3"><i class="bi bi-pencil"></i></a>' +
                         '<a href="#" class="' + (active ? 'text-danger' : 'text-success') + '" ' +

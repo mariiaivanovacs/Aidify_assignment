@@ -11,7 +11,17 @@ namespace Aidify_assigment.Admin
     {
         protected override string RequiredRole => Constants.RoleAdmin;
 
-        protected void Page_Load(object sender, EventArgs e) { }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["export"] == "users_csv")
+                ExportUsersCsv();
+        }
+
+        private void ExportUsersCsv()
+        {
+            var users = new AdminRepository().GetAllUsers();
+            ReportService.DownloadUsersCsv(Response, users);
+        }
 
         // Returns stats + chart data for the Analytics page.
         [WebMethod(EnableSession = true)]
@@ -25,10 +35,38 @@ namespace Aidify_assigment.Admin
 
             var attemptsByModule = new List<object>();
             var popularModules   = new List<object>();
+            decimal completionRate = 0;
 
             using (var conn = DbHelper.GetConnection())
             {
                 conn.Open();
+
+                // Completion rate = enrollments where all lessons done / total enrollments
+                var crCmd = new SqlCommand(@"
+                    SELECT
+                        COUNT(*) AS Total,
+                        SUM(CASE WHEN completed.EnrolId IS NOT NULL THEN 1 ELSE 0 END) AS Done
+                    FROM Enrollments e
+                    LEFT JOIN (
+                        SELECT e2.EnrolId
+                        FROM   Enrollments e2
+                        JOIN   Modules m ON m.ModuleId = e2.ModuleId AND m.IsDeleted = 0
+                        WHERE  (SELECT COUNT(*) FROM Lessons l WHERE l.ModuleId = e2.ModuleId) > 0
+                          AND  (SELECT COUNT(*) FROM Lessons l WHERE l.ModuleId = e2.ModuleId)
+                             = (SELECT COUNT(*) FROM Progress p
+                                JOIN Lessons l2 ON l2.LessonId = p.LessonId
+                                WHERE p.EnrolId = e2.EnrolId AND l2.ModuleId = e2.ModuleId)
+                    ) AS completed ON completed.EnrolId = e.EnrolId", conn);
+                using (var cr = crCmd.ExecuteReader())
+                {
+                    if (cr.Read())
+                    {
+                        int total = (int)cr["Total"];
+                        int done  = (int)cr["Done"];
+                        completionRate = total > 0
+                            ? System.Math.Round(done * 100m / total, 1) : 0;
+                    }
+                }
 
                 // Attempts per module — top 7 for bar chart
                 var cmd1 = new SqlCommand(@"
@@ -75,6 +113,7 @@ namespace Aidify_assigment.Admin
                 totalUsers      = stats.TotalUsers,
                 activeLearners  = stats.ActiveLearners,
                 totalAttempts   = stats.TotalAttempts,
+                completionRate,
                 attemptsByModule,
                 popularModules
             };

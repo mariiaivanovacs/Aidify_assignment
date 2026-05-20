@@ -168,6 +168,9 @@ namespace Aidify_assigment.Learner.Quiz
             Session.Remove("QuizCorrectMap");
             Session.Remove("QuizQuestionIds");
 
+            // Evaluate badge rules after every quiz submission
+            try { new BadgeService().Evaluate(userId); } catch { /* badge failure must never block redirect */ }
+
             Response.Redirect("~/Learner/Quiz/Results.aspx?attemptId=" + attemptId, false);
             Context.ApplicationInstance.CompleteRequest();
         }

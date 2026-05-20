@@ -346,6 +346,11 @@
 
                 <div class="d-flex justify-content-end gap-3">
                     <a href="List.aspx" class="btn-cancel">Cancel</a>
+                    <button type="submit" name="forceReset" value="1"
+                            class="btn btn-outline-danger px-4"
+                            onclick="return confirm('Send a password-reset link to this user?');">
+                        <i class="bi bi-key me-1"></i> Send Reset Link
+                    </button>
                     <asp:Button ID="btnSave" runat="server" Text="Save Changes" CssClass="btn btn-aidify px-4" />
                 </div>
 

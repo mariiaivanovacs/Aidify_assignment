@@ -1,8 +1,6 @@
-// REQUIRES: BCrypt.Net-Next NuGet package
-// Install via Visual Studio: Tools > NuGet Package Manager > Manage NuGet Packages for Solution
-// Search "BCrypt.Net-Next" and install. This file will not compile without it.
+// PASSWORD HASHING: currently using plain-text comparison for development.
+// See HASHING_GUIDE.md to add BCrypt when ready — no other files need changing.
 using System;
-using BCrypt.Net;
 
 namespace Aidify_assigment
 {
@@ -18,7 +16,7 @@ namespace Aidify_assigment
                 _repo.LogLoginAttempt(null, false, ipAddress);
                 return null;
             }
-            bool ok = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            bool ok = (password == user.PasswordHash);
             _repo.LogLoginAttempt(user.UserId, ok, ipAddress);
             if (!ok || !user.IsActive) return null;
             return user;
@@ -28,8 +26,7 @@ namespace Aidify_assigment
         {
             if (_repo.EmailExists(email))
                 throw new InvalidOperationException("An account with that email already exists.");
-            string hash = BCrypt.Net.BCrypt.HashPassword(password, workFactor: 11);
-            return _repo.Insert(fullName, email, hash, Constants.RoleLearner);
+            return _repo.Insert(fullName, email, password, Constants.RoleLearner);
         }
 
         public bool IsAccountLocked(string email)
@@ -57,8 +54,7 @@ namespace Aidify_assigment
         {
             var row = _repo.GetValidEmailToken(token, "Reset");
             if (row == null) return false;
-            string hash = BCrypt.Net.BCrypt.HashPassword(newPassword, workFactor: 11);
-            _repo.UpdatePasswordHash(Convert.ToInt32(row["UserId"]), hash);
+            _repo.UpdatePasswordHash(Convert.ToInt32(row["UserId"]), newPassword);
             _repo.MarkTokenUsed(Convert.ToInt32(row["TokenId"]));
             return true;
         }

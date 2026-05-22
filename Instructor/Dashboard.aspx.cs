@@ -57,8 +57,15 @@ namespace Aidify_assigment.Instructor
 
         private class ModuleSummary
         {
-            public int    ModuleId, LessonCount, LearnerCount;
-            public string Title, Description, Level, Status, LastUpdated;
+            public int ModuleId { get; set; }
+            public int LessonCount { get; set; }
+            public int LearnerCount { get; set; }
+
+            public string Title { get; set; }
+            public string Description { get; set; }
+            public string Level { get; set; }
+            public string Status { get; set; }
+            public string LastUpdated { get; set; }
         }
     }
 }

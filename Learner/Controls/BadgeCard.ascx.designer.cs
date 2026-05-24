@@ -7,38 +7,47 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace LearnerDash
+namespace LearnerDash.Learner.Controls
 {
 
 
-    public partial class SiteMaster
+    public partial class BadgeCard
     {
 
         /// <summary>
-        /// HeadContent control.
+        /// imgBadge control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder HeadContent;
+        protected global::System.Web.UI.WebControls.Image imgBadge;
 
         /// <summary>
-        /// NotificationBell1 control.
+        /// lblBadgeEmoji control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UserControl NotificationBell1;
+        protected global::System.Web.UI.WebControls.Label lblBadgeEmoji;
 
         /// <summary>
-        /// MainContent control.
+        /// lblBadgeName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
+        protected global::System.Web.UI.WebControls.Label lblBadgeName;
+
+        /// <summary>
+        /// lblAwardedDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblAwardedDate;
     }
 }

@@ -1,4 +1,5 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="LearnerDash.SiteMaster" %>
+<%@ Register Src="~/Learner/Controls/NotificationBell.ascx" TagName="NotificationBell" TagPrefix="uc" %>
 <!DOCTYPE html>
 <html lang="en">
 <head runat="server">
@@ -201,7 +202,7 @@
         <div class="topbar-title"><%: Page.Title %></div>
         <div class="topbar-right">
             <a runat="server" href="~/Learner/Notifications.aspx" class="topbar-icon">
-                <i class="bi bi-bell"></i>
+                <uc:NotificationBell ID="NotificationBell1" runat="server" />
             </a>
             <div class="avatar-circle">M</div>
         </div>

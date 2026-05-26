@@ -771,9 +771,10 @@
                     <span class="material-symbols-outlined">notifications</span>
                 </button>
 
-                <button type="button" class="topbar-icon">
-                    <span class="material-symbols-outlined">help_outline</span>
-                </button>
+                    <div>
+                        <div class="profile-name">Dr. Sarah Mitchell</div>
+                        <div class="profile-role">Lead Medical Instructor</div>
+                    </div>
 
                 <a href="#" class="profile-chip">
                     <img alt="Instructor"

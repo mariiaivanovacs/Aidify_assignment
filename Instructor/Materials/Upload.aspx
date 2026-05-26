@@ -804,11 +804,13 @@
 
     <div class="aidify-page">
 
-        <aside class="aidify-sidebar">
-            <div class="aidify-brand">
-                <h1>Aidify</h1>
-                <p>Instructor Portal</p>
-            </div>
+            <!-- Sidebar -->
+            <aside class="materials-sidebar">
+                <div class="instructor-block">
+                    <div class="instructor-name">Dr. Sarah Mitchell</div>
+                    <div class="instructor-role">Lead Medical Instructor</div>
+                    <div class="verified-text">Verified Educator</div>
+                </div>
 
             <nav class="aidify-nav">
                 <a href="/Instructor/Dashboard.aspx">

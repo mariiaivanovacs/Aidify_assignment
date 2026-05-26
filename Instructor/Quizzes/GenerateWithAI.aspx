@@ -622,18 +622,14 @@
             </a>
         </nav>
 
-        <div class="aidify-sidebar-bottom">
-            <a href="#" onclick="showToast('Settings selected.'); return false;">
-                <span class="material-symbols-outlined">settings</span>
-                Settings
-            </a>
-
-            <a href="#" style="color:#ba1a1a;" onclick="showToast('Logout selected.'); return false;">
-                <span class="material-symbols-outlined">logout</span>
-                Logout
-            </a>
-        </div>
-    </aside>
+            <div class="instructor-mini">
+                <div class="avatar">M</div>
+                <div>
+                    <div class="mini-name">Dr. Sarah Mitchell</div>
+                    <div class="mini-role">Lead Medical Instructor</div>
+                </div>
+            </div>
+        </aside>
 
     <header class="aidify-topbar">
         <div class="topbar-search">

@@ -11,7 +11,7 @@ namespace Aidify_assigment
 {
 
 
-    public partial class _Default
+    public partial class Default
     {
     }
 }

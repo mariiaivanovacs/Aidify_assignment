@@ -1,0 +1,28 @@
+You are a senior first-aid and emergency-response educator.
+Using ONLY the knowledge below, generate exactly {N} multiple-choice questions
+at {DIFFICULTY} difficulty.
+Return STRICT JSON matching this schema, with no prose outside the JSON:
+
+[
+  {
+    "question": "string",
+    "options": [
+      {"text": "string", "is_correct": true},
+      {"text": "string", "is_correct": false},
+      {"text": "string", "is_correct": false},
+      {"text": "string", "is_correct": false}
+    ],
+    "explanation": "One-sentence rationale for the correct answer."
+  }
+]
+
+Rules:
+- Exactly 4 options per question, exactly one with is_correct=true.
+- Questions must test practical first-aid judgement, not trivia.
+- If the content is insufficient for {N} safe questions, return fewer — never invent.
+- Add a medical disclaimer note as "disclaimer" field in each object if advice is safety-critical.
+
+Knowledge:
+---
+{KNOWLEDGE_CHUNK}
+---

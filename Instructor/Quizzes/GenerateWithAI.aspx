@@ -1,1250 +1,1275 @@
-<%@ Page Title="Generate Quiz with AI" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="GenerateWithAI.aspx.cs" Inherits="Aidify_assigment.Instructor.Quizzes.GenerateWithAI" %>
+<%@ Page Title="Generate Quiz With AI" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="GenerateWithAI.aspx.cs" Inherits="Aidify_assigment.Instructor.Quizzes.GenerateWithAI" %>
 
-<asp:Content ID="GenerateWithAIContent" ContentPlaceHolderID="MainContent" runat="server">
+<asp:Content ID="GenerateQuizAIContent" ContentPlaceHolderID="MainContent" runat="server">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
-    <style>
-        * {
-            box-sizing: border-box;
+<style>
+    body {
+        font-family: 'Inter', sans-serif !important;
+        background: #fff8f7 !important;
+        color: #281715 !important;
+    }
+
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+        vertical-align: middle;
+    }
+
+    .aidify-page {
+        min-height: 100vh;
+        background: #fff8f7;
+    }
+
+    .aidify-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 220px;
+        height: 100vh;
+        background: #fff0ee;
+        border-right: 1px solid #e6bdb8;
+        padding: 20px 12px;
+        display: flex;
+        flex-direction: column;
+        z-index: 20;
+    }
+
+    .aidify-brand {
+        padding: 0 12px 30px;
+    }
+
+    .aidify-brand h1 {
+        margin: 0;
+        color: #b70011;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .aidify-brand p {
+        margin: 3px 0 0;
+        color: #5c403c;
+        font-size: 11px;
+    }
+
+    .aidify-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+    }
+
+    .aidify-nav a,
+    .aidify-sidebar-bottom a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: #5c403c;
+        text-decoration: none !important;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+    .aidify-nav a:hover,
+    .aidify-sidebar-bottom a:hover {
+        background: #fbdbd7;
+        color: #281715;
+    }
+
+    .aidify-nav a.active {
+        background: #b70011;
+        color: #fff;
+        box-shadow: 0 8px 18px rgba(183, 0, 17, .16);
+    }
+
+    .aidify-nav .material-symbols-outlined,
+    .aidify-sidebar-bottom .material-symbols-outlined {
+        font-size: 18px;
+    }
+
+    .aidify-sidebar-bottom {
+        border-top: 1px solid #e6bdb8;
+        padding-top: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .aidify-topbar {
+        position: fixed;
+        top: 0;
+        left: 220px;
+        right: 0;
+        height: 56px;
+        background: rgba(255, 248, 247, .94);
+        border-bottom: 1px solid #e6bdb8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        z-index: 15;
+    }
+
+    .topbar-search {
+        position: relative;
+        width: min(460px, 100%);
+    }
+
+    .topbar-search .material-symbols-outlined {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #5c403c;
+        font-size: 20px;
+    }
+
+    .topbar-search input {
+        width: 100%;
+        height: 38px;
+        border-radius: 999px;
+        border: 1px solid #e6bdb8;
+        background: #fff0ee;
+        padding: 0 16px 0 42px;
+        color: #281715;
+        font-size: 13px;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .topbar-icon {
+        width: 34px;
+        height: 34px;
+        border: 0;
+        background: transparent;
+        color: #281715;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .topbar-icon:hover {
+        background: #fbdbd7;
+        color: #b70011;
+    }
+
+    .profile-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #281715;
+        text-decoration: none !important;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .profile-chip img {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 1px solid #e6bdb8;
+    }
+
+    .aidify-main {
+        margin-left: 220px;
+        margin-top: 56px;
+        padding: 28px;
+        min-height: calc(100vh - 56px);
+    }
+
+    .page-container {
+        max-width: 1220px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .page-title {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        margin: 0 0 4px;
+        color: #281715;
+    }
+
+    .page-subtitle {
+        color: #5c403c;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .header-actions,
+    .button-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary-red,
+    .btn-outline-red,
+    .btn-muted {
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        text-decoration: none !important;
+        cursor: pointer;
+    }
+
+    .btn-primary-red {
+        background: #b70011;
+        color: #fff !important;
+        border: 1px solid #b70011;
+        box-shadow: 0 10px 22px rgba(183, 0, 17, .16);
+    }
+
+    .btn-outline-red {
+        background: #fff;
+        color: #b70011 !important;
+        border: 1px solid #e6bdb8;
+    }
+
+    .btn-muted {
+        background: #fff;
+        color: #281715 !important;
+        border: 1px solid #e6bdb8;
+    }
+
+    .generator-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(380px, .9fr);
+        gap: 22px;
+        align-items: start;
+    }
+
+    .panel-card {
+        background: #fff;
+        border: 1px solid #e6bdb8;
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(40, 23, 21, .06);
+        overflow: hidden;
+    }
+
+    .panel-card + .panel-card {
+        margin-top: 18px;
+    }
+
+    .panel-header {
+        padding: 16px 18px;
+        border-bottom: 1px solid #e6bdb8;
+        background: #fff8f7;
+    }
+
+    .panel-title {
+        margin: 0;
+        color: #281715;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .panel-subtitle {
+        margin: 4px 0 0;
+        color: #5c403c;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .panel-body {
+        padding: 18px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-group.full {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: flex;
+        justify-content: space-between;
+        color: #5c403c;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 7px;
+    }
+
+    .required {
+        color: #b70011;
+        font-size: 10px;
+        letter-spacing: .06em;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100% !important;
+        max-width: none !important;
+        border: 1px solid #e6bdb8;
+        background: #fff8f7;
+        border-radius: 8px;
+        color: #281715;
+        font-size: 13px;
+        outline: none;
+        padding: 10px 12px;
+        box-sizing: border-box;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        border-color: #b70011;
+        box-shadow: 0 0 0 4px rgba(183, 0, 17, .08);
+    }
+
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+        line-height: 1.5;
+    }
+
+    .preview-box {
+        background: #fff8f7;
+        border: 1px solid #e6bdb8;
+        border-radius: 10px;
+        padding: 14px;
+        display: grid;
+        gap: 10px;
+        color: #281715;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .preview-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid #f0d2ce;
+        padding-bottom: 8px;
+    }
+
+    .preview-row:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .preview-label {
+        color: #5c403c;
+        font-weight: 800;
+    }
+
+    .preview-value {
+        color: #281715;
+        font-weight: 800;
+        text-align: right;
+    }
+
+    .question-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .question-card {
+        border: 1px solid #e6bdb8;
+        border-radius: 10px;
+        background: #fff8f7;
+        padding: 14px;
+    }
+
+    .question-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .question-title {
+        color: #281715;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.5;
+    }
+
+    .question-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #e6bdb8;
+        background: #fff;
+        color: #281715;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .icon-btn:hover {
+        background: #fff0ee;
+        color: #b70011;
+    }
+
+    .option-list {
+        display: grid;
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .option-item {
+        background: #fff;
+        border: 1px solid #f0d2ce;
+        border-radius: 8px;
+        padding: 8px 10px;
+        color: #5c403c;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .answer-box {
+        margin-top: 10px;
+        background: #fff0ee;
+        border: 1px solid #e6bdb8;
+        border-radius: 8px;
+        padding: 10px;
+        color: #281715;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .checklist {
+        display: grid;
+        gap: 10px;
+    }
+
+    .check-item {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        color: #281715;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .check-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: #dcfce7;
+        color: #15803d;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .empty-state {
+        border: 1px dashed #e6bdb8;
+        border-radius: 12px;
+        padding: 22px;
+        text-align: center;
+        color: #5c403c;
+        background: #fff8f7;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        background: #281715;
+        color: #fff;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        box-shadow: 0 12px 30px rgba(40, 23, 21, .25);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(10px);
+        transition: .25s ease;
+        z-index: 100;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 1150px) {
+        .generator-grid {
+            grid-template-columns: 1fr;
         }
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #fff8f7;
-        }
-
-        .ai-page {
-            min-height: 100vh;
-            background: #fff8f7;
-            color: #281715;
-            display: flex;
-        }
-
-        .ai-sidebar {
-            width: 280px;
-            min-height: 100vh;
-            background: #fff0ee;
-            border-right: 1px solid #e6bdb8;
-            display: flex;
-            flex-direction: column;
-            padding: 24px 12px;
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-        }
-
-        .brand {
-            color: #b70011;
-            font-size: 24px;
-            font-weight: 800;
-            padding: 0 16px 28px;
-        }
-
-        .ai-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-            flex: 1;
-        }
-
-        .ai-nav a {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            padding: 13px 15px;
-            margin: 0 2px;
-            border-radius: 11px;
-            color: #5c403c;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s ease;
-        }
-
-        .ai-nav a:hover {
-            background: #fbdbd7;
-            color: #281715;
-        }
-
-        .ai-nav a.active {
-            background: #b70011;
-            color: #ffffff;
-            box-shadow: 0 8px 18px rgba(183, 0, 17, 0.16);
-        }
-
-        .ai-nav .material-symbols-outlined {
-            font-size: 20px;
-        }
-
-        .instructor-mini {
-            border-top: 1px solid #e6bdb8;
-            padding: 18px 16px 4px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 999px;
-            background: #ffdad6;
-            color: #b70011;
-            border: 2px solid #b70011;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-        }
-
-        .mini-name {
-            font-size: 13px;
-            font-weight: 800;
-            color: #281715;
-        }
-
-        .mini-role {
-            font-size: 11px;
-            color: #596373;
-        }
-
-        .ai-main {
-            flex: 1;
-            min-width: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background: #fff8f7;
-        }
-
-        .ai-topbar {
-            height: 64px;
-            background: #fff8f7;
-            border-bottom: 1px solid #e6bdb8;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
-            position: sticky;
-            top: 0;
-            z-index: 40;
-        }
-
-        .portal-title {
-            color: #b70011;
-            font-size: 20px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .ai-active-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            background: #ffe2de;
-            color: #b70011;
-            border: 1px solid #e6bdb8;
-            border-radius: 999px;
-            padding: 6px 12px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .topbar-icon {
-            color: #5c403c;
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .topbar-icon:hover {
-            background: #fbdbd7;
-            color: #b70011;
-        }
-
-        .ai-content {
-            flex: 1;
-            padding: 32px;
-            overflow-y: auto;
-        }
-
-        .ai-container {
-            max-width: 1180px;
-            margin: 0 auto;
-        }
-
-        .hero {
-            text-align: center;
-            margin-bottom: 44px;
-        }
-
-        .hero-title {
-            font-size: 48px;
-            line-height: 1.1;
-            letter-spacing: -0.04em;
-            font-weight: 800;
-            color: #281715;
-            margin: 0 0 10px;
-        }
-
-        .hero-subtitle {
-            color: #596373;
-            font-size: 16px;
-            line-height: 1.6;
-            max-width: 720px;
-            margin: 0 auto;
-        }
-
-        .stepper {
-            max-width: 760px;
-            margin: 0 auto 44px;
+    @media (max-width: 850px) {
+        .aidify-sidebar {
             position: relative;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-        }
-
-        .stepper::before {
-            content: "";
-            position: absolute;
-            top: 20px;
-            left: 8%;
-            right: 8%;
-            height: 2px;
-            background: #e6bdb8;
-            z-index: 0;
-        }
-
-        .step-item {
-            position: relative;
-            z-index: 1;
-            background: #fff8f7;
-            padding: 0 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .step-number {
-            width: 42px;
-            height: 42px;
-            border-radius: 999px;
-            background: #fbdbd7;
-            color: #5c403c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            border: 4px solid #fff8f7;
-            box-shadow: 0 0 0 1px #e6bdb8;
-        }
-
-        .step-item.active .step-number {
-            background: #b70011;
-            color: #ffffff;
-            box-shadow: 0 10px 22px rgba(183, 0, 17, 0.22);
-        }
-
-        .step-label {
-            color: #5c403c;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .wizard-card {
-            background: #ffffff;
-            border: 1px solid #e6bdb8;
-            border-radius: 22px;
-            overflow: hidden;
-            box-shadow: 0 18px 44px rgba(40, 23, 21, 0.08);
-        }
-
-        .wizard-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 8fr) minmax(280px, 4fr);
-        }
-
-        .wizard-left {
-            padding: 34px;
-            border-right: 1px solid #e6bdb8;
-        }
-
-        .wizard-right {
-            background: #fff0ee;
-            padding: 28px;
-        }
-
-        .field-group {
-            margin-bottom: 24px;
-        }
-
-        .field-label {
-            display: block;
-            color: #281715;
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 10px;
-        }
-
-        .upload-zone {
-            border: 2px dashed #e6bdb8;
-            border-radius: 16px;
-            background: #fff8f7;
-            padding: 34px;
-            text-align: center;
-            position: relative;
-            transition: 0.2s ease;
-        }
-
-        .upload-zone:hover {
-            border-color: #b70011;
-            background: #fff0ee;
-        }
-
-        .file-cover {
-            position: absolute;
-            inset: 0;
             width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 5;
+            height: auto;
         }
 
-        .upload-icon {
-            width: 66px;
-            height: 66px;
-            border-radius: 999px;
-            background: rgba(183, 0, 17, 0.06);
-            color: #b70011;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .aidify-nav {
+            flex-direction: row;
+            overflow-x: auto;
         }
 
-        .upload-title {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            color: #281715;
+        .aidify-topbar {
+            left: 0;
+            position: relative;
         }
 
-        .upload-help {
-            color: #596373;
-            font-size: 12px;
-            margin: 0;
+        .aidify-main {
+            margin-left: 0;
+            margin-top: 0;
+            padding: 20px 16px;
         }
 
-        .file-ready {
-            display: none;
-            color: #b70011;
-            font-size: 12px;
-            font-weight: 800;
-            margin-top: 12px;
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr;
         }
-
-        .ai-input,
-        .ai-select {
-            width: 100%;
-            background: #fff8f7 !important;
-            border: 1px solid #916f6b !important;
-            border-radius: 11px !important;
-            color: #281715 !important;
-            padding: 13px 14px !important;
-            font-size: 14px !important;
-            font-weight: 700;
-            box-shadow: none !important;
-            outline: none !important;
-        }
-
-        .ai-input:focus,
-        .ai-select:focus {
-            border-color: #b70011 !important;
-            box-shadow: 0 0 0 4px rgba(183, 0, 17, 0.10) !important;
-        }
-
-        .btn-generate {
-            width: 100%;
-            background: #b70011 !important;
-            border: 1px solid #b70011 !important;
-            color: #ffffff !important;
-            border-radius: 15px !important;
-            padding: 17px 22px !important;
-            font-size: 16px !important;
-            font-weight: 800 !important;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            box-shadow: 0 14px 28px rgba(183, 0, 17, 0.20);
-        }
-
-        .tips-title {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            color: #281715;
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 18px;
-        }
-
-        .tip-box {
-            background: #ffffff;
-            border: 1px solid #e6bdb8;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 18px;
-        }
-
-        .tip-kicker {
-            color: #b70011;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 4px;
-        }
-
-        .tip-text {
-            color: #596373;
-            font-size: 13px;
-            line-height: 1.55;
-            margin: 0;
-        }
-
-        .recent-file {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #ffffff;
-            border: 1px solid #e6bdb8;
-            border-radius: 10px;
-            padding: 11px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #281715;
-            margin-bottom: 9px;
-        }
-
-        .generating-card,
-        .done-card {
-            background: #ffffff;
-            border: 1px solid #e6bdb8;
-            border-radius: 22px;
-            box-shadow: 0 18px 44px rgba(40, 23, 21, 0.08);
-            padding: 70px 24px;
-            text-align: center;
-        }
-
-        .spinner-shell {
-            width: 190px;
-            height: 190px;
-            border-radius: 999px;
-            margin: 0 auto 28px;
-            position: relative;
-            background: #fff0ee;
-            border: 7px solid #ffe2de;
-        }
-
-        .spinner-shell::before {
-            content: "";
-            position: absolute;
-            inset: -7px;
-            border-radius: 999px;
-            border: 7px solid #b70011;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-        }
-
-        .spinner-inner {
-            position: absolute;
-            inset: 34px;
-            border-radius: 18px;
-            background: #fff8f7;
-            border: 1px solid #e6bdb8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #b70011;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .generating-title,
-        .done-title {
-            font-size: 34px;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            color: #281715;
-            margin-bottom: 10px;
-        }
-
-        .generating-text {
-            color: #596373;
-            font-size: 15px;
-            line-height: 1.6;
-            max-width: 560px;
-            margin: 0 auto 24px;
-        }
-
-        .log-box {
-            max-width: 380px;
-            margin: 26px auto 0;
-            background: rgba(40, 23, 21, 0.04);
-            border: 1px solid #e6bdb8;
-            border-radius: 12px;
-            padding: 13px;
-            text-align: left;
-            font-size: 11px;
-            font-family: Consolas, monospace;
-        }
-
-        .review-head {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 22px;
-        }
-
-        .review-badge {
-            display: inline-flex;
-            background: rgba(183, 0, 17, 0.08);
-            color: #b70011;
-            border-radius: 6px;
-            padding: 4px 8px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 6px;
-        }
-
-        .review-title {
-            color: #281715;
-            font-size: 32px;
-            font-weight: 800;
-            margin: 0 0 5px;
-        }
-
-        .review-subtitle {
-            color: #596373;
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .review-actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .btn-soft,
-        .btn-primary-ai {
-            border-radius: 12px !important;
-            padding: 12px 22px !important;
-            font-weight: 800 !important;
-            font-size: 13px !important;
-        }
-
-        .btn-soft {
-            background: #ffe9e6 !important;
-            color: #b70011 !important;
-            border: 1px solid #e6bdb8 !important;
-        }
-
-        .btn-primary-ai {
-            background: #b70011 !important;
-            color: #ffffff !important;
-            border: 1px solid #b70011 !important;
-        }
-
-        .generated-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 22px;
-        }
-
-        .question-card {
-            background: #ffffff;
-            border: 1px solid #e6bdb8;
-            border-radius: 18px;
-            padding: 22px;
-            box-shadow: 0 8px 22px rgba(40, 23, 21, 0.04);
-        }
-
-        .q-top {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .q-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .q-number {
-            background: #b70011;
-            color: #ffffff;
-            border-radius: 999px;
-            padding: 5px 10px;
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .q-type {
-            color: #b70011;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-        }
-
-        .q-module {
-            color: #596373;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .q-tools {
-            display: flex;
-            gap: 4px;
-            background: #fff0ee;
-            border: 1px solid #e6bdb8;
-            border-radius: 9px;
-            padding: 4px;
-        }
-
-        .tool-btn {
-            border: 0;
-            background: transparent;
-            color: #5c403c;
-            border-radius: 7px;
-            width: 30px;
-            height: 30px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tool-btn.keep {
-            color: #15803d;
-        }
-
-        .tool-btn.delete {
-            color: #dc2626;
-        }
-
-        .generated-question-input {
-            width: 100%;
-            border: 0 !important;
-            background: transparent !important;
-            color: #281715 !important;
-            font-size: 17px !important;
-            font-weight: 800 !important;
-            line-height: 1.45 !important;
-            min-height: 110px;
-            resize: vertical;
-            box-shadow: none !important;
-            outline: none !important;
-            margin-bottom: 18px;
-        }
-
-        .option-preview {
-            border: 1px solid #e6bdb8;
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 9px;
-            color: #5c403c;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .option-preview.correct {
-            border: 2px solid #b70011;
-            background: rgba(183, 0, 17, 0.05);
-            color: #281715;
-            font-weight: 800;
-        }
-
-        .letter {
-            width: 28px;
-            height: 28px;
-            border-radius: 999px;
-            background: #e6bdb8;
-            color: #5c403c;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        .option-preview.correct .letter {
-            background: #b70011;
-            color: #ffffff;
-        }
-
-        .done-card {
-            max-width: 620px;
-            margin: 0 auto;
-            padding: 50px;
-        }
-
-        .done-icon {
-            width: 82px;
-            height: 82px;
-            border-radius: 999px;
-            background: #dcfce7;
-            color: #15803d;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .done-links {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-top: 24px;
-        }
-
-        .done-links a {
-            color: #b70011;
-            font-weight: 800;
-            text-decoration: none;
-            background: #fff0ee;
-            border: 1px solid #e6bdb8;
-            border-radius: 999px;
-            padding: 9px 15px;
-        }
-
-        .ai-footer {
-            border-top: 1px solid #e6bdb8;
-            padding: 16px 32px;
-            color: #596373;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 18px;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 22px;
-        }
-
-        .footer-links a {
-            color: #596373;
-            text-decoration: none;
-        }
-
-        .footer-links a:hover {
-            color: #b70011;
-        }
-
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
-        }
-
-        @media (max-width: 1100px) {
-            .wizard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .wizard-left {
-                border-right: 0;
-                border-bottom: 1px solid #e6bdb8;
-            }
-
-            .generated-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 860px) {
-            .ai-page {
-                display: block;
-            }
-
-            .ai-sidebar {
-                width: 100%;
-                min-height: auto;
-                height: auto;
-                position: relative;
-            }
-
-            .ai-nav {
-                flex-direction: row;
-                overflow-x: auto;
-            }
-
-            .ai-nav a {
-                white-space: nowrap;
-            }
-
-            .ai-topbar {
-                padding: 0 16px;
-            }
-
-            .ai-active-pill {
-                display: none;
-            }
-
-            .ai-content {
-                padding: 22px 16px;
-            }
-
-            .hero-title {
-                font-size: 36px;
-            }
-
-            .stepper {
-                overflow-x: auto;
-                gap: 16px;
-            }
-
-            .stepper::before {
-                display: none;
-            }
-
-            .review-head {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .ai-footer {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-        }
-    </style>
-
-    <div class="ai-page">
-
-        <aside class="ai-sidebar">
-            <div class="brand">Aidify</div>
-
-            <nav class="ai-nav">
-                <a href="/Instructor/Dashboard.aspx">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    Dashboard
-                </a>
-
-                <a href="/Instructor/Modules/Edit.aspx">
-                    <span class="material-symbols-outlined">school</span>
-                    My Modules
-                </a>
-
-                <a href="/Instructor/Materials/Upload.aspx">
-                    <span class="material-symbols-outlined">description</span>
-                    Materials
-                </a>
-
-                <a href="/Instructor/Quizzes/Edit.aspx">
-                    <span class="material-symbols-outlined">quiz</span>
-                    Quizzes
-                </a>
-
-                <a class="active" href="/Instructor/Quizzes/GenerateWithAI.aspx">
-                    <span class="material-symbols-outlined">auto_awesome</span>
-                    AI Generator
-                </a>
-            </nav>
-
-            <div class="instructor-mini">
-                <div class="avatar">M</div>
+    }
+</style>
+
+<div class="aidify-page">
+
+    <aside class="aidify-sidebar">
+        <div class="aidify-brand">
+            <h1>Aidify</h1>
+            <p>Instructor Portal</p>
+        </div>
+
+        <nav class="aidify-nav">
+            <a href="/Instructor/Dashboard.aspx">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+
+            <a href="/Instructor/Modules/List.aspx">
+                <span class="material-symbols-outlined">school</span>
+                Modules
+            </a>
+
+            <a href="/Instructor/Materials/Upload.aspx">
+                <span class="material-symbols-outlined">description</span>
+                Materials
+            </a>
+
+            <a class="active" href="/Instructor/Quizzes/List.aspx">
+                <span class="material-symbols-outlined">quiz</span>
+                Quizzes
+            </a>
+
+            <a href="/Instructor/Performance.aspx">
+                <span class="material-symbols-outlined">trending_up</span>
+                Performance
+            </a>
+
+            <a href="/Instructor/Discussions/Discussions.aspx">
+                <span class="material-symbols-outlined">forum</span>
+                Discussions
+            </a>
+
+            <a href="/Instructor/Challenges.aspx">
+                <span class="material-symbols-outlined">military_tech</span>
+                Challenges
+            </a>
+
+            <a href="/Instructor/Events.aspx">
+                <span class="material-symbols-outlined">calendar_today</span>
+                Events
+            </a>
+        </nav>
+
+        <div class="aidify-sidebar-bottom">
+            <a href="#" onclick="showToast('Settings selected.'); return false;">
+                <span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+
+            <a href="#" style="color:#ba1a1a;" onclick="showToast('Logout selected.'); return false;">
+                <span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+        </div>
+    </aside>
+
+    <header class="aidify-topbar">
+        <div class="topbar-search">
+            <span class="material-symbols-outlined">search</span>
+            <input id="globalSearch" type="text" placeholder="Search AI quiz topics or modules..." />
+        </div>
+
+        <div class="topbar-actions">
+            <button type="button" class="topbar-icon" onclick="openNotifications()">
+                <span class="material-symbols-outlined">notifications</span>
+            </button>
+
+            <button type="button" class="topbar-icon" onclick="openHelp()">
+                <span class="material-symbols-outlined">help_outline</span>
+            </button>
+
+            <a href="#" class="profile-chip" onclick="openProfile(); return false;">
+                <img alt="Instructor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTgTMp5iW7KpgwUSWn4fAuyefPR2SBfnO8bdfPX0kbX_N9naIVTbimChz6P6d-FPnlbUYB_y1tOjHq_Rye4b4y13fEnuo2LLcxWyFZ_KbEA7Sc1FYwD01OUtZ3kgcBRQGnRyD7_GdB2CV5ZTAMfIsGaz3BjYHlmxSNsHmK_q-oNfgqRh1LLDL33IPm4v78RmJ1UWsdUWCxExhnOuwVdQzB3QjAWwemoUo7i2_9YIta-46d5zHsC6ko63pD_0thGj29USMlLX8RSbI" />
+                <span>Dr. Sarah Mitchell</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="aidify-main">
+        <div class="page-container">
+
+            <section class="page-header">
                 <div>
-                    <div class="mini-name">Dr. Sarah Mitchell</div>
-                    <div class="mini-role">Lead Medical Instructor</div>
+                    <h2 class="page-title">Generate Quiz With AI</h2>
+                    <p class="page-subtitle">Generate structured quiz questions for clinical training modules, then send them back to the Quiz Builder.</p>
                 </div>
-            </div>
-        </aside>
 
-        <main class="ai-main">
+                <div class="header-actions">
+                    <button type="button" class="btn-muted" onclick="backToQuizzes()">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        Back to Quizzes
+                    </button>
 
-            <header class="ai-topbar">
-                <h1 class="portal-title">Instructor Portal</h1>
+                    <button type="button" class="btn-outline-red" onclick="generateQuestions()">
+                        <span class="material-symbols-outlined">auto_awesome</span>
+                        Generate Questions
+                    </button>
 
-                <div class="topbar-actions">
-                    <div class="ai-active-pill">
-                        <span class="material-symbols-outlined" style="font-size:15px;font-variation-settings:'FILL' 1;">auto_awesome</span>
-                        Aidify Intelligence Active
+                    <button type="button" class="btn-primary-red" onclick="useInQuizBuilder()">
+                        <span class="material-symbols-outlined">send</span>
+                        Use in Quiz Builder
+                    </button>
+                </div>
+            </section>
+
+            <section class="generator-grid">
+
+                <div>
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h3 class="panel-title">AI Generator Form</h3>
+                            <p class="panel-subtitle">Set the quiz topic, module, difficulty, and assessment rules.</p>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="form-grid">
+
+                                <div class="form-group full">
+                                    <label class="form-label">
+                                        Quiz Topic
+                                        <span class="required">* REQUIRED</span>
+                                    </label>
+                                    <input id="quizTopic" class="form-input" type="text" placeholder="e.g., CPR chest compressions, choking response, wound care" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Select Module</label>
+                                    <select id="selectModule" class="form-select" onchange="updatePreview()">
+                                        <option>CPR Fundamentals</option>
+                                        <option>Airway Emergencies</option>
+                                        <option>Trauma Response</option>
+                                        <option>Burn Treatment Basics</option>
+                                        <option>Emergency Wound Care</option>
+                                        <option>Pediatric First Aid</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Difficulty</label>
+                                    <select id="difficulty" class="form-select" onchange="updatePreview()">
+                                        <option>Easy</option>
+                                        <option selected="selected">Medium</option>
+                                        <option>Hard</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Generate Style</label>
+                                    <select id="generateStyle" class="form-select" onchange="updatePreview()">
+                                        <option>Knowledge Check</option>
+                                        <option>Scenario-Based</option>
+                                        <option>Certification Practice</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Number of Questions</label>
+                                    <input id="questionCount" class="form-input" type="number" min="1" max="20" value="5" onchange="updatePreview()" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Passing Score</label>
+                                    <input id="passingScore" class="form-input" type="number" min="0" max="100" value="80" onchange="updatePreview()" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Time Limit</label>
+                                    <input id="timeLimit" class="form-input" type="number" min="1" value="10" onchange="updatePreview()" />
+                                </div>
+
+                                <div class="form-group full">
+                                    <label class="form-label">Certification Ready</label>
+                                    <select id="certificationReady" class="form-select" onchange="updatePreview()">
+                                        <option value="false">No</option>
+                                        <option value="true">Yes</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group full">
+                                    <label class="form-label">Learning Objective</label>
+                                    <textarea id="learningObjective" class="form-textarea" placeholder="Describe what learners should be able to do after completing this quiz."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="button-row">
+                                <button type="button" class="btn-primary-red" onclick="generateQuestions()">
+                                    <span class="material-symbols-outlined">auto_awesome</span>
+                                    Generate Questions
+                                </button>
+
+                                <button type="button" class="btn-muted" onclick="clearGeneratorForm()">
+                                    <span class="material-symbols-outlined">restart_alt</span>
+                                    Clear Form
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside>
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Generation Preview</h3>
+                            <p class="panel-subtitle">Live summary of the generated quiz draft.</p>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="preview-box">
+                                <div class="preview-row">
+                                    <span class="preview-label">Quiz Title</span>
+                                    <span class="preview-value" id="previewTitle">Generated Clinical Quiz</span>
+                                </div>
+
+                                <div class="preview-row">
+                                    <span class="preview-label">Module</span>
+                                    <span class="preview-value" id="previewModule">CPR Fundamentals</span>
+                                </div>
+
+                                <div class="preview-row">
+                                    <span class="preview-label">Difficulty</span>
+                                    <span class="preview-value" id="previewDifficulty">Medium</span>
+                                </div>
+
+                                <div class="preview-row">
+                                    <span class="preview-label">Passing Score</span>
+                                    <span class="preview-value" id="previewPassing">80%</span>
+                                </div>
+
+                                <div class="preview-row">
+                                    <span class="preview-label">Time Limit</span>
+                                    <span class="preview-value" id="previewTime">10 min</span>
+                                </div>
+
+                                <div class="preview-row">
+                                    <span class="preview-label">Questions</span>
+                                    <span class="preview-value" id="previewQuestions">0</span>
+                                </div>
+
+                                <div class="preview-row">
+                                    <span class="preview-label">Certification Ready</span>
+                                    <span class="preview-value" id="previewCertification">No</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <span class="topbar-icon">
-                        <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
-                    </span>
-
-                    <span class="topbar-icon">
-                        <span class="material-symbols-outlined" style="font-size:20px;">search</span>
-                    </span>
-                </div>
-            </header>
-
-            <div class="ai-content">
-                <div class="ai-container">
-
-                    <section class="hero">
-                        <h2 class="hero-title">AI Quiz Generator</h2>
-                        <p class="hero-subtitle">
-                            Transform medical manuals, lecture notes, and research papers into interactive clinical assessments in seconds.
-                        </p>
-                    </section>
-
-                    <div class="stepper">
-                        <div class="step-item active">
-                            <div class="step-number">1</div>
-                            <div class="step-label">Configure</div>
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Generated Questions</h3>
+                            <p class="panel-subtitle">Review, edit, or delete generated questions before sending them to Quiz Builder.</p>
                         </div>
 
-                        <div class="step-item">
-                            <div class="step-number">2</div>
-                            <div class="step-label">Generate</div>
-                        </div>
-
-                        <div class="step-item">
-                            <div class="step-number">3</div>
-                            <div class="step-label">Review</div>
-                        </div>
-
-                        <div class="step-item">
-                            <div class="step-number">4</div>
-                            <div class="step-label">Success</div>
+                        <div class="panel-body">
+                            <div id="generatedQuestions" class="question-list">
+                                <div class="empty-state">
+                                    No questions generated yet. Fill the form and click Generate Questions.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <asp:MultiView ID="mvWizard" runat="server" ActiveViewIndex="0">
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h3 class="panel-title">AI Quality Checklist</h3>
+                            <p class="panel-subtitle">Prototype checklist for generated assessment quality.</p>
+                        </div>
 
-                        <asp:View ID="vwUpload" runat="server">
-                            <div class="wizard-card">
-                                <div class="wizard-grid">
-
-                                    <div class="wizard-left">
-
-                                        <div class="field-group">
-                                            <asp:Label ID="lblKnowledge" runat="server"
-                                                AssociatedControlID="fuKnowledge"
-                                                CssClass="field-label">
-                                                Knowledge Base Source
-                                            </asp:Label>
-
-                                            <div class="upload-zone">
-                                                <asp:FileUpload ID="fuKnowledge" runat="server"
-                                                    CssClass="file-cover"
-                                                    onchange="showAIFileName(this)" />
-
-                                                <div class="upload-icon">
-                                                    <span class="material-symbols-outlined" style="font-size:38px;">upload_file</span>
-                                                </div>
-
-                                                <div class="upload-title">Click to upload or drag & drop</div>
-                                                <p class="upload-help">Supported formats: .pdf, .docx, .txt, .md (Max 25MB)</p>
-
-                                                <div id="aiFileReady" class="file-ready">File ready for generation</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-grid">
-                                            <div class="field-group">
-                                                <asp:Label ID="lblNumQuestions" runat="server"
-                                                    AssociatedControlID="txtNumQuestions"
-                                                    CssClass="field-label">
-                                                    Questions Count
-                                                </asp:Label>
-
-                                                <asp:TextBox ID="txtNumQuestions" runat="server"
-                                                    CssClass="ai-input"
-                                                    TextMode="Number">
-                                                </asp:TextBox>
-                                            </div>
-
-                                            <div class="field-group">
-                                                <asp:Label ID="lblAIDifficulty" runat="server"
-                                                    AssociatedControlID="ddlAIDifficulty"
-                                                    CssClass="field-label">
-                                                    Assessment Rigor
-                                                </asp:Label>
-
-                                                <asp:DropDownList ID="ddlAIDifficulty" runat="server"
-                                                    CssClass="ai-select">
-                                                    <asp:ListItem Value="Beginner">Standard Academic</asp:ListItem>
-                                                    <asp:ListItem Value="Intermediate">Clinical Residency</asp:ListItem>
-                                                    <asp:ListItem Value="Advanced">Board Exam Level</asp:ListItem>
-                                                </asp:DropDownList>
-                                            </div>
-                                        </div>
-
-                                        <div class="field-group">
-                                            <asp:Label ID="lblTargetQuiz" runat="server"
-                                                AssociatedControlID="ddlTargetQuiz"
-                                                CssClass="field-label">
-                                                Module Assignment / Target Quiz
-                                            </asp:Label>
-
-                                            <asp:DropDownList ID="ddlTargetQuiz" runat="server"
-                                                CssClass="ai-select">
-                                            </asp:DropDownList>
-                                        </div>
-
-                                        <asp:Button ID="btnGenerateAI" runat="server"
-                                            Text="Initiate AI Generation"
-                                            CssClass="btn btn-generate"
-                                            OnClick="btnGenerateAI_Click" />
-                                    </div>
-
-                                    <aside class="wizard-right">
-                                        <div class="tips-title">
-                                            <span class="material-symbols-outlined" style="color:#b70011;">info</span>
-                                            Pro Tips
-                                        </div>
-
-                                        <div class="tip-box">
-                                            <div class="tip-kicker">Clinical Context</div>
-                                            <p class="tip-text">
-                                                Our AI specializes in creating high-fidelity clinical scenarios based on your specific protocols.
-                                            </p>
-                                        </div>
-
-                                        <div class="tip-box">
-                                            <div class="tip-kicker">AI Summary</div>
-                                            <p class="tip-text">
-                                                Knowledge file analysis + question drafting. Provide concise source material for clearer questions.
-                                            </p>
-                                        </div>
-
-                                        <div>
-                                            <div class="tip-kicker" style="margin-bottom:10px;">Recent Materials</div>
-
-                                            <div class="recent-file">
-                                                <span class="material-symbols-outlined" style="font-size:17px;color:#b70011;">description</span>
-                                                ICU_Sedation_v2.pdf
-                                                <span class="material-symbols-outlined ms-auto" style="font-size:17px;">add</span>
-                                            </div>
-
-                                            <div class="recent-file">
-                                                <span class="material-symbols-outlined" style="font-size:17px;color:#b70011;">description</span>
-                                                Pediatric_Triage.md
-                                                <span class="material-symbols-outlined ms-auto" style="font-size:17px;">add</span>
-                                            </div>
-                                        </div>
-                                    </aside>
-
-                                </div>
-                            </div>
-                        </asp:View>
-
-                        <asp:View ID="vwGenerating" runat="server">
-                            <div class="generating-card">
-                                <div class="spinner-shell">
-                                    <div class="spinner-inner">
-                                        <span class="material-symbols-outlined" style="font-size:70px;">clinical_notes</span>
-                                    </div>
+                        <div class="panel-body">
+                            <div class="checklist">
+                                <div class="check-item">
+                                    <span class="check-icon material-symbols-outlined">check</span>
+                                    Uses clinical training context
                                 </div>
 
-                                <asp:Label ID="lblGenerating" runat="server"
-                                    CssClass="generating-title d-block">
-                                    Synthesizing Protocol Assessments...
-                                </asp:Label>
-
-                                <p class="generating-text">
-                                    The AI is cross-referencing clinical protocols and extracting distractors to ensure high validity.
-                                    Estimated time: <strong style="color:#b70011;">8s</strong>
-                                </p>
-
-                                <div class="log-box">
-                                    <div style="color:#15803d;">● PDF Metadata Parsed</div>
-                                    <div style="color:#15803d;">● Knowledge Graph Initialized</div>
-                                    <div style="color:#b70011;">● Generating Distractors...</div>
-                                </div>
-                            </div>
-                        </asp:View>
-
-                        <asp:View ID="vwPreview" runat="server">
-
-                            <div class="review-head">
-                                <div>
-                                    <div class="review-badge">Drafting Complete</div>
-                                    <h2 class="review-title">Review AI Drafts</h2>
-                                    <p class="review-subtitle">
-                                        Refine clinical scenarios and confirm distractors before publishing.
-                                    </p>
+                                <div class="check-item">
+                                    <span class="check-icon material-symbols-outlined">check</span>
+                                    Includes correct answer
                                 </div>
 
-                                <div class="review-actions">
-                                    <asp:Button ID="btnDiscardAll" runat="server"
-                                        Text="Regenerate / Discard All"
-                                        CssClass="btn btn-soft"
-                                        CausesValidation="false"
-                                        OnClick="btnDiscardAll_Click" />
+                                <div class="check-item">
+                                    <span class="check-icon material-symbols-outlined">check</span>
+                                    Includes explanation
+                                </div>
 
-                                    <asp:Button ID="btnSaveKeptQuestions" runat="server"
-                                        Text="Finalize Module"
-                                        CssClass="btn btn-primary-ai"
-                                        OnClick="btnSaveKeptQuestions_Click" />
+                                <div class="check-item">
+                                    <span class="check-icon material-symbols-outlined">check</span>
+                                    Matches selected difficulty
+                                </div>
+
+                                <div class="check-item">
+                                    <span class="check-icon material-symbols-outlined">check</span>
+                                    Ready to move into Quiz Builder
                                 </div>
                             </div>
 
-                            <div class="generated-grid">
-                                <asp:Repeater ID="rptGeneratedQuestions" runat="server">
-                                    <ItemTemplate>
-                                        <article class="question-card">
-                                            <div class="q-top">
-                                                <div class="q-meta">
-                                                    <span class="q-number"><%# (Container.ItemIndex + 1).ToString("00") %></span>
-                                                    <div>
-                                                        <div class="q-type">Clinical Scenario</div>
-                                                        <div class="q-module">Trauma Protocol I</div>
-                                                    </div>
-                                                </div>
+                            <div class="button-row" style="margin-top:16px;">
+                                <button type="button" class="btn-primary-red" onclick="useInQuizBuilder()">
+                                    <span class="material-symbols-outlined">send</span>
+                                    Use in Quiz Builder
+                                </button>
 
-                                                <div class="q-tools">
-                                                    <button type="button" class="tool-btn keep">
-                                                        <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 1;">check_circle</span>
-                                                    </button>
-
-                                                    <button type="button" class="tool-btn">
-                                                        <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
-                                                    </button>
-
-                                                    <button type="button" class="tool-btn delete">
-                                                        <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <asp:TextBox ID="txtGeneratedQuestion" runat="server"
-                                                CssClass="generated-question-input"
-                                                TextMode="MultiLine"
-                                                Text='<%# Eval("QuestionText") %>'>
-                                            </asp:TextBox>
-
-                                            <div class="option-preview correct">
-                                                <span class="letter">A</span>
-                                                <span>Perform the priority clinical intervention according to protocol.</span>
-                                            </div>
-
-                                            <div class="option-preview">
-                                                <span class="letter">B</span>
-                                                <span>Administer supportive care first.</span>
-                                            </div>
-
-                                            <div class="option-preview">
-                                                <span class="letter">C</span>
-                                                <span>Delay intervention pending reassessment.</span>
-                                            </div>
-                                        </article>
-                                    </ItemTemplate>
-                                </asp:Repeater>
+                                <button type="button" class="btn-outline-red" onclick="exportGeneratedDraft()">
+                                    <span class="material-symbols-outlined">ios_share</span>
+                                    Export Generated Draft
+                                </button>
                             </div>
-                        </asp:View>
+                        </div>
+                    </div>
+                </aside>
 
-                        <asp:View ID="vwDone" runat="server">
-                            <div class="done-card">
-                                <div class="done-icon">
-                                    <span class="material-symbols-outlined" style="font-size:44px;font-variation-settings:'FILL' 1;">check_circle</span>
-                                </div>
+            </section>
 
-                                <h2 class="done-title">Questions Saved</h2>
+        </div>
+    </main>
 
-                                <asp:Label ID="lblSaveSuccess" runat="server"
-                                    CssClass="d-block"
-                                    Style="color:#15803d;font-weight:800;">
-                                    Questions saved successfully.
-                                </asp:Label>
+</div>
 
-                                <div class="done-links">
-                                    <asp:HyperLink ID="lnkEditQuiz" runat="server">Edit Quiz</asp:HyperLink>
-                                    <asp:HyperLink ID="lnkGenerateMore" runat="server">Generate More</asp:HyperLink>
+<div id="generatorToast" class="toast">Action completed.</div>
 
-                                    <asp:HyperLink ID="lnkDashboard" runat="server">
-                                        Back to Dashboard
-                                    </asp:HyperLink>
+<script>
+    var generatedQuestionsList = [];
 
-                                    <asp:HyperLink ID="lnkDashboardFooter" runat="server" Style="display:none;">
-                                        Back to Dashboard
-                                    </asp:HyperLink>
-                                </div>
-                            </div>
-                        </asp:View>
+    document.addEventListener("DOMContentLoaded", function () {
+        attachPreviewEvents();
+        updatePreview();
+    });
 
-                    </asp:MultiView>
+    function attachPreviewEvents() {
+        var ids = [
+            "quizTopic",
+            "selectModule",
+            "difficulty",
+            "generateStyle",
+            "questionCount",
+            "passingScore",
+            "timeLimit",
+            "certificationReady",
+            "learningObjective"
+        ];
 
-                </div>
-            </div>
+        ids.forEach(function (id) {
+            var element = document.getElementById(id);
 
-            <footer class="ai-footer">
-                <div>© 2024 Aidify Medical Education Platform. All Rights Reserved.</div>
-
-                <div class="footer-links">
-                    <a href="#">Support</a>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms</a>
-                </div>
-            </footer>
-
-        </main>
-    </div>
-
-    <script type="text/javascript">
-        function showAIFileName(input) {
-            var label = document.getElementById('aiFileReady');
-
-            if (!label) {
-                return;
+            if (element) {
+                element.addEventListener("input", updatePreview);
+                element.addEventListener("change", updatePreview);
             }
+        });
 
-            if (input.files && input.files.length > 0) {
-                label.style.display = 'block';
-                label.innerText = input.files[0].name + ' is ready for generation';
-            } else {
-                label.style.display = 'none';
-                label.innerText = 'File ready for generation';
-            }
+        var globalSearch = document.getElementById("globalSearch");
+
+        if (globalSearch) {
+            globalSearch.addEventListener("input", function () {
+                var query = globalSearch.value.toLowerCase().trim();
+                var topic = document.getElementById("quizTopic");
+                if (!topic.value && query.length > 2) {
+                    topic.value = globalSearch.value;
+                    updatePreview();
+                }
+            });
         }
-    </script>
+    }
+
+    function showToast(message) {
+        var toast = document.getElementById("generatorToast");
+        toast.textContent = message;
+        toast.classList.add("show");
+
+        clearTimeout(window.__generatorToastTimer);
+        window.__generatorToastTimer = setTimeout(function () {
+            toast.classList.remove("show");
+        }, 2200);
+    }
+
+    function backToQuizzes() {
+        window.location.href = "/Instructor/Quizzes/List.aspx";
+    }
+
+    function getCleanTopic() {
+        var topic = document.getElementById("quizTopic").value.trim();
+        return topic || "Clinical Emergency Response";
+    }
+
+    function updatePreview() {
+        var topic = getCleanTopic();
+        var moduleName = document.getElementById("selectModule").value;
+        var difficulty = document.getElementById("difficulty").value;
+        var passing = document.getElementById("passingScore").value || "80";
+        var time = document.getElementById("timeLimit").value || "10";
+        var cert = document.getElementById("certificationReady").value === "true" ? "Yes" : "No";
+
+        document.getElementById("previewTitle").textContent = topic + " Quiz";
+        document.getElementById("previewModule").textContent = moduleName;
+        document.getElementById("previewDifficulty").textContent = difficulty;
+        document.getElementById("previewPassing").textContent = passing + "%";
+        document.getElementById("previewTime").textContent = time + " min";
+        document.getElementById("previewQuestions").textContent = generatedQuestionsList.length;
+        document.getElementById("previewCertification").textContent = cert;
+    }
+
+    function generateQuestions() {
+        var topic = document.getElementById("quizTopic").value.trim();
+        var moduleName = document.getElementById("selectModule").value;
+        var difficulty = document.getElementById("difficulty").value;
+        var style = document.getElementById("generateStyle").value;
+        var count = parseInt(document.getElementById("questionCount").value, 10) || 5;
+
+        if (!topic) {
+            showToast("Quiz topic is required.");
+            document.getElementById("quizTopic").focus();
+            return;
+        }
+
+        count = Math.max(1, Math.min(count, 20));
+        generatedQuestionsList = [];
+
+        for (var i = 1; i <= count; i++) {
+            generatedQuestionsList.push({
+                text: buildQuestionText(topic, moduleName, difficulty, style, i),
+                type: "Multiple Choice",
+                correct: "A",
+                a: "Follow the recommended clinical sequence",
+                b: "Skip assessment and continue immediately",
+                c: "Delay action without monitoring the learner or patient",
+                d: "Ignore learner safety checks",
+                explanation: "The recommended clinical sequence improves safety, consistency, and decision-making during emergency response training."
+            });
+        }
+
+        renderGeneratedQuestions();
+        updatePreview();
+        showToast(count + " questions generated.");
+    }
+
+    function buildQuestionText(topic, moduleName, difficulty, style, index) {
+        if (style === "Scenario-Based") {
+            return "Scenario " + index + ": A learner is managing " + topic + " during " + moduleName + ". Which action is most appropriate?";
+        }
+
+        if (style === "Certification Practice") {
+            return "Certification practice " + index + ": What is the safest evidence-based action for " + topic + " in " + moduleName + "?";
+        }
+
+        return "Knowledge check " + index + ": Which action is most appropriate when managing " + topic + " in " + moduleName + "?";
+    }
+
+    function renderGeneratedQuestions() {
+        var container = document.getElementById("generatedQuestions");
+        container.innerHTML = "";
+
+        if (generatedQuestionsList.length === 0) {
+            container.innerHTML =
+                '<div class="empty-state">No questions generated yet. Fill the form and click Generate Questions.</div>';
+            updatePreview();
+            return;
+        }
+
+        generatedQuestionsList.forEach(function (question, index) {
+            var card = document.createElement("div");
+            card.className = "question-card";
+
+            card.innerHTML =
+                '<div class="question-head">' +
+                '<div class="question-title">Q' + (index + 1) + '. ' + escapeHtml(question.text) + '</div>' +
+                '<div class="question-actions">' +
+                '<button type="button" class="icon-btn" onclick="editGeneratedQuestion(' + index + ')">' +
+                '<span class="material-symbols-outlined">edit</span>' +
+                '</button>' +
+                '<button type="button" class="icon-btn" onclick="deleteGeneratedQuestion(' + index + ')">' +
+                '<span class="material-symbols-outlined">delete</span>' +
+                '</button>' +
+                '</div>' +
+                '</div>' +
+                '<div class="option-list">' +
+                '<div class="option-item">A. ' + escapeHtml(question.a) + '</div>' +
+                '<div class="option-item">B. ' + escapeHtml(question.b) + '</div>' +
+                '<div class="option-item">C. ' + escapeHtml(question.c) + '</div>' +
+                '<div class="option-item">D. ' + escapeHtml(question.d) + '</div>' +
+                '</div>' +
+                '<div class="answer-box">' +
+                '<strong>Correct Answer:</strong> ' + escapeHtml(question.correct) + '<br />' +
+                '<strong>Explanation:</strong> ' + escapeHtml(question.explanation) +
+                '</div>';
+
+            container.appendChild(card);
+        });
+
+        updatePreview();
+    }
+
+    function editGeneratedQuestion(index) {
+        var question = generatedQuestionsList[index];
+
+        if (!question) {
+            showToast("Question not found.");
+            return;
+        }
+
+        var updatedText = prompt("Edit question text:", question.text);
+
+        if (updatedText === null) {
+            showToast("Edit cancelled.");
+            return;
+        }
+
+        updatedText = updatedText.trim();
+
+        if (!updatedText) {
+            showToast("Question text cannot be empty.");
+            return;
+        }
+
+        generatedQuestionsList[index].text = updatedText;
+        renderGeneratedQuestions();
+        showToast("Question updated.");
+    }
+
+    function deleteGeneratedQuestion(index) {
+        var questionNumber = index + 1;
+        var confirmed = confirm("Delete generated question " + questionNumber + "?");
+
+        if (!confirmed) {
+            showToast("Delete cancelled.");
+            return;
+        }
+
+        generatedQuestionsList.splice(index, 1);
+        renderGeneratedQuestions();
+        showToast("Question deleted.");
+    }
+
+    function clearGeneratorForm() {
+        document.getElementById("quizTopic").value = "";
+        document.getElementById("selectModule").value = "CPR Fundamentals";
+        document.getElementById("difficulty").value = "Medium";
+        document.getElementById("generateStyle").value = "Knowledge Check";
+        document.getElementById("questionCount").value = "5";
+        document.getElementById("passingScore").value = "80";
+        document.getElementById("timeLimit").value = "10";
+        document.getElementById("certificationReady").value = "false";
+        document.getElementById("learningObjective").value = "";
+
+        generatedQuestionsList = [];
+        renderGeneratedQuestions();
+        updatePreview();
+        showToast("Form cleared.");
+    }
+
+    function buildGeneratedQuizObject() {
+        var topic = getCleanTopic();
+        var moduleName = document.getElementById("selectModule").value;
+        var difficulty = document.getElementById("difficulty").value;
+        var passingScore = document.getElementById("passingScore").value || "80";
+        var timeLimit = document.getElementById("timeLimit").value || "10";
+        var certificationReady = document.getElementById("certificationReady").value === "true";
+        var objective = document.getElementById("learningObjective").value.trim();
+
+        return {
+            title: topic + " Quiz",
+            module: moduleName,
+            difficulty: difficulty,
+            passingScore: passingScore,
+            timeLimit: timeLimit,
+            certificationReady: certificationReady,
+            description: objective || "Generated quiz for " + moduleName + " covering " + topic + ".",
+            questions: generatedQuestionsList
+        };
+    }
+
+    function useInQuizBuilder() {
+        if (generatedQuestionsList.length === 0) {
+            showToast("Generate questions first.");
+            return;
+        }
+
+        var generatedQuiz = buildGeneratedQuizObject();
+
+        localStorage.setItem("aidifyGeneratedQuiz", JSON.stringify(generatedQuiz));
+        showToast("Generated quiz sent to Quiz Builder.");
+
+        setTimeout(function () {
+            window.location.href = "/Instructor/Quizzes/List.aspx#quizEditor";
+        }, 900);
+    }
+
+    function exportGeneratedDraft() {
+        if (generatedQuestionsList.length === 0) {
+            showToast("Generate questions first.");
+            return;
+        }
+
+        var quiz = buildGeneratedQuizObject();
+
+        var questionRows = quiz.questions.map(function (question, index) {
+            return (
+                "<tr>" +
+                "<td>" + (index + 1) + "</td>" +
+                "<td>" + escapeHtml(question.text) + "</td>" +
+                "<td>" + escapeHtml(question.correct) + "</td>" +
+                "<td>" + escapeHtml(question.explanation) + "</td>" +
+                "</tr>"
+            );
+        }).join("");
+
+        var reportWindow = window.open("", "_blank", "width=1100,height=800");
+
+        if (!reportWindow) {
+            alert("Popup blocked. Please allow popups to export the draft.");
+            return;
+        }
+
+        reportWindow.document.open();
+        reportWindow.document.write(
+            "<!DOCTYPE html>" +
+            "<html>" +
+            "<head>" +
+            "<title>Aidify Generated Quiz Draft</title>" +
+            "<style>" +
+            "body{font-family:Arial,sans-serif;margin:32px;color:#281715;background:#fff;}" +
+            "h1{color:#b70011;margin:0 0 6px;}" +
+            ".sub{color:#5c403c;margin-bottom:22px;}" +
+            ".summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}" +
+            ".box{border:1px solid #e6bdb8;border-radius:10px;background:#fff8f7;padding:14px;}" +
+            ".label{font-size:11px;text-transform:uppercase;font-weight:800;color:#5c403c;}" +
+            ".value{font-size:20px;font-weight:800;margin-top:6px;}" +
+            "table{width:100%;border-collapse:collapse;margin-top:14px;}" +
+            "th{background:#fff0ee;color:#5c403c;text-align:left;padding:10px;border:1px solid #e6bdb8;font-size:11px;text-transform:uppercase;}" +
+            "td{padding:10px;border:1px solid #e6bdb8;font-size:13px;vertical-align:top;}" +
+            "</style>" +
+            "</head>" +
+            "<body>" +
+            "<h1>Aidify Generated Quiz Draft</h1>" +
+            "<div class='sub'>Generated AI quiz draft for instructor review.</div>" +
+
+            "<div class='summary'>" +
+            "<div class='box'><div class='label'>Title</div><div class='value'>" + escapeHtml(quiz.title) + "</div></div>" +
+            "<div class='box'><div class='label'>Module</div><div class='value'>" + escapeHtml(quiz.module) + "</div></div>" +
+            "<div class='box'><div class='label'>Difficulty</div><div class='value'>" + escapeHtml(quiz.difficulty) + "</div></div>" +
+            "<div class='box'><div class='label'>Questions</div><div class='value'>" + quiz.questions.length + "</div></div>" +
+            "</div>" +
+
+            "<h2>Generated Questions</h2>" +
+            "<table>" +
+            "<thead><tr><th>No.</th><th>Question</th><th>Correct</th><th>Explanation</th></tr></thead>" +
+            "<tbody>" + questionRows + "</tbody>" +
+            "</table>" +
+            "</body>" +
+            "</html>"
+        );
+
+        reportWindow.document.close();
+        showToast("Generated draft exported.");
+    }
+
+    function openNotifications() {
+        alert(
+            "AI Quiz Generator Notifications\n\n" +
+            "• Generated drafts can be sent to Quiz Builder.\n" +
+            "• Certification-style quizzes should be reviewed before publishing.\n" +
+            "• Always verify clinical accuracy before release."
+        );
+    }
+
+    function openHelp() {
+        alert(
+            "AI Quiz Generator Help\n\n" +
+            "Generate Questions: creates sample quiz questions from your topic.\n" +
+            "Edit: updates generated question text.\n" +
+            "Delete: removes a generated question.\n" +
+            "Use in Quiz Builder: saves the quiz draft and redirects to the main Quiz Builder.\n" +
+            "Export Generated Draft: opens a clean printable draft report."
+        );
+    }
+
+    function openProfile() {
+        alert(
+            "Instructor Profile\n\n" +
+            "Dr. Sarah Mitchell\n" +
+            "Lead Medical Instructor\n" +
+            "Verified Educator"
+        );
+    }
+
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+</script>
 
 </asp:Content>

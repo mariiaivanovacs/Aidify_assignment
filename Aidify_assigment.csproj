@@ -98,12 +98,16 @@
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Instructor\Challenges.aspx" />
     <Content Include="Instructor\Dashboard.aspx" />
+    <Content Include="Instructor\Discussions.aspx" />
+    <Content Include="Instructor\Events.aspx" />
     <Content Include="Instructor\Lessons\Edit.aspx" />
     <Content Include="Instructor\Materials\Upload.aspx" />
-    <Content Include="Instructor\Modules\Edit.aspx" />
-    <Content Include="Instructor\Quizzes\Edit.aspx" />
+    <Content Include="Instructor\Modules\List.aspx" />
+    <Content Include="Instructor\Performance.aspx" />
     <Content Include="Instructor\Quizzes\GenerateWithAI.aspx" />
+    <Content Include="Instructor\Quizzes\List.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -192,12 +196,33 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Instructor\Challenges.aspx.cs">
+      <DependentUpon>Challenges.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Instructor\Challenges.aspx.designer.cs">
+      <DependentUpon>Challenges.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Instructor\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Instructor\Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Discussions.aspx.cs">
+      <DependentUpon>Discussions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Instructor\Discussions.aspx.designer.cs">
+      <DependentUpon>Discussions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Events.aspx.cs">
+      <DependentUpon>Events.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Instructor\Events.aspx.designer.cs">
+      <DependentUpon>Events.aspx</DependentUpon>
     </Compile>
     <Compile Include="Instructor\Lessons\Edit.aspx.cs">
       <DependentUpon>Edit.aspx</DependentUpon>
@@ -213,19 +238,19 @@
     <Compile Include="Instructor\Materials\Upload.aspx.designer.cs">
       <DependentUpon>Upload.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Instructor\Modules\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Instructor\Modules\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Instructor\Modules\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Instructor\Modules\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Instructor\Quizzes\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Instructor\Performance.aspx.cs">
+      <DependentUpon>Performance.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Instructor\Quizzes\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Instructor\Performance.aspx.designer.cs">
+      <DependentUpon>Performance.aspx</DependentUpon>
     </Compile>
     <Compile Include="Instructor\Quizzes\GenerateWithAI.aspx.cs">
       <DependentUpon>GenerateWithAI.aspx</DependentUpon>
@@ -233,6 +258,13 @@
     </Compile>
     <Compile Include="Instructor\Quizzes\GenerateWithAI.aspx.designer.cs">
       <DependentUpon>GenerateWithAI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">

@@ -24,22 +24,13 @@ namespace Aidify_assigment.Instructor
         protected global::System.Web.UI.WebControls.Label lblWelcomeInstructor;
 
         /// <summary>
-        /// lnkCreateModule control.
+        /// lblPendingDiscussions control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink lnkCreateModule;
-
-        /// <summary>
-        /// lnkGenerateWithAI control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink lnkGenerateWithAI;
+        protected global::System.Web.UI.WebControls.Label lblPendingDiscussions;
 
         /// <summary>
         /// rptMyModules control.

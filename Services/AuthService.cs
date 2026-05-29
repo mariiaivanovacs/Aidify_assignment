@@ -56,7 +56,7 @@ namespace Aidify_assigment
                         })).GetAwaiter().GetResult();
                     var json   = resp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     var parsed = Newtonsoft.Json.Linq.JObject.Parse(json);
-                    return parsed["success"]?.Value<bool>() ?? false;
+                    return parsed.Value<bool?>("success") ?? false;
                 }
             }
             catch { return true; }  // network failure → don't block users

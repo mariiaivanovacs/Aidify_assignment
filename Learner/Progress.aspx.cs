@@ -47,9 +47,9 @@ namespace Aidify_assigment.Learner
                     while (r.Read())
                         rows.Add(new ProgressRow {
                             ModuleName = r["Title"].ToString(),
-                            Completed  = (int)r["Completed"],
-                            Total      = (int)r["Total"],
-                            Pct        = (int)(decimal)r["Pct"]
+                            Completed  = Convert.ToInt32(r["Completed"]),
+                            Total      = Convert.ToInt32(r["Total"]),
+                            Pct        = Convert.ToInt32(r["Pct"])
                         });
             }
             rptModuleProgress.DataSource = rows;

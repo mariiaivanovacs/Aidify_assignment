@@ -35,7 +35,7 @@ namespace Aidify_assigment.Admin.Users
                     conn.Open();
 
                     var checkCmd = new SqlCommand(
-                        "SELECT COUNT(*) FROM Users WHERE Email = @Email",
+                        "SELECT COUNT(*) FROM Users WHERE Email = @Email AND IsDeleted = 0",
                         conn);
 
                     checkCmd.Parameters.AddWithValue("@Email", email);
@@ -90,7 +90,7 @@ namespace Aidify_assigment.Admin.Users
                         newUserId,
                         token,
                         "Reset",
-                        DateTime.UtcNow.AddMinutes(1));
+                        DateTime.UtcNow.AddHours(24));
 
                     string siteUrl = ConfigurationManager.AppSettings["SiteUrl"];
                     string resetLink = siteUrl + "/Auth/ResetPassword.aspx?t=" + token;
@@ -104,7 +104,7 @@ namespace Aidify_assigment.Admin.Users
                         "text-decoration:none;border-radius:8px;font-weight:bold;'>Set Password</a></p>" +
                         "<p>If the button does not work, copy and paste this link into your browser:</p>" +
                         "<p>" + resetLink + "</p>" +
-                        "<p>This link will expire in 1 minute.</p>" +
+                        "<p>This link will expire in 24 hours.</p>" +
                         "<p>Regards,<br/>Aidify Team</p>";
 
                     EmailService.Send(

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -8,9 +8,8 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor.Lessons
 {
-    public partial class List : Page
+    public partial class List : InstructorBasePage
     {
-        private const int InstructorUserId = 2;
 
         private string ConnectionString
         {
@@ -64,6 +63,7 @@ namespace Aidify_assigment.Instructor.Lessons
                 else if (e.CommandName == "DeleteLesson")
                 {
                     DeleteLesson(lessonId);
+                    AuditService.Log(InstructorUserId, "DeleteLesson", "Lessons", lessonId);
                     LoadLessons();
                     LoadLessonStats();
                     ShowMessage("Lesson deleted successfully.", true);

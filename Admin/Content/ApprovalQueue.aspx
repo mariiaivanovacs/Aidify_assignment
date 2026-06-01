@@ -210,7 +210,7 @@
         <div class="mb-4">
             <h1>Content Approval Queue</h1>
             <p class="text-muted" style="font-size:15px;">
-                Review and manage pending modules and events submitted for approval.
+                Review and manage pending modules, events, and challenges submitted for approval.
             </p>
         </div>
 
@@ -219,6 +219,7 @@
                 <button type="button" class="filter-btn active" id="btnAllRequests">All Requests (0)</button>
                 <button type="button" class="filter-btn" id="btnModules">Modules (0)</button>
                 <button type="button" class="filter-btn" id="btnEvents">Events (0)</button>
+                <button type="button" class="filter-btn" id="btnChallenges">Challenges (0)</button>
             </div>
 
             <div class="d-flex align-items-center gap-2">
@@ -239,6 +240,7 @@
 <script type="text/javascript">
     var allModules = [];
     var allEvents = [];
+    var allChallenges = [];
     var currentView = "all";
     var currentPage = 1;
     var pageSize = 4;
@@ -278,6 +280,21 @@
         });
     }
 
+    function loadPendingChallenges() {
+        $.ajax({
+            type: 'POST',
+            url: 'ApprovalQueue.aspx/GetPendingChallenges',
+            data: '{}',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (r) {
+                allChallenges = r.d || [];
+                updateCounts();
+                renderModules();
+            }
+        });
+    }
+
     function updateCounts() {
 
         document.getElementById('btnModules').textContent =
@@ -286,8 +303,11 @@
         document.getElementById('btnEvents').textContent =
             'Events (' + allEvents.length + ')';
 
+        document.getElementById('btnChallenges').textContent =
+            'Challenges (' + allChallenges.length + ')';
+
         document.getElementById('btnAllRequests').textContent =
-            'All Requests (' + (allModules.length + allEvents.length) + ')';
+            'All Requests (' + (allModules.length + allEvents.length + allChallenges.length) + ')';
     }
 
     function getFilteredModules() {
@@ -305,8 +325,11 @@
         else if (currentView === "events")
             items = allEvents;
 
+        else if (currentView === "challenges")
+            items = allChallenges;
+
         else
-            items = allModules.concat(allEvents);
+            items = allModules.concat(allEvents).concat(allChallenges);
 
         return items.filter(function (m) {
 
@@ -348,6 +371,7 @@
         for (var i = 0; i < pageModules.length; i++) {
             var m = pageModules[i];
             var isEvent = m.itemType === "Event";
+            var isChallenge = m.itemType === "Challenge";
             var dt = new Date(parseInt(m.submittedAt.replace('/Date(', '').replace(')/', '')));
             var dateStr = dt.toLocaleDateString('en-MY');
 
@@ -360,7 +384,11 @@
                 '</div>' +
 
                 '<h3 class="h5 fw-bold mb-1">' + esc(m.title) + '</h3>' +
-                (isEvent
+                (isChallenge
+                    ? '<p class="text-muted small mb-1">Reward: <strong>' +
+                    esc(m.pointsReward || 0) +
+                    ' points</strong></p>'
+                    : isEvent
                     ? '<p class="text-muted small mb-1">Location: <strong>' +
                     esc(m.location || '-') +
                     '</strong></p>'
@@ -371,16 +399,15 @@
 
                 '<div class="d-flex flex-wrap gap-2">' +
                 '<a href="ApprovalQueue.aspx?action=approve&type=' +
-                (isEvent ? 'event' : 'module') +
+                (isChallenge ? 'challenge' : (isEvent ? 'event' : 'module')) +
                 '&id=' + m.itemId +
                 '" class="btn-sm-approve" onclick="return confirm(\'Approve this request?\');">' +
                 '<i class="bi bi-check-circle"></i> Approve' +
                 '</a>' +
 
-                '<a href="ApprovalQueue.aspx?action=reject&type=' +
-                (isEvent ? 'event' : 'module') +
-                '&id=' + m.itemId +
-                '" class="btn-sm-outline-danger" onclick="return confirm(\'Reject and return to Draft?\');">' +
+                '<a href="#" class="btn-sm-outline-danger" onclick="return rejectRequest(\'' +
+                (isChallenge ? 'challenge' : (isEvent ? 'event' : 'module')) +
+                '\',' + m.itemId + ');">' +
                 '<i class="bi bi-x-circle"></i> Reject' +
                 '</a>' +
                 '</div>' +
@@ -412,6 +439,29 @@
         document.getElementById('approvalPagination').innerHTML = html;
     }
 
+    function rejectRequest(type, id) {
+        var reason = prompt('Enter the rejection reason for this request:');
+
+        if (reason === null) {
+            return false;
+        }
+
+        reason = reason.trim();
+
+        if (reason.length === 0) {
+            alert('A rejection reason is required.');
+            return false;
+        }
+
+        window.location.href =
+            'ApprovalQueue.aspx?action=reject&type=' +
+            encodeURIComponent(type) +
+            '&id=' + encodeURIComponent(id) +
+            '&reason=' + encodeURIComponent(reason);
+
+        return false;
+    }
+
     function esc(s) {
         return String(s || '')
             .replace(/&/g, '&amp;')
@@ -422,6 +472,7 @@
     $(document).ready(function () {
         loadPendingModules();
         loadPendingEvents();
+        loadPendingChallenges();
 
         $('#btnAllRequests').click(function () {
             currentView = "all";
@@ -437,6 +488,12 @@
 
         $('#btnEvents').click(function () {
             currentView = "events";
+            currentPage = 1;
+            renderModules();
+        });
+
+        $('#btnChallenges').click(function () {
+            currentView = "challenges";
             currentPage = 1;
             renderModules();
         });

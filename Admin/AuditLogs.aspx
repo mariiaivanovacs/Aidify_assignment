@@ -451,10 +451,15 @@
                         <option value="">All Actions</option>
                         <option value="CreateUser">CreateUser</option>
                         <option value="UpdateUser">UpdateUser</option>
+                        <option value="DeleteUser">DeleteUser</option>
                         <option value="EnableUser">EnableUser</option>
                         <option value="DisableUser">DisableUser</option>
+                        <option value="CreateModule">CreateModule</option>
+                        <option value="CreateEvent">CreateEvent</option>
                         <option value="ApproveModule">ApproveModule</option>
                         <option value="RejectModule">RejectModule</option>
+                        <option value="ApproveEvent">ApproveEvent</option>
+                        <option value="RejectEvent">RejectEvent</option>
                         <option value="ForceResetPassword">ForceResetPassword</option>
                     </select>
                 </div>

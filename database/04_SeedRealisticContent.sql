@@ -51,7 +51,7 @@ INSERT INTO Lessons (ModuleId, Title, BodyHtml, SequenceOrder, EstimatedMinutes)
      1, 8),
 
     (@CPR, 'Chest Compressions Technique',
-     '<h3>How to Perform Chest Compressions</h3><ol><li>Place the heel of your hand on the centre of the chest (lower half of the sternum).</li><li>Place your other hand on top and interlock your fingers.</li><li>Keep your arms straight, position your shoulders directly above your hands.</li><li>Compress the chest at least 5 cm (2 inches) deep.</li><li>Compress at a rate of 100–120 compressions per minute.</li><li>Allow full chest recoil between compressions — do not lean on the chest.</li></ol><p>The rhythm of the song <em>Stayin Alive</em> by the Bee Gees is approximately 100 bpm — a useful mental guide.</p>',
+     '<h3>How to Perform Chest Compressions</h3><ol><li>Place the heel of your hand on the centre of the chest (lower half of the sternum).</li><li>Place your other hand on top and interlock your fingers.</li><li>Keep your arms straight, position your shoulders directly above your hands.</li><li>Compress the chest at least 5 cm (2 inches) deep.</li><li>Compress at a rate of 100-120 compressions per minute.</li><li>Allow full chest recoil between compressions — do not lean on the chest.</li></ol><p>The rhythm of the song <em>Stayin Alive</em> by the Bee Gees is approximately 100 bpm — a useful mental guide.</p>',
      2, 10),
 
     (@CPR, 'Rescue Breathing',
@@ -127,10 +127,10 @@ INSERT INTO Questions (QuizId, QuestionText, QuestionType, Points) VALUES
     (@QuizCPR, 'What is the correct compression rate for adult CPR?', 'MCQ', 1);
 DECLARE @Q1 INT = SCOPE_IDENTITY();
 INSERT INTO Options (QuestionId, OptionText, IsCorrect) VALUES
-    (@Q1, '60–80 compressions per minute',  0),
-    (@Q1, '100–120 compressions per minute',1),
-    (@Q1, '80–100 compressions per minute', 0),
-    (@Q1, '120–140 compressions per minute',0);
+    (@Q1, '60-80 compressions per minute',  0),
+    (@Q1, '100-120 compressions per minute',1),
+    (@Q1, '80-100 compressions per minute', 0),
+    (@Q1, '120-140 compressions per minute',0);
 
 INSERT INTO Questions (QuizId, QuestionText, QuestionType, Points) VALUES
     (@QuizCPR, 'How deep should chest compressions be for an adult?', 'MCQ', 1);
@@ -200,7 +200,7 @@ INSERT INTO Options (QuestionId, OptionText, IsCorrect) VALUES
     (@C3, 'Perform a blind finger sweep of the mouth',       0);
 
 INSERT INTO Questions (QuizId, QuestionText, QuestionType, Points) VALUES
-    (@QuizChoking, 'Mild choking — the person CAN cough. What is the correct response?', 'MCQ', 1);
+    (@QuizChoking, 'Mild choking - the person CAN cough. What is the correct response?', 'MCQ', 1);
 DECLARE @C4 INT = SCOPE_IDENTITY();
 INSERT INTO Options (QuestionId, OptionText, IsCorrect) VALUES
     (@C4, 'Immediately perform the Heimlich manoeuvre',                 0),
@@ -226,7 +226,7 @@ INSERT INTO Questions (QuizId, QuestionText, QuestionType, Points) VALUES
 DECLARE @B2 INT = SCOPE_IDENTITY();
 INSERT INTO Options (QuestionId, OptionText, IsCorrect) VALUES
     (@B2, 'Directly on the wound',                            0),
-    (@B2, '5–8 cm above the wound, not on a joint',          1),
+    (@B2, '5-8 cm above the wound, not on a joint',          1),
     (@B2, 'On the nearest joint above the wound',             0),
     (@B2, 'Anywhere that feels comfortable for the casualty', 0);
 
@@ -274,8 +274,8 @@ INSERT INTO Questions (QuizId, QuestionText, QuestionType, Points) VALUES
     (@QuizBurns, 'A burn covers the casualty''s entire hand. Should you call emergency services?', 'MCQ', 1);
 DECLARE @N4 INT = SCOPE_IDENTITY();
 INSERT INTO Options (QuestionId, OptionText, IsCorrect) VALUES
-    (@N4, 'No — the hand is a small area, treat at home',                          0),
-    (@N4, 'Yes — burns to the hand require emergency medical attention',           1),
+    (@N4, 'No - the hand is a small area, treat at home',                          0),
+    (@N4, 'Yes - burns to the hand require emergency medical attention',           1),
     (@N4, 'Only if the burn is full thickness',                                    0),
     (@N4, 'Only if the casualty is a child',                                       0);
 

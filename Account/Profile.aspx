@@ -63,6 +63,26 @@
         margin-bottom: 28px;
     }
 
+    .profile-avatar-box {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 22px;
+        padding: 18px;
+        background: #fafafa;
+        border: 1px solid #eeeeee;
+        border-radius: 14px;
+    }
+
+    .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #E53935;
+        background: #ffe2de;
+    }
+
     .form-label {
         font-weight: 700;
         color: #555;
@@ -105,7 +125,7 @@
 
 <header class="profile-topbar">
     <div class="container">
-        <a href="<%= ResolveUrl("~/Admin/Dashboard.aspx") %>" class="profile-brand">
+        <a href="<%= ResolveUrl(GetDashboardUrl()) %>" class="profile-brand">
             <img src="<%= ResolveUrl("~/Images/aidify-kit.png") %>"
                  alt="Aidify Logo"
                  class="profile-logo" />
@@ -120,6 +140,21 @@
 
         <h1 class="profile-title">My Profile</h1>
         <p class="profile-subtitle">View and update your basic account information.</p>
+
+        <div class="profile-avatar-box">
+            <asp:Image ID="imgAvatar"
+                runat="server"
+                CssClass="profile-avatar"
+                AlternateText="Profile picture" />
+
+            <div class="flex-grow-1">
+                <label class="form-label mt-0">Profile Picture</label>
+                <asp:FileUpload ID="fuAvatar"
+                    runat="server"
+                    CssClass="form-control" />
+                <small class="text-muted">JPEG, PNG, or GIF only. Max 2 MB.</small>
+            </div>
+        </div>
 
         <label class="form-label">Full Name</label>
         <asp:TextBox ID="txtFullName"
@@ -143,7 +178,7 @@
             CssClass="message-label" />
 
         <div class="profile-actions">
-            <a href="<%= ResolveUrl("~/Admin/Dashboard.aspx") %>" class="btn btn-outline-secondary">
+            <a href="<%= ResolveUrl(GetDashboardUrl()) %>" class="btn btn-outline-secondary">
                 Go Back
             </a>
 

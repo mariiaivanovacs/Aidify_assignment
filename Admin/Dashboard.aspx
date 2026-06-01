@@ -146,26 +146,6 @@
             color: #ffffff;
         }
 
-        .support-box {
-            background-color: #db322f;
-            color: white;
-            border-radius: 18px;
-            padding: 22px;
-            margin-top: 35px;
-        }
-
-        .support-box h6 {
-            font-weight: 800;
-            margin-top: 8px;
-        }
-
-        .support-box p {
-            margin: 0;
-            opacity: 0.9;
-            font-size: 14px;
-        }
-
-
         .admin-main {
             flex: 1;
             padding: 42px 48px 42px;
@@ -195,6 +175,27 @@
             border-radius: 16px;
             padding: 24px;
             height: 100%;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        .admin-stat-link {
+            color: inherit;
+            display: block;
+            height: 100%;
+            text-decoration: none;
+        }
+
+        .admin-stat-link:hover,
+        .admin-stat-link:focus {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .admin-stat-link:hover .admin-stat-card,
+        .admin-stat-link:focus .admin-stat-card {
+            border-color: #db322f;
+            box-shadow: 0 12px 28px rgba(31, 41, 51, 0.12);
+            transform: translateY(-2px);
         }
 
         .admin-stat-top {
@@ -503,16 +504,6 @@
                     <i class="bi bi-clock-history"></i> Audit Logs
                 </a>
 
-                <div class="support-box">
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="bi bi-question-circle fs-4 me-2" style="line-height: 1;"></i>
-                        <h6 class="mb-0 fw-bold" style="line-height: 1;">
-                            Technical Support
-                        </h6>
-                    </div>
-
-                    <p>Priority admin hotline available 24/7.</p>
-                </div>
             </aside>
 
             <!-- Main Dashboard Content -->
@@ -541,68 +532,76 @@
                 <div class="row g-4 mb-4">
 
                     <div class="col-md-6 col-lg-3">
-                        <div class="admin-stat-card">
-                            <div class="admin-stat-top">
-                                <div class="admin-stat-icon icon-blue">
-                                    <i class="bi bi-people"></i>
-                                </div>
-                                <small id="statUserGrowthLabel" class="text-success fw-bold">—</small>
-                            </div>
-                            <span>Total active users</span>
-                            <h2 id="statTotalUsers">—</h2>
-                            <p>Registered learners and staff</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3">
-                        <div class="admin-stat-card">
-                            <div class="admin-stat-top">
-                                <div class="admin-stat-icon icon-purple">
-                                    <i class="bi bi-check-circle"></i>
-                                </div>
-                                <small id="statLearnerStatusLabel" class="text-success fw-bold">—</small>
-                            </div>
-                            <span>Module Completion Rate</span>
-
-                                <h2 id="statActiveLearners">—</h2>
-
-                                <div class="progress mt-2" style="height: 6px;">
-                                    <div id="learnerProgressBar"
-                                         class="progress-bar bg-danger"
-                                         style="width: 0%;">
+                        <a href="Users/List.aspx" class="admin-stat-link" aria-label="Open user management">
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-top">
+                                    <div class="admin-stat-icon icon-blue">
+                                        <i class="bi bi-people"></i>
                                     </div>
+                                    <small id="statUserGrowthLabel" class="text-success fw-bold">—</small>
                                 </div>
-
-                                <p id="completionLabel">Loading...</p>
-                        </div>
+                                <span>Total active users</span>
+                                <h2 id="statTotalUsers">—</h2>
+                                <p>Registered learners and staff</p>
+                            </div>
+                        </a>
                     </div>
 
                     <div class="col-md-6 col-lg-3">
-                        <div class="admin-stat-card">
-                            <div class="admin-stat-top">
-                                <div class="admin-stat-icon icon-green">
-                                    <i class="bi bi-shield-plus"></i>
+                        <a href="Analytics.aspx" class="admin-stat-link" aria-label="Open analytics completion report">
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-top">
+                                    <div class="admin-stat-icon icon-purple">
+                                        <i class="bi bi-check-circle"></i>
+                                    </div>
+                                    <small id="statLearnerStatusLabel" class="text-success fw-bold">—</small>
                                 </div>
-                                <small id="statAttemptsStatusLabel" class="text-muted fw-bold">—</small>
+                                <span>Module Completion Rate</span>
+
+                                    <h2 id="statActiveLearners">—</h2>
+
+                                    <div class="progress mt-2" style="height: 6px;">
+                                        <div id="learnerProgressBar"
+                                             class="progress-bar bg-danger"
+                                             style="width: 0%;">
+                                        </div>
+                                    </div>
+
+                                    <p id="completionLabel">Loading...</p>
                             </div>
-                            <span>Module Attempts</span>
-                            <h2 id="statTotalAttempts">—</h2>
-                            <p>Total learning activity recorded</p>
-                        </div>
+                        </a>
                     </div>
 
                     <div class="col-md-6 col-lg-3">
-                        <div class="admin-stat-card priority-card">
-                            <div class="admin-stat-top">
-                                <div class="admin-stat-icon icon-red">
-                                    <i class="bi bi-exclamation-triangle"></i>
+                        <a href="Analytics.aspx" class="admin-stat-link" aria-label="Open analytics activity report">
+                            <div class="admin-stat-card">
+                                <div class="admin-stat-top">
+                                    <div class="admin-stat-icon icon-green">
+                                        <i class="bi bi-shield-plus"></i>
+                                    </div>
+                                    <small id="statAttemptsStatusLabel" class="text-muted fw-bold">—</small>
                                 </div>
-                                <small id="statAlertStatusLabel" class="text-danger fw-bold">—</small>
+                                <span>Module Attempts</span>
+                                <h2 id="statTotalAttempts">—</h2>
+                                <p>Total learning activity recorded</p>
                             </div>
-                            <span>Critical Alerts</span>
-                            <h2 id="statPendingModules">—</h2>
-                            <p>Needs admin review</p>
-                        </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <a href="Content/ApprovalQueue.aspx" class="admin-stat-link" aria-label="Open approval queue">
+                            <div class="admin-stat-card priority-card">
+                                <div class="admin-stat-top">
+                                    <div class="admin-stat-icon icon-red">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                    </div>
+                                    <small id="statAlertStatusLabel" class="text-danger fw-bold">—</small>
+                                </div>
+                                <span>Critical Alerts</span>
+                                <h2 id="statPendingModules">—</h2>
+                                <p>Needs admin review</p>
+                            </div>
+                        </a>
                     </div>
 
                 </div>

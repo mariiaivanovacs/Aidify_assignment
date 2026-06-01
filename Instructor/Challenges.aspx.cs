@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor
 {
-    public partial class Challenges : Page
+    public partial class Challenges : InstructorBasePage
     {
         private string ConnectionString
         {
@@ -88,13 +88,15 @@ namespace Aidify_assigment.Instructor
             {
                 if (string.IsNullOrWhiteSpace(hfChallengeId.Value))
                 {
-                    InsertChallenge(title, description, startDate, endDate, pointsReward);
+                    int challengeId = InsertChallenge(title, description, startDate, endDate, pointsReward);
+                    AuditService.Log(InstructorUserId, "CreateChallenge", "Challenges", challengeId);
                     ShowMessage("Challenge created successfully and saved as Draft.", true);
                 }
                 else
                 {
                     int challengeId = Convert.ToInt32(hfChallengeId.Value);
                     UpdateChallenge(challengeId, title, description, startDate, endDate, pointsReward);
+                    AuditService.Log(InstructorUserId, "UpdateChallenge", "Challenges", challengeId);
                     ShowMessage("Challenge updated successfully.", true);
                 }
 
@@ -161,13 +163,15 @@ namespace Aidify_assigment.Instructor
                 else if (e.CommandName == "PublishChallenge")
                 {
                     PublishChallenge(challengeId);
-                    ShowMessage("Challenge published successfully.", true);
+                    AuditService.Log(InstructorUserId, "SubmitChallengeForReview", "Challenges", challengeId);
+                    ShowMessage("Challenge submitted for admin review successfully.", true);
                     LoadChallenges();
                     LoadChallengeStats();
                 }
                 else if (e.CommandName == "DeleteChallenge")
                 {
                     DeleteChallenge(challengeId);
+                    AuditService.Log(InstructorUserId, "DeleteChallenge", "Challenges", challengeId);
                     ShowMessage("Challenge deleted successfully.", true);
                     LoadChallenges();
                     LoadChallengeStats();
@@ -179,15 +183,17 @@ namespace Aidify_assigment.Instructor
             }
         }
 
-        private void InsertChallenge(string title, string description, DateTime startDate, DateTime endDate, int pointsReward)
+        private int InsertChallenge(string title, string description, DateTime startDate, DateTime endDate, int pointsReward)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
                 string query = @"
                     INSERT INTO dbo.Challenges
-                        (Title, Description, StartDate, EndDate, PointsReward, BadgeRewardId, Status)
+                        (Title, Description, StartDate, EndDate, PointsReward, BadgeRewardId, CreatedBy, Status)
                     VALUES
-                        (@Title, @Description, @StartDate, @EndDate, @PointsReward, @BadgeRewardId, @Status);";
+                        (@Title, @Description, @StartDate, @EndDate, @PointsReward, @BadgeRewardId, @CreatedBy, @Status);
+
+                    SELECT CAST(SCOPE_IDENTITY() AS int);";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -197,10 +203,11 @@ namespace Aidify_assigment.Instructor
                     cmd.Parameters.AddWithValue("@EndDate", endDate);
                     cmd.Parameters.AddWithValue("@PointsReward", pointsReward);
                     cmd.Parameters.AddWithValue("@BadgeRewardId", DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
                     cmd.Parameters.AddWithValue("@Status", "Draft");
 
                     con.Open();
-                    cmd.ExecuteNonQuery();
+                    return Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
         }
@@ -238,11 +245,12 @@ namespace Aidify_assigment.Instructor
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
-                string query = "UPDATE dbo.Challenges SET Status = 'Published' WHERE ChallengeId = @ChallengeId;";
+                string query = "UPDATE dbo.Challenges SET Status = 'PendingReview' WHERE ChallengeId = @ChallengeId AND CreatedBy = @CreatedBy;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@ChallengeId", challengeId);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
 
                     con.Open();
                     cmd.ExecuteNonQuery();

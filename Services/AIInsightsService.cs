@@ -37,6 +37,8 @@ namespace Aidify_assigment
                         null,
                         DateTime.UtcNow.AddHours(24),
                         Cache.NoSlidingExpiration);
+
+                    SaveInsight("DailySummary", prompt, insight, DateTime.UtcNow.AddHours(24));
                 }
 
                 return string.IsNullOrWhiteSpace(insight)
@@ -67,6 +69,9 @@ namespace Aidify_assigment
 
                 var answer = await new GeminiClient()
                     .GenerateAsync(prompt, jsonMode: false);
+
+                if (!string.IsNullOrWhiteSpace(answer))
+                    SaveInsight("AdminQuestion", prompt, answer, null);
 
                 return string.IsNullOrWhiteSpace(answer)
                     ? "AI service returned no response."
@@ -105,6 +110,23 @@ namespace Aidify_assigment
                 "Here is today's platform data: " + dataJson + ". " +
                 "Write a concise 2-3 sentence daily summary highlighting the most important metric " +
                 "and one actionable recommendation. Do not invent data.";
+        }
+        private static void SaveInsight(string category, string prompt, string response, DateTime? cachedUntil)
+        {
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new System.Data.SqlClient.SqlCommand(@"
+                    INSERT INTO AIInsights (Category, PromptUsed, ResponseText, GeneratedAt, CachedUntil)
+                    VALUES (@Category, @PromptUsed, @ResponseText, GETUTCDATE(), @CachedUntil)", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Category", category);
+                    cmd.Parameters.AddWithValue("@PromptUsed", prompt);
+                    cmd.Parameters.AddWithValue("@ResponseText", response);
+                    cmd.Parameters.AddWithValue("@CachedUntil", cachedUntil.HasValue ? (object)cachedUntil.Value : DBNull.Value);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

@@ -113,16 +113,11 @@
             margin-right: 12px;
         }
 
-        .bulk-card {
-            background: #4B50C7;
-            color: white;
-            border-radius: 16px;
-            padding: 42px;
-        }
-
-        .bulk-card img {
-            border: 4px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
+        .avatar-circle img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
         }
         .um-footer {
             background: #eeeeee;
@@ -325,33 +320,11 @@
                 </div>
             </div>
 
-            <div class="row g-4">
-                <div class="col-lg-8">
-                    <div class="bulk-card h-100 text-center">
+            <div class="security-card p-4">
+                <h3 class="fw-bold mb-4">Security Logs</h3>
 
-                        <h3 class="fw-bold mb-3">
-                            User Account Management
-                        </h3>
-
-                        <img src="../../Images/user-management-banner.jpeg"
-                             class="img-fluid rounded shadow-sm mb-3"
-                             style="max-height:250px; width:100%; object-fit:cover;" />
-
-                        <p class="opacity-75 mb-0">
-                            Create users, assign roles, manage permissions, and monitor account activity across the Aidify platform.
-                        </p>
-
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="security-card p-4 h-100">
-                        <h3 class="fw-bold mb-4">Security Logs</h3>
-
-                        <div id="securityLogsBody">
-                            <small class="text-muted">Loading logs...</small>
-                        </div>
-                    </div>
+                <div id="securityLogsBody">
+                    <small class="text-muted">Loading logs...</small>
                 </div>
             </div>
 
@@ -375,6 +348,7 @@
     var allUsers = [];
     var currentPage = 1;
     var pageSize = 5;
+    var appRoot = '<%= ResolveUrl("~/") %>';
 
     function loadUsers() {
         $.ajax({
@@ -441,7 +415,7 @@
             html +=
                 '<tr>' +
                 '<td class="ps-4">' +
-                '<span class="avatar-circle bg-danger-subtle text-danger">' + esc(u.initials) + '</span>' +
+                renderUserAvatar(u) +
                 '<strong>' + esc(u.fullName) + '</strong><br/>' +
                 '<small class="text-muted ms-5">' + esc(u.email) + '</small>' +
                 '</td>' +
@@ -453,6 +427,10 @@
                 '<a href="#" class="' + (active ? 'text-danger' : 'text-success') + '" ' +
                 'onclick="toggleUser(' + u.userId + ',' + (!active) + ');return false;">' +
                 '<i class="bi bi-person-' + (active ? 'x' : 'check') + '"></i> ' + toggleLabel +
+                '</a>' +
+                '<a href="#" class="text-danger ms-3" ' +
+                'onclick="softDeleteUser(' + u.userId + ');return false;">' +
+                '<i class="bi bi-trash"></i> Delete' +
                 '</a>' +
                 '</td>' +
                 '</tr>';
@@ -505,8 +483,41 @@
         });
     }
 
+    function softDeleteUser(userId) {
+        if (!confirm('Soft-delete this user account? Historical records will remain, but the user will be hidden and cannot log in.')) {
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: 'List.aspx/SoftDeleteUser',
+            data: JSON.stringify({ userId: userId }),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function () {
+                loadUsers();
+            }
+        });
+    }
+
     function esc(s) {
         return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function avatarUrl(path) {
+        path = String(path || '');
+        if (path.indexOf('~/') === 0) return appRoot + path.substring(2);
+        return path;
+    }
+
+    function renderUserAvatar(u) {
+        if (u.avatarPath) {
+            return '<span class="avatar-circle">' +
+                '<img src="' + esc(avatarUrl(u.avatarPath)) + '" alt="' + esc(u.fullName) + ' avatar" />' +
+                '</span>';
+        }
+
+        return '<span class="avatar-circle bg-danger-subtle text-danger">' + esc(u.initials) + '</span>';
     }
 
     function downloadVisibleUsersCsv() {
@@ -564,10 +575,17 @@
             dataType: 'json',
             success: function (r) {
                 var d = r.d;
+                if (!d) {
+                    showUserStatsError();
+                    return;
+                }
                 document.getElementById('ulStatTotal').textContent = d.totalUsers.toLocaleString();
                 document.getElementById('ulStatLearners').textContent = d.activeLearners.toLocaleString();
                 document.getElementById('ulStatPending').textContent = d.pendingModules;
                 document.getElementById('ulStatCompletion').textContent = d.completionRate + '%';
+            },
+            error: function () {
+                showUserStatsError();
             }
         });
 
@@ -597,12 +615,6 @@
                         '</div>';
                 }
 
-                html +=
-                    '<div class="d-flex gap-3">' +
-                    '<i class="bi bi-arrow-right-circle text-muted"></i>' +
-                    '<small><a href="../AuditLogs.aspx">View full audit log...</a></small>' +
-                    '</div>';
-
                 document.getElementById('securityLogsBody').innerHTML = html;
             },
             error: function () {
@@ -611,6 +623,13 @@
             }
         });
     });
+
+    function showUserStatsError() {
+        document.getElementById('ulStatTotal').textContent = 'Error';
+        document.getElementById('ulStatLearners').textContent = 'Error';
+        document.getElementById('ulStatPending').textContent = 'Error';
+        document.getElementById('ulStatCompletion').textContent = 'Error';
+    }
 </script>
 
 </asp:Content>

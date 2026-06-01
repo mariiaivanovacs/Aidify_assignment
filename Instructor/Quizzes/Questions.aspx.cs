@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -7,9 +7,8 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor.Quizzes
 {
-    public partial class Questions : Page
+    public partial class Questions : InstructorBasePage
     {
-        private const int InstructorUserId = 2;
 
         private string ConnectionString
         {
@@ -70,7 +69,29 @@ namespace Aidify_assigment.Instructor.Quizzes
             string option3 = txtOption3.Text.Trim();
             string option4 = txtOption4.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(option1) || string.IsNullOrWhiteSpace(option2))
+            if (questionType == "TrueFalse")
+            {
+                option1 = "True";
+                option2 = "False";
+                option3 = "";
+                option4 = "";
+            }
+
+            if (questionType == "ShortAnswer")
+            {
+                option2 = "";
+                option3 = "";
+                option4 = "";
+                rbCorrect1.Checked = true;
+            }
+
+            if (questionType == "ShortAnswer" && string.IsNullOrWhiteSpace(option1))
+            {
+                ShowMessage("Please enter the accepted short answer in option 1.", false);
+                return;
+            }
+
+            if (questionType != "ShortAnswer" && (string.IsNullOrWhiteSpace(option1) || string.IsNullOrWhiteSpace(option2)))
             {
                 ShowMessage("Please enter at least option 1 and option 2.", false);
                 return;
@@ -81,7 +102,11 @@ namespace Aidify_assigment.Instructor.Quizzes
                 int questionId = InsertQuestion(quizId, questionText, questionType, points);
 
                 InsertOption(questionId, option1, rbCorrect1.Checked);
-                InsertOption(questionId, option2, rbCorrect2.Checked);
+
+                if (!string.IsNullOrWhiteSpace(option2))
+                {
+                    InsertOption(questionId, option2, rbCorrect2.Checked);
+                }
 
                 if (!string.IsNullOrWhiteSpace(option3))
                 {
@@ -93,6 +118,7 @@ namespace Aidify_assigment.Instructor.Quizzes
                     InsertOption(questionId, option4, rbCorrect4.Checked);
                 }
 
+                AuditService.Log(InstructorUserId, "CreateQuestion", "Questions", questionId);
                 ClearForm();
                 LoadQuestions();
                 ShowMessage("Question added successfully.", true);
@@ -120,6 +146,7 @@ namespace Aidify_assigment.Instructor.Quizzes
             try
             {
                 DeleteQuestion(questionId);
+                AuditService.Log(InstructorUserId, "DeleteQuestion", "Questions", questionId);
                 LoadQuestions();
                 ShowMessage("Question deleted successfully.", true);
             }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -8,9 +8,8 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor.Materials
 {
-    public partial class Upload : Page
+    public partial class Upload : InstructorBasePage
     {
-        private const int InstructorUserId = 2;
 
         private string ConnectionString
         {
@@ -121,7 +120,8 @@ namespace Aidify_assigment.Instructor.Materials
 
             try
             {
-                InsertMaterial(moduleId, lessonId, type, filePath, captionToSave);
+                int materialId = InsertMaterial(moduleId, lessonId, type, filePath, captionToSave);
+                AuditService.Log(InstructorUserId, "UploadMaterial", "LearningMaterials", materialId);
 
                 ShowMessage("Material uploaded successfully.", true);
                 ClearForm();
@@ -412,7 +412,7 @@ namespace Aidify_assigment.Instructor.Materials
             }
         }
 
-        private void InsertMaterial(int moduleId, int? lessonId, string type, string filePath, string caption)
+        private int InsertMaterial(int moduleId, int? lessonId, string type, string filePath, string caption)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -420,7 +420,9 @@ namespace Aidify_assigment.Instructor.Materials
                     INSERT INTO dbo.LearningMaterials
                         (ModuleId, LessonId, Type, FilePath, Caption)
                     VALUES
-                        (@ModuleId, @LessonId, @Type, @FilePath, @Caption);";
+                        (@ModuleId, @LessonId, @Type, @FilePath, @Caption);
+
+                    SELECT CAST(SCOPE_IDENTITY() AS int);";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -431,7 +433,7 @@ namespace Aidify_assigment.Instructor.Materials
                     cmd.Parameters.AddWithValue("@Caption", string.IsNullOrWhiteSpace(caption) ? (object)DBNull.Value : caption);
 
                     con.Open();
-                    cmd.ExecuteNonQuery();
+                    return Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
         }

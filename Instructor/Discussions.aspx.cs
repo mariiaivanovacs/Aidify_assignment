@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -7,9 +7,8 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor
 {
-    public partial class Discussions : Page
+    public partial class Discussions : InstructorBasePage
     {
-        private const int InstructorUserId = 2;
 
         private string ConnectionString
         {
@@ -65,7 +64,8 @@ namespace Aidify_assigment.Instructor
 
             try
             {
-                InsertThread(moduleId, InstructorUserId, title, body);
+                int threadId = InsertThread(moduleId, InstructorUserId, title, body);
+                AuditService.Log(InstructorUserId, "CreateDiscussionThread", "DiscussionThreads", threadId);
 
                 ClearThreadForm();
                 LoadThreads();
@@ -136,7 +136,8 @@ namespace Aidify_assigment.Instructor
                         return;
                     }
 
-                    InsertReply(threadId, InstructorUserId, txtReplyBody.Text.Trim());
+                    int replyId = InsertReply(threadId, InstructorUserId, txtReplyBody.Text.Trim());
+                    AuditService.Log(InstructorUserId, "CreateDiscussionReply", "DiscussionReplies", replyId);
 
                     LoadThreads();
                     LoadDiscussionStats();
@@ -374,7 +375,7 @@ namespace Aidify_assigment.Instructor
             }
         }
 
-        private void InsertThread(int moduleId, int userId, string title, string body)
+        private int InsertThread(int moduleId, int userId, string title, string body)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -382,7 +383,9 @@ namespace Aidify_assigment.Instructor
                     INSERT INTO dbo.DiscussionThreads
                         (ModuleId, UserId, Title, Body, CreatedAt)
                     VALUES
-                        (@ModuleId, @UserId, @Title, @Body, GETDATE());";
+                        (@ModuleId, @UserId, @Title, @Body, GETDATE());
+
+                    SELECT CAST(SCOPE_IDENTITY() AS int);";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -392,12 +395,12 @@ namespace Aidify_assigment.Instructor
                     cmd.Parameters.AddWithValue("@Body", body);
 
                     con.Open();
-                    cmd.ExecuteNonQuery();
+                    return Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
         }
 
-        private void InsertReply(int threadId, int userId, string body)
+        private int InsertReply(int threadId, int userId, string body)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -405,7 +408,9 @@ namespace Aidify_assigment.Instructor
                     INSERT INTO dbo.DiscussionReplies
                         (ThreadId, UserId, Body, CreatedAt)
                     VALUES
-                        (@ThreadId, @UserId, @Body, GETDATE());";
+                        (@ThreadId, @UserId, @Body, GETDATE());
+
+                    SELECT CAST(SCOPE_IDENTITY() AS int);";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -414,7 +419,7 @@ namespace Aidify_assigment.Instructor
                     cmd.Parameters.AddWithValue("@Body", body);
 
                     con.Open();
-                    cmd.ExecuteNonQuery();
+                    return Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
         }

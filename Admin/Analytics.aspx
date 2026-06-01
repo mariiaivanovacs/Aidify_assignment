@@ -230,34 +230,39 @@
     color: #1a1a1a;
     }
 
-    .dist-bar-wrap {
-        height: 120px;
-        display: flex;
-        align-items: flex-end;
-        gap: 16px;
-        margin: 24px 0 10px;
+    .score-row {
+        display: grid;
+        grid-template-columns: 78px minmax(0, 1fr) 72px;
+        gap: 14px;
+        align-items: center;
+        margin-top: 14px;
     }
 
-    .dist-bar-wrap .dbar {
-        flex: 1;
-        border-radius: 6px 6px 0 0;
+    .score-range {
+        color: #1a1a1a;
+        font-size: 13px;
+        font-weight: 800;
     }
 
-    .dbar-grey {
-        background: #e2e2e2;
-    }
-
-    .dbar-red {
-        background: #b71c1c;
-    }
-
-    .dist-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
+    .score-count {
+        color: #666;
+        font-size: 13px;
         font-weight: 700;
-        color: #888;
-        padding: 0 2px;
+        text-align: right;
+    }
+
+    .score-track {
+        background: #efefef;
+        border-radius: 999px;
+        height: 10px;
+        overflow: hidden;
+    }
+
+    .score-fill {
+        background: #E53935;
+        border-radius: 999px;
+        height: 100%;
+        min-width: 8px;
     }
 
     /* ── EXPORT BUTTONS ── */
@@ -389,7 +394,9 @@
                 <a href="Analytics.aspx?export=users_csv" class="btn-export-csv">
                     <i class="bi bi-download"></i> Export Users CSV
                 </a>
-               
+                <a href="Analytics.aspx?export=admin_report" class="btn-export-pdf" target="_blank">
+                    <i class="bi bi-printer"></i> Printable Report
+                </a>
             </div>
         </div>
 
@@ -598,18 +605,19 @@ $(document).ready(function () {
                     }
                 }
 
-                var scoreHtml =
-                    '<div class="dist-bar-wrap" style="height:140px;">';
+                var scoreHtml = '<div class="score-distribution-list">';
 
                 for (var s = 0; s < d.scoreDistribution.length; s++) {
                     var item = d.scoreDistribution[s];
-                    var height = Math.max(20, Math.round(item.total / maxScoreCount * 120));
+                    var width = Math.max(6, Math.round(item.total / maxScoreCount * 100));
 
                     scoreHtml +=
-                        '<div style="flex:1;text-align:center;">' +
-                        '<div class="dbar dbar-red" style="height:' + height + 'px;min-height:12px;"></div>' +
-                        '<small class="text-muted fw-bold mt-2">' + esc(item.range) + '</small>' +
-                        '<br><small class="text-muted">' + item.total + '</small>' +
+                        '<div class="score-row">' +
+                        '<div class="score-range">' + esc(item.range) + '</div>' +
+                        '<div class="score-track">' +
+                        '<div class="score-fill" style="width:' + width + '%;"></div>' +
+                        '</div>' +
+                        '<div class="score-count">' + item.total + ' attempt' + (item.total === 1 ? '' : 's') + '</div>' +
                         '</div>';
                 }
 

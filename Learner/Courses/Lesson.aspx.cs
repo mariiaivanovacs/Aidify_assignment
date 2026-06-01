@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Web.Script.Services;
+using System.Web.Services;
 using Aidify_assigment;
 
 namespace Aidify_assigment.Learner.Courses
@@ -89,6 +92,7 @@ namespace Aidify_assigment.Learner.Courses
             using (var conn = DbHelper.GetConnection())
             {
                 conn.Open();
+                bool insertedProgress = false;
                 using (var tx = conn.BeginTransaction())
                 {
                     // Find enrolment
@@ -116,10 +120,16 @@ namespace Aidify_assigment.Learner.Courses
                         ins.Parameters.AddWithValue("@L", lessonId);
                         ins.ExecuteNonQuery();
 
-                        // Add 5 league points
-                        AddLeaguePoints(userId, 5, conn, tx);
+                        LeagueService.AddPoints(userId, 5, conn, tx);
+                        insertedProgress = true;
                     }
                     tx.Commit();
+                }
+
+                if (insertedProgress)
+                {
+                    try { new BadgeService().Evaluate(userId); } catch { /* badge failure must never block lesson completion */ }
+                    try { new CertificateService().EnsureForCompletedModule(userId, moduleId); } catch { /* certificate failure must never block lesson completion */ }
                 }
             }
 
@@ -128,23 +138,174 @@ namespace Aidify_assigment.Learner.Courses
             pnlAfterComplete.Visible   = true;
         }
 
-        private static void AddLeaguePoints(int userId, int pts, SqlConnection conn, SqlTransaction tx)
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public static PopQuizQuestion GetPopQuizQuestion(int moduleId)
         {
-            var upd = new SqlCommand(@"
-                IF EXISTS (SELECT 1 FROM League WHERE UserId=@U)
-                    UPDATE League SET Points = Points + @Pts,
-                        Tier = CASE WHEN Points + @Pts >= 500 THEN 'Platinum'
-                                    WHEN Points + @Pts >= 300 THEN 'Gold'
-                                    WHEN Points + @Pts >= 100 THEN 'Silver'
-                                    ELSE 'Bronze' END,
-                        UpdatedAt = GETUTCDATE()
-                    WHERE UserId = @U
-                ELSE
-                    INSERT INTO League (UserId, Tier, Points) VALUES (@U, 'Bronze', @Pts)",
-                conn, tx);
-            upd.Parameters.AddWithValue("@U",   userId);
-            upd.Parameters.AddWithValue("@Pts", pts);
-            upd.ExecuteNonQuery();
+            if (!AuthHelper.IsRole(Constants.RoleLearner) || moduleId <= 0)
+                return null;
+
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+
+                if (!LearnerCanAccessModule(AuthHelper.GetUserId(), moduleId, conn))
+                    return null;
+
+                var cmd = new SqlCommand(@"
+                    SELECT TOP 1 q.QuestionId, q.QuestionText, q.QuizId
+                    FROM Questions q
+                    JOIN Quizzes quiz ON quiz.QuizId = q.QuizId
+                    WHERE quiz.ModuleId = @ModuleId
+                    ORDER BY NEWID()", conn);
+                cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+
+                int questionId = 0, quizId = 0;
+                string questionText = "";
+                using (var r = cmd.ExecuteReader())
+                {
+                    if (!r.Read()) return null;
+                    questionId = Convert.ToInt32(r["QuestionId"]);
+                    quizId = Convert.ToInt32(r["QuizId"]);
+                    questionText = r["QuestionText"].ToString();
+                }
+
+                var options = new List<PopQuizOption>();
+                var optionCmd = new SqlCommand(@"
+                    SELECT OptionId, OptionText
+                    FROM Options
+                    WHERE QuestionId=@QuestionId
+                    ORDER BY OptionId", conn);
+                optionCmd.Parameters.AddWithValue("@QuestionId", questionId);
+
+                using (var r = optionCmd.ExecuteReader())
+                    while (r.Read())
+                        options.Add(new PopQuizOption
+                        {
+                            OptionId = Convert.ToInt32(r["OptionId"]),
+                            OptionText = r["OptionText"].ToString()
+                        });
+
+                return new PopQuizQuestion
+                {
+                    QuestionId = questionId,
+                    QuizId = quizId,
+                    QuestionText = questionText,
+                    Options = options
+                };
+            }
+        }
+
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public static PopQuizResult SubmitPopQuizAnswer(int questionId, int selectedOptionId)
+        {
+            if (!AuthHelper.IsRole(Constants.RoleLearner) || questionId <= 0 || selectedOptionId <= 0)
+                return new PopQuizResult { IsCorrect = false, Message = "Unable to submit this answer." };
+
+            int userId = AuthHelper.GetUserId();
+            int quizId = 0, moduleId = 0;
+            bool isCorrect = false;
+
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+
+                var check = new SqlCommand(@"
+                    SELECT q.QuizId, quiz.ModuleId,
+                           CASE WHEN o.IsCorrect = 1 THEN 1 ELSE 0 END AS IsCorrect
+                    FROM Questions q
+                    JOIN Quizzes quiz ON quiz.QuizId = q.QuizId
+                    JOIN Options o ON o.QuestionId = q.QuestionId
+                    WHERE q.QuestionId = @QuestionId
+                      AND o.OptionId = @SelectedOptionId", conn);
+                check.Parameters.AddWithValue("@QuestionId", questionId);
+                check.Parameters.AddWithValue("@SelectedOptionId", selectedOptionId);
+
+                using (var r = check.ExecuteReader())
+                {
+                    if (!r.Read())
+                        return new PopQuizResult { IsCorrect = false, Message = "Invalid answer selected." };
+
+                    quizId = Convert.ToInt32(r["QuizId"]);
+                    moduleId = Convert.ToInt32(r["ModuleId"]);
+                    isCorrect = Convert.ToInt32(r["IsCorrect"]) == 1;
+                }
+
+                if (!LearnerCanAccessModule(userId, moduleId, conn))
+                    return new PopQuizResult { IsCorrect = false, Message = "Unable to submit this answer." };
+
+                using (var tx = conn.BeginTransaction())
+                {
+                    var attempt = new SqlCommand(@"
+                        INSERT INTO QuizAttempts (UserId, QuizId, Score, Passed, IsPopQuiz)
+                        OUTPUT INSERTED.AttemptId
+                        VALUES (@UserId, @QuizId, @Score, @Passed, 1)", conn, tx);
+                    attempt.Parameters.AddWithValue("@UserId", userId);
+                    attempt.Parameters.AddWithValue("@QuizId", quizId);
+                    attempt.Parameters.AddWithValue("@Score", isCorrect ? 100m : 0m);
+                    attempt.Parameters.AddWithValue("@Passed", isCorrect);
+                    int attemptId = Convert.ToInt32(attempt.ExecuteScalar());
+
+                    var answer = new SqlCommand(@"
+                        INSERT INTO AttemptAnswers (AttemptId, QuestionId, SelectedOptionId, IsCorrect)
+                        VALUES (@AttemptId, @QuestionId, @SelectedOptionId, @IsCorrect)", conn, tx);
+                    answer.Parameters.AddWithValue("@AttemptId", attemptId);
+                    answer.Parameters.AddWithValue("@QuestionId", questionId);
+                    answer.Parameters.AddWithValue("@SelectedOptionId", selectedOptionId);
+                    answer.Parameters.AddWithValue("@IsCorrect", isCorrect);
+                    answer.ExecuteNonQuery();
+
+                    if (isCorrect)
+                        LeagueService.AddPoints(userId, 2, conn, tx);
+
+                    tx.Commit();
+                }
+            }
+
+            if (isCorrect)
+                return new PopQuizResult { IsCorrect = true, Message = "Correct. You earned 2 league points." };
+
+            return new PopQuizResult { IsCorrect = false, Message = "Not quite. Keep going." };
+        }
+
+        private static bool LearnerCanAccessModule(int userId, int moduleId, SqlConnection conn)
+        {
+            var cmd = new SqlCommand(@"
+                SELECT COUNT(*)
+                FROM Modules m
+                WHERE m.ModuleId=@ModuleId
+                  AND m.Status='Published'
+                  AND m.IsDeleted=0
+                  AND EXISTS (
+                      SELECT 1
+                      FROM Enrollments e
+                      WHERE e.UserId=@UserId
+                        AND e.ModuleId=m.ModuleId
+                  )", conn);
+            cmd.Parameters.AddWithValue("@UserId", userId);
+            cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+            return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+        }
+
+        public class PopQuizQuestion
+        {
+            public int QuestionId { get; set; }
+            public int QuizId { get; set; }
+            public string QuestionText { get; set; }
+            public List<PopQuizOption> Options { get; set; }
+        }
+
+        public class PopQuizOption
+        {
+            public int OptionId { get; set; }
+            public string OptionText { get; set; }
+        }
+
+        public class PopQuizResult
+        {
+            public bool IsCorrect { get; set; }
+            public string Message { get; set; }
         }
     }
 }

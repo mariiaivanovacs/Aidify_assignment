@@ -15,6 +15,7 @@ namespace Aidify_assigment
             {
                 client.Credentials = new NetworkCredential(user, pass);
                 client.EnableSsl = true;
+                client.Timeout = 10000;
 
                 var msg = new MailMessage(user, to, subject, htmlBody)
                 {

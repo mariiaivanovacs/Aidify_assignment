@@ -68,8 +68,9 @@ namespace Aidify_assigment.Learner.Quiz
                 var feedback = new List<FeedbackRow>();
                 var fc = new SqlCommand(@"
                     SELECT q.QuestionText, aa.IsCorrect,
-                           (SELECT OptionText FROM Options
-                            WHERE OptionId = aa.SelectedOptionId) AS YourAnswer,
+                           COALESCE(aa.AnswerText,
+                                    (SELECT OptionText FROM Options
+                                     WHERE OptionId = aa.SelectedOptionId)) AS YourAnswer,
                            (SELECT TOP 1 OptionText FROM Options
                             WHERE QuestionId = q.QuestionId AND IsCorrect = 1) AS CorrectAnswer
                     FROM   AttemptAnswers aa

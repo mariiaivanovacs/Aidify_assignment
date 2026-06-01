@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -7,9 +7,8 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor.Modules
 {
-    public partial class List : Page
+    public partial class List : InstructorBasePage
     {
-        private const int InstructorUserId = 2;
 
         private string ConnectionString
         {
@@ -67,6 +66,7 @@ namespace Aidify_assigment.Instructor.Modules
                 else if (e.CommandName == "SubmitReview")
                 {
                     SubmitModuleForReview(moduleId);
+                    AuditService.Log(InstructorUserId, "SubmitModuleForReview", "Modules", moduleId);
                     LoadModules();
                     LoadModuleStats();
                     ShowMessage("Module submitted for review.", true);
@@ -74,6 +74,7 @@ namespace Aidify_assigment.Instructor.Modules
                 else if (e.CommandName == "DeleteModule")
                 {
                     SoftDeleteModule(moduleId);
+                    AuditService.Log(InstructorUserId, "DeleteModule", "Modules", moduleId);
                     LoadModules();
                     LoadModuleStats();
                     ShowMessage("Module deleted successfully.", true);

@@ -11,6 +11,7 @@
     .question-card h6 { font-weight: 700; margin-bottom: 16px; }
     .form-check     { padding: 10px 14px; border-radius: 8px; border: 1px solid #f0d8d8; margin-bottom: 8px; cursor: pointer; transition: background 0.15s; }
     .form-check:hover { background: #FDF2F2; }
+    .short-answer   { border: 1px solid #f0d8d8; border-radius: 8px; padding: 12px 14px; width: 100%; }
 </style>
 
 <div class="row justify-content-center">
@@ -41,7 +42,7 @@
                         <asp:Label ID="lblQuestionText" runat="server"
                             Text='<%# Eval("QuestionText") %>' />
                     </h6>
-                    <div>
+                    <asp:Panel ID="pnlOptions" runat="server" Visible='<%# !IsShortAnswer(Eval("QuestionType")) %>'>
                         <asp:RadioButton ID="rbOption_0" runat="server"
                             Text='<%# Eval("Option1") %>'
                             GroupName='<%# "q" + Eval("QuestionId") %>'
@@ -58,7 +59,11 @@
                             Text='<%# Eval("Option4") %>'
                             GroupName='<%# "q" + Eval("QuestionId") %>'
                             CssClass="form-check" />
-                    </div>
+                    </asp:Panel>
+                    <asp:TextBox ID="txtShortAnswer" runat="server"
+                        CssClass="short-answer"
+                        Visible='<%# IsShortAnswer(Eval("QuestionType")) %>'
+                        placeholder="Type your answer"></asp:TextBox>
                 </div>
             </ItemTemplate>
         </asp:Repeater>

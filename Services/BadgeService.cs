@@ -14,34 +14,38 @@ namespace Aidify_assigment
             {
                 conn.Open();
 
-                // Load all badge rules
+                var rules = new System.Collections.Generic.List<BadgeRule>();
                 var rulesCmd = new SqlCommand(
                     "SELECT BadgeId, Name, RuleType, RuleThreshold FROM Badges", conn);
 
                 using (var r = rulesCmd.ExecuteReader())
                 {
                     while (r.Read())
-                    {
-                        int    badgeId   = (int)r["BadgeId"];
-                        string name      = r["Name"].ToString();
-                        string ruleType  = r["RuleType"] == DBNull.Value ? "" : r["RuleType"].ToString();
-                        int    threshold = r["RuleThreshold"] == DBNull.Value ? 0 : (int)r["RuleThreshold"];
-
-                        if (AlreadyHas(userId, badgeId, conn)) continue;
-
-                        bool earned = false;
-                        switch (ruleType)
+                        rules.Add(new BadgeRule
                         {
-                            case "QuizScore":
-                                earned = GetBestScore(userId, conn) >= threshold;
-                                break;
-                            case "ModulesCompleted":
-                                earned = GetCompletedModulesCount(userId, conn) >= threshold;
-                                break;
-                        }
+                            BadgeId = (int)r["BadgeId"],
+                            Name = r["Name"].ToString(),
+                            RuleType = r["RuleType"] == DBNull.Value ? "" : r["RuleType"].ToString(),
+                            RuleThreshold = r["RuleThreshold"] == DBNull.Value ? 0 : (int)r["RuleThreshold"]
+                        });
+                }
 
-                        if (earned) Award(userId, badgeId, name, conn);
+                foreach (var rule in rules)
+                {
+                    if (AlreadyHas(userId, rule.BadgeId, conn)) continue;
+
+                    bool earned = false;
+                    switch (rule.RuleType)
+                    {
+                        case "QuizScore":
+                            earned = GetBestScore(userId, conn) >= rule.RuleThreshold;
+                            break;
+                        case "ModulesCompleted":
+                            earned = GetCompletedModulesCount(userId, conn) >= rule.RuleThreshold;
+                            break;
                     }
+
+                    if (earned) Award(userId, rule.BadgeId, rule.Name, conn);
                 }
             }
         }
@@ -95,6 +99,14 @@ namespace Aidify_assigment
                 "Badge Earned!",
                 "You earned the \"" + name + "\" badge.",
                 "~/Learner/Progress.aspx");
+        }
+
+        private class BadgeRule
+        {
+            public int BadgeId { get; set; }
+            public string Name { get; set; }
+            public string RuleType { get; set; }
+            public int RuleThreshold { get; set; }
         }
     }
 }

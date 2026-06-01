@@ -61,6 +61,7 @@ namespace Aidify_assigment.Admin.Events
                         CreatedBy,
                         Status
                     )
+                    OUTPUT INSERTED.EventId
                     VALUES
                     (
                         @Title,
@@ -79,7 +80,8 @@ namespace Aidify_assigment.Admin.Events
                 cmd.Parameters.AddWithValue("@MeetingUrl", string.IsNullOrWhiteSpace(meetingUrl) ? (object)DBNull.Value : meetingUrl);
                 cmd.Parameters.AddWithValue("@CreatedBy", createdBy);
 
-                cmd.ExecuteNonQuery();
+                int newEventId = Convert.ToInt32(cmd.ExecuteScalar());
+                AuditService.Log(createdBy, "CreateEvent", "Events", newEventId, conn);
             }
 
             lblMessage.CssClass = "alert alert-success d-block mb-3";

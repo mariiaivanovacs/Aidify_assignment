@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.UI;
 
 namespace Aidify_assigment.Instructor
 {
-    public partial class TestConnection : Page
+    public partial class TestConnection : InstructorBasePage
     {
         protected void Page_Load(object sender, EventArgs e)
         {

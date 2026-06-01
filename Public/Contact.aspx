@@ -54,7 +54,7 @@
                             </div>
                             <div>
                                 <small>Emergency Line</small>
-                                <h5>1-800-AIDIFY-911</h5>
+                                <h5>XXXXXX</h5>
                                 <p>Available 24/7 for urgent course support.</p>
                             </div>
                         </div>

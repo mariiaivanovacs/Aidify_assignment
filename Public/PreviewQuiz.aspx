@@ -103,8 +103,11 @@
                                 ID="btnSubmitPreviewQuiz"
                                 runat="server"
                                 Text="Submit Preview Quiz"
-                                CssClass="btn btn-aidify" />
+                                CssClass="btn btn-aidify"
+                                OnClientClick="return gradePreviewQuiz();" />
                         </div>
+
+                        <div id="previewQuizResult" class="mt-3"></div>
 
                     </div>
 
@@ -156,6 +159,7 @@
 
     <script>
         var previewLoaded = false;
+        var previewQuestions = [];
 
         function getQueryInt(name) {
             var match = new RegExp('[?&]' + name + '=([^&]+)').exec(window.location.search);
@@ -229,19 +233,74 @@
             var container = document.getElementById('previewQuestionsContainer');
             if (!qs || qs.length === 0) {
                 container.innerHTML = '<p class="text-muted">No preview questions available yet.</p>';
+                previewQuestions = [];
                 return;
             }
 
+            previewQuestions = qs;
+            document.getElementById('previewQuizResult').innerHTML = '';
             var html = '';
             for (var i = 0; i < qs.length; i++) {
                 var q = qs[i];
-                html += '<div class="quiz-question-card"><h3>' + esc(q.questionText) + '</h3><div class="quiz-options">';
+                html += '<div class="quiz-question-card preview-question" id="previewQuestion' + q.questionId + '">' +
+                    '<h3>' + esc(q.questionText) + '</h3><div class="quiz-options">';
                 for (var j = 0; j < q.options.length; j++) {
                     html += '<label><input type="radio" name="pq' + q.questionId + '" value="' + j + '" /> ' + esc(q.options[j]) + '</label>';
                 }
+                html += '<div class="preview-answer-feedback mt-2" id="previewFeedback' + q.questionId + '"></div>';
                 html += '</div></div>';
             }
             container.innerHTML = html;
+        }
+
+        function gradePreviewQuiz() {
+            if (!previewQuestions || previewQuestions.length === 0) {
+                document.getElementById('previewQuizResult').innerHTML =
+                    '<div class="alert alert-warning">No preview questions are available to score.</div>';
+                return false;
+            }
+
+            var answered = 0;
+            var correct = 0;
+
+            for (var i = 0; i < previewQuestions.length; i++) {
+                var q = previewQuestions[i];
+                var selected = document.querySelector('input[name="pq' + q.questionId + '"]:checked');
+                var selectedIndex = selected ? parseInt(selected.value, 10) : -1;
+                var isCorrect = selectedIndex === q.correctIndex;
+                var feedback = document.getElementById('previewFeedback' + q.questionId);
+                var card = document.getElementById('previewQuestion' + q.questionId);
+
+                if (selectedIndex >= 0) answered++;
+                if (isCorrect) correct++;
+
+                if (card) {
+                    card.classList.remove('border-success', 'border-danger');
+                    card.classList.add(isCorrect ? 'border-success' : 'border-danger');
+                }
+
+                if (feedback) {
+                    if (selectedIndex < 0) {
+                        feedback.innerHTML = '<span class="text-danger fw-semibold">Not answered.</span> Correct answer: <strong>' +
+                            esc(q.options[q.correctIndex] || '') + '</strong>';
+                    } else if (isCorrect) {
+                        feedback.innerHTML = '<span class="text-success fw-semibold">Correct.</span>';
+                    } else {
+                        feedback.innerHTML = '<span class="text-danger fw-semibold">Incorrect.</span> Correct answer: <strong>' +
+                            esc(q.options[q.correctIndex] || '') + '</strong>';
+                    }
+                }
+            }
+
+            var resultClass = correct === previewQuestions.length ? 'alert-success' : 'alert-info';
+            document.getElementById('previewQuizResult').innerHTML =
+                '<div class="alert ' + resultClass + '">' +
+                '<strong>Preview score: ' + correct + ' / ' + previewQuestions.length + '</strong><br />' +
+                answered + ' question(s) answered. Register for full quizzes with saved attempts, progress tracking, badges, and certificates.' +
+                '</div>';
+
+            document.getElementById('previewQuizResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            return false;
         }
 
         function cleanLessonHtml(html) {

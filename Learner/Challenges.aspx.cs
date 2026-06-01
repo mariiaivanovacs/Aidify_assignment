@@ -26,12 +26,13 @@ namespace Aidify_assigment.Learner
                 var cmd = new SqlCommand(@"
                     SELECT c.ChallengeId, c.Title, c.Description,
                            c.StartDate, c.EndDate, c.PointsReward,
-                           CASE WHEN EXISTS (
-                               SELECT 1 FROM ChallengeParticipation
-                               WHERE ChallengeId = c.ChallengeId AND UserId = @UserId
-                           ) THEN 1 ELSE 0 END AS AlreadyJoined
+                           cp.Status AS ParticipationStatus,
+                           cp.CompletedAt
                     FROM   Challenges c
-                    WHERE  Status = 'Published'
+                    LEFT JOIN ChallengeParticipation cp
+                           ON cp.ChallengeId = c.ChallengeId
+                          AND cp.UserId = @UserId
+                    WHERE  c.Status = 'Published'
                       AND  (EndDate IS NULL OR EndDate > GETUTCDATE())
                     ORDER BY StartDate", conn);
                 cmd.Parameters.AddWithValue("@UserId", userId);
@@ -45,7 +46,8 @@ namespace Aidify_assigment.Learner
                             StartDate = (DateTime)r["StartDate"],
                             EndDate = r["EndDate"] != DBNull.Value ? (DateTime?)r["EndDate"] : null,
                             PointsReward = (int)r["PointsReward"],
-                            AlreadyJoined = (int)r["AlreadyJoined"] == 1
+                            ParticipationStatus = r["ParticipationStatus"] == DBNull.Value ? "" : r["ParticipationStatus"].ToString(),
+                            CompletedAt = r["CompletedAt"] != DBNull.Value ? (DateTime?)r["CompletedAt"] : null
                         });
             }
 
@@ -56,11 +58,23 @@ namespace Aidify_assigment.Learner
 
         protected void rptChallenges_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            if (e.CommandName != "Join") return;
-
             int userId = AuthHelper.GetUserId();
             int challengeId = Convert.ToInt32(e.CommandArgument);
 
+            if (e.CommandName == "Join")
+            {
+                JoinChallenge(userId, challengeId);
+            }
+            else if (e.CommandName == "Complete")
+            {
+                CompleteChallenge(userId, challengeId);
+            }
+
+            BindChallenges();
+        }
+
+        private static void JoinChallenge(int userId, int challengeId)
+        {
             using (var conn = DbHelper.GetConnection())
             {
                 conn.Open();
@@ -79,8 +93,59 @@ namespace Aidify_assigment.Learner
                     ins.ExecuteNonQuery();
                 }
             }
+        }
 
-            BindChallenges();
+        private static void CompleteChallenge(int userId, int challengeId)
+        {
+            int reward = 0;
+
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+                using (var tx = conn.BeginTransaction())
+                {
+                    var cmd = new SqlCommand(@"
+                        SELECT cp.CPId, cp.Status, c.PointsReward
+                        FROM ChallengeParticipation cp
+                        JOIN Challenges c ON c.ChallengeId = cp.ChallengeId
+                        WHERE cp.ChallengeId=@ChallengeId
+                          AND cp.UserId=@UserId
+                          AND c.Status='Published'", conn, tx);
+                    cmd.Parameters.AddWithValue("@ChallengeId", challengeId);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+
+                    int cpId = 0;
+                    string status = "";
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        if (r.Read())
+                        {
+                            cpId = Convert.ToInt32(r["CPId"]);
+                            status = r["Status"] == DBNull.Value ? "" : r["Status"].ToString();
+                            reward = Convert.ToInt32(r["PointsReward"]);
+                        }
+                    }
+
+                    if (cpId == 0 || string.Equals(status, "Completed", StringComparison.OrdinalIgnoreCase))
+                    {
+                        tx.Commit();
+                        return;
+                    }
+
+                    var update = new SqlCommand(@"
+                        UPDATE ChallengeParticipation
+                        SET Status='Completed', CompletedAt=GETUTCDATE()
+                        WHERE CPId=@CPId AND ISNULL(Status,'Joined') <> 'Completed'", conn, tx);
+                    update.Parameters.AddWithValue("@CPId", cpId);
+                    update.ExecuteNonQuery();
+
+                    LeagueService.AddPoints(userId, reward, conn, tx);
+                    tx.Commit();
+                }
+            }
+
+            NotificationService.Push(userId, "Challenge Completed", "You earned " + reward + " league points.", "~/Learner/Challenges.aspx");
+            try { new BadgeService().Evaluate(userId); } catch { /* badge failure must never block challenge completion */ }
         }
 
         private class ChallengeRow
@@ -91,7 +156,10 @@ namespace Aidify_assigment.Learner
             public string Description { get; set; }
             public DateTime StartDate { get; set; }
             public DateTime? EndDate { get; set; }
-            public bool AlreadyJoined { get; set; }
+            public string ParticipationStatus { get; set; }
+            public DateTime? CompletedAt { get; set; }
+            public bool AlreadyJoined { get { return !string.IsNullOrWhiteSpace(ParticipationStatus); } }
+            public bool IsCompleted { get { return CompletedAt.HasValue || string.Equals(ParticipationStatus, "Completed", StringComparison.OrdinalIgnoreCase); } }
         }
     }
 }

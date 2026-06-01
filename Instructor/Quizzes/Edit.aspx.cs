@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -7,9 +7,8 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor.Quizzes
 {
-    public partial class Edit : Page
+    public partial class Edit : InstructorBasePage
     {
-        private const int InstructorUserId = 2;
 
         private string ConnectionString
         {
@@ -134,12 +133,14 @@ namespace Aidify_assigment.Instructor.Quizzes
                 {
                     int newId = InsertQuiz(moduleId, title, description, timeLimitSec, passingPct, isPreview);
                     hfQuizId.Value = newId.ToString();
+                    AuditService.Log(InstructorUserId, "CreateQuiz", "Quizzes", newId);
                     return newId;
                 }
                 else
                 {
                     int quizId = Convert.ToInt32(hfQuizId.Value);
                     UpdateQuiz(quizId, moduleId, title, description, timeLimitSec, passingPct, isPreview);
+                    AuditService.Log(InstructorUserId, "UpdateQuiz", "Quizzes", quizId);
                     return quizId;
                 }
             }

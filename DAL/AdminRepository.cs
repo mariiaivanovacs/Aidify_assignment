@@ -34,6 +34,7 @@ namespace Aidify_assigment
         public string Initials     { get; set; }
         public string RoleBadgeCss { get; set; }
         public string LastActive   { get; set; }
+        public string AvatarPath   { get; set; }
     }
 
     public class AuditLogDto
@@ -81,6 +82,15 @@ namespace Aidify_assigment
         public DateTime EventDate { get; set; }
     }
 
+    public class PendingChallengeDto
+    {
+        public int ChallengeId { get; set; }
+        public string Title { get; set; }
+        public int PointsReward { get; set; }
+        public string CreatedByName { get; set; }
+        public DateTime SubmittedAt { get; set; }
+    }
+
     public class AdminRepository
     {
         // ── Stats ────────────────────────────────────────────────────────────
@@ -93,15 +103,15 @@ namespace Aidify_assigment
 
                 var cmd = new SqlCommand(@"
             SELECT
-                (SELECT COUNT(*) FROM Users WHERE IsActive = 1) AS TotalUsers,
+                (SELECT COUNT(*) FROM Users WHERE IsActive = 1 AND IsDeleted = 0) AS TotalUsers,
 
                 (SELECT COUNT(*) FROM Users u
                  JOIN Roles r ON r.RoleId = u.RoleId
-                 WHERE r.RoleName = 'Learner' AND u.IsActive = 1) AS ActiveLearners,
+                 WHERE r.RoleName = 'Learner' AND u.IsActive = 1 AND u.IsDeleted = 0) AS ActiveLearners,
 
                 (SELECT COUNT(*) FROM Users u
                 JOIN Roles r ON r.RoleId = u.RoleId
-                WHERE r.RoleName = 'Instructor' AND u.IsActive = 1) AS TotalInstructors,
+                WHERE r.RoleName = 'Instructor' AND u.IsActive = 1 AND u.IsDeleted = 0) AS TotalInstructors,
 
                 (SELECT COUNT(*) FROM Modules
                     WHERE IsDeleted = 0) AS TotalModules,
@@ -164,13 +174,14 @@ namespace Aidify_assigment
             {
                 conn.Open();
                 var cmd = new SqlCommand(@"
-                    SELECT u.UserId, u.FullName, u.Email, r.RoleName, u.IsActive,
+                    SELECT u.UserId, u.FullName, u.Email, u.AvatarPath, r.RoleName, u.IsActive,
                            (SELECT MAX(lh.Timestamp)
                             FROM   LoginHistory lh
                             WHERE  lh.UserId = u.UserId AND lh.Success = 1) AS LastLogin
                     FROM   Users u
                     JOIN   Roles r ON r.RoleId = u.RoleId
                     WHERE  (@Search IS NULL OR u.FullName LIKE @Search OR u.Email LIKE @Search)
+                      AND  u.IsDeleted = 0
                       AND  (@Role   IS NULL OR r.RoleName = @Role)
                     ORDER BY u.CreatedAt DESC", conn);
 
@@ -199,13 +210,14 @@ namespace Aidify_assigment
                 conn.Open();
 
                 var cmd = new SqlCommand(@"
-            SELECT u.UserId, u.FullName, u.Email, r.RoleName, u.IsActive,
+            SELECT u.UserId, u.FullName, u.Email, u.AvatarPath, r.RoleName, u.IsActive,
                    (SELECT MAX(lh.Timestamp)
                     FROM LoginHistory lh
                     WHERE lh.UserId = u.UserId AND lh.Success = 1) AS LastLogin
             FROM Users u
             JOIN Roles r ON r.RoleId = u.RoleId
-            WHERE u.UserId = @Id", conn);
+            WHERE u.UserId = @Id
+              AND u.IsDeleted = 0", conn);
 
                 cmd.Parameters.AddWithValue("@Id", userId);
 
@@ -231,7 +243,7 @@ namespace Aidify_assigment
                            Email    = @Email,
                            RoleId   = (SELECT RoleId FROM Roles WHERE RoleName = @Role),
                            IsActive = @IsActive
-                    WHERE  UserId = @Id", conn, tx);
+                    WHERE  UserId = @Id AND IsDeleted = 0", conn, tx);
                 cmd.Parameters.AddWithValue("@FullName", fullName);
                 cmd.Parameters.AddWithValue("@Email",    email);
                 cmd.Parameters.AddWithValue("@Role",     roleName);
@@ -253,7 +265,7 @@ namespace Aidify_assigment
                 using (var tx = conn.BeginTransaction())
                 {
                     var cmd = new SqlCommand(
-                        "UPDATE Users SET IsActive = @Active WHERE UserId = @Id",
+                        "UPDATE Users SET IsActive = @Active WHERE UserId = @Id AND IsDeleted = 0",
                         conn, tx);
                     cmd.Parameters.AddWithValue("@Active", isActive);
                     cmd.Parameters.AddWithValue("@Id",     userId);
@@ -268,6 +280,30 @@ namespace Aidify_assigment
                         isActive ? "EnableUser" : "DisableUser",
                         "Users", userId, conn, tx);
 
+                    tx.Commit();
+                }
+            }
+        }
+
+        public void SoftDeleteUser(int userId)
+        {
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+                using (var tx = conn.BeginTransaction())
+                {
+                    var cmd = new SqlCommand(
+                        "UPDATE Users SET IsDeleted = 1, IsActive = 0 WHERE UserId = @Id",
+                        conn, tx);
+                    cmd.Parameters.AddWithValue("@Id", userId);
+                    cmd.ExecuteNonQuery();
+
+                    int adminId = System.Web.HttpContext.Current != null &&
+                                  System.Web.HttpContext.Current.Session[Constants.SessionUserId] != null
+                        ? (int)System.Web.HttpContext.Current.Session[Constants.SessionUserId]
+                        : 0;
+
+                    AuditService.Log(adminId, "DeleteUser", "Users", userId, conn, tx);
                     tx.Commit();
                 }
             }
@@ -395,7 +431,7 @@ namespace Aidify_assigment
             }
         }
 
-        public void RejectEvent(int eventId, int adminUserId)
+        public void RejectEvent(int eventId, int adminUserId, string reason)
         {
             using (var conn = DbHelper.GetConnection())
             {
@@ -404,8 +440,9 @@ namespace Aidify_assigment
                 using (var tx = conn.BeginTransaction())
                 {
                     Execute(conn, tx,
-                        "UPDATE Events SET Status = 'Draft' WHERE EventId = @Id",
-                        new SqlParameter("@Id", eventId));
+                        "UPDATE Events SET Status = 'Rejected', RejectionReason = @Reason WHERE EventId = @Id",
+                        new SqlParameter("@Id", eventId),
+                        new SqlParameter("@Reason", string.IsNullOrWhiteSpace(reason) ? "No reason provided." : reason.Trim()));
 
                     AuditService.Log(
                         adminUserId,
@@ -415,6 +452,83 @@ namespace Aidify_assigment
                         conn,
                         tx);
 
+                    tx.Commit();
+                }
+            }
+        }
+
+        public List<PendingChallengeDto> GetPendingChallenges()
+        {
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+
+                var cmd = new SqlCommand(@"
+            SELECT
+                c.ChallengeId,
+                c.Title,
+                ISNULL(c.PointsReward, 0) AS PointsReward,
+                ISNULL(u.FullName,'Unknown') AS CreatedByName,
+                ISNULL(c.StartDate, GETDATE()) AS SubmittedAt
+            FROM Challenges c
+            LEFT JOIN Users u ON u.UserId = c.CreatedBy
+            WHERE c.Status = 'PendingReview'
+            ORDER BY c.ChallengeId DESC
+        ", conn);
+
+                var list = new List<PendingChallengeDto>();
+
+                using (var r = cmd.ExecuteReader())
+                {
+                    while (r.Read())
+                    {
+                        list.Add(new PendingChallengeDto
+                        {
+                            ChallengeId = (int)r["ChallengeId"],
+                            Title = r["Title"].ToString(),
+                            PointsReward = (int)r["PointsReward"],
+                            CreatedByName = r["CreatedByName"].ToString(),
+                            SubmittedAt = (DateTime)r["SubmittedAt"]
+                        });
+                    }
+                }
+
+                return list;
+            }
+        }
+
+        public void ApproveChallenge(int challengeId, int adminUserId)
+        {
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+
+                using (var tx = conn.BeginTransaction())
+                {
+                    Execute(conn, tx,
+                        "UPDATE Challenges SET Status = 'Published' WHERE ChallengeId = @Id",
+                        new SqlParameter("@Id", challengeId));
+
+                    AuditService.Log(adminUserId, "ApproveChallenge", "Challenges", challengeId, conn, tx);
+                    tx.Commit();
+                }
+            }
+        }
+
+        public void RejectChallenge(int challengeId, int adminUserId, string reason)
+        {
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+
+                using (var tx = conn.BeginTransaction())
+                {
+                    Execute(conn, tx,
+                        "UPDATE Challenges SET Status = 'Rejected', RejectionReason = @Reason WHERE ChallengeId = @Id",
+                        new SqlParameter("@Id", challengeId),
+                        new SqlParameter("@Reason", string.IsNullOrWhiteSpace(reason) ? "No reason provided." : reason.Trim()));
+
+                    AuditService.Log(adminUserId, "RejectChallenge", "Challenges", challengeId, conn, tx);
                     tx.Commit();
                 }
             }
@@ -472,7 +586,7 @@ namespace Aidify_assigment
             }
         }
 
-        public void RejectModule(int moduleId, int adminUserId)
+        public void RejectModule(int moduleId, int adminUserId, string reason)
         {
             using (var conn = DbHelper.GetConnection())
             {
@@ -480,12 +594,14 @@ namespace Aidify_assigment
                 using (var tx = conn.BeginTransaction())
                 {
                     Execute(conn, tx,
-                        "UPDATE Modules SET Status = 'Draft' WHERE ModuleId = @Id",
-                        new SqlParameter("@Id", moduleId));
+                        "UPDATE Modules SET Status = 'Rejected', RejectionReason = @Reason WHERE ModuleId = @Id",
+                        new SqlParameter("@Id", moduleId),
+                        new SqlParameter("@Reason", string.IsNullOrWhiteSpace(reason) ? "No reason provided." : reason.Trim()));
 
                     NotifyCreator(conn, tx, moduleId,
                         "Module Rejected",
-                        "Your module requires revisions before it can be published.",
+                        "Your module requires revisions before it can be published. Reason: " +
+                        (string.IsNullOrWhiteSpace(reason) ? "No reason provided." : reason.Trim()),
                         "~/Instructor/Dashboard.aspx");
 
                     AuditService.Log(adminUserId, "RejectModule", "Modules", moduleId, conn, tx);
@@ -565,16 +681,19 @@ namespace Aidify_assigment
                     (SELECT COUNT(*)
                      FROM Users
                      WHERE IsEmailConfirmed = 0
-                     AND IsActive = 1) AS UnconfirmedUsers,
+                     AND IsActive = 1
+                     AND IsDeleted = 0) AS UnconfirmedUsers,
 
                     (SELECT COUNT(*)
                      FROM Users
-                     WHERE CreatedAt >= DATEADD(HOUR,-24,GETUTCDATE())) AS NewUsers,
+                     WHERE CreatedAt >= DATEADD(HOUR,-24,GETUTCDATE())
+                     AND IsDeleted = 0) AS NewUsers,
 
                     (SELECT COUNT(*)
                      FROM Users u
                      INNER JOIN Roles r ON u.RoleId = r.RoleId
                      WHERE r.RoleName = 'Instructor'
+                     AND u.IsDeleted = 0
                      AND u.CreatedAt >= DATEADD(DAY,-7,GETUTCDATE())) AS NewInstructors,
 
                     (SELECT COUNT(*)
@@ -687,7 +806,8 @@ namespace Aidify_assigment
                 FullName = r["FullName"].ToString(),
                 Email    = r["Email"].ToString(),
                 RoleName = r["RoleName"].ToString(),
-                IsActive = (bool)r["IsActive"]
+                IsActive = (bool)r["IsActive"],
+                AvatarPath = r["AvatarPath"] == DBNull.Value ? "" : r["AvatarPath"].ToString()
             };
             dto.StatusLabel  = dto.IsActive ? "Active" : "Disabled";
             dto.Initials     = Initials(dto.FullName);

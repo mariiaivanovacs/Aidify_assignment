@@ -21,7 +21,7 @@ namespace Aidify_assigment.Auth
                 if (user != null && user.IsActive)
                 {
                     var auth = new AuthService();
-                    string token = auth.CreateEmailTokenMinutes(user.UserId, "Reset", 1);
+                    string token = auth.CreateEmailToken(user.UserId, "Reset", expiryHours: 24);
 
                     string siteUrl = ConfigurationManager.AppSettings["SiteUrl"]
                                      ?? Request.Url.GetLeftPart(UriPartial.Authority);
@@ -32,7 +32,7 @@ namespace Aidify_assigment.Auth
                         email,
                         "Reset your Aidify password",
                         $"<p>Hi {Server.HtmlEncode(user.FullName)},</p>" +
-                        $"<p>Click the link below to reset your password. It expires in 1 minute.</p>" +
+                        $"<p>Click the link below to reset your password. It expires in 24 hours.</p>" +
                         $"<p><a href='{link}'>Reset my password</a></p>" +
                         $"<p>If you did not request this, you can safely ignore this email.</p>");
                 }

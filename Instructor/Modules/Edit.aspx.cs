@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -7,9 +7,8 @@ using System.Web.UI;
 
 namespace Aidify_assigment.Instructor.Modules
 {
-    public partial class Edit : Page
+    public partial class Edit : InstructorBasePage
     {
-        private const int InstructorUserId = 2;
 
         private string ConnectionString
         {
@@ -111,12 +110,14 @@ namespace Aidify_assigment.Instructor.Modules
                 {
                     int newId = InsertModule(title, description, difficulty, coverImagePath, status, isPreview);
                     hfModuleId.Value = newId.ToString();
+                    AuditService.Log(InstructorUserId, status == "PendingReview" ? "SubmitModuleForReview" : "CreateModule", "Modules", newId);
                     return newId;
                 }
                 else
                 {
                     int moduleId = Convert.ToInt32(hfModuleId.Value);
                     UpdateModule(moduleId, title, description, difficulty, coverImagePath, status, isPreview);
+                    AuditService.Log(InstructorUserId, status == "PendingReview" ? "SubmitModuleForReview" : "UpdateModule", "Modules", moduleId);
                     return moduleId;
                 }
             }

@@ -74,7 +74,7 @@ namespace Aidify_assigment.Auth
                     emailName = fullName;
                 }
 
-                string token = auth.CreateEmailTokenMinutes(userId, "Confirm", 1);
+                string token = auth.CreateEmailToken(userId, "Confirm", expiryHours: 24);
 
                 string siteUrl = ConfigurationManager.AppSettings["SiteUrl"]
                                  ?? Request.Url.GetLeftPart(UriPartial.Authority);
@@ -85,7 +85,7 @@ namespace Aidify_assigment.Auth
                     email,
                     "Confirm your Aidify account",
                     $"<p>Hi {Server.HtmlEncode(emailName)},</p>" +
-                    $"<p>Click the link below to confirm your account. It expires in 1 minute.</p>" +
+                    $"<p>Click the link below to confirm your account. It expires in 24 hours.</p>" +
                     $"<p><a href='{link}'>Confirm my account</a></p>");
 
                 pnlSuccess.Visible = true;

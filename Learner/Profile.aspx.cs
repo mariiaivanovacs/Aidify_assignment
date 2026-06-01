@@ -11,6 +11,8 @@ namespace Aidify_assigment.Learner
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            Page.Form.Enctype = "multipart/form-data";
+
             if (!IsPostBack) LoadProfile();
         }
 
@@ -48,14 +50,24 @@ namespace Aidify_assigment.Learner
             string email    = txtEmail.Text.Trim().ToLower();
             string newAvatar = null;
 
+            if (ContainsMarkup(fullName) || ContainsMarkup(email))
+            {
+                lblProfileStatus.CssClass = "text-danger d-block";
+                lblProfileStatus.Visible = true;
+                lblProfileStatus.Text = "HTML or script tags are not allowed in profile fields.";
+                return;
+            }
+
             if (fuAvatar.HasFile)
             {
                 string[] allowed = { "image/jpeg", "image/png", "image/gif" };
-                if (Array.IndexOf(allowed, fuAvatar.PostedFile.ContentType) < 0)
-                { lblProfileStatus.CssClass = "text-danger d-block"; lblProfileStatus.Text = "Images only (JPEG/PNG/GIF)."; return; }
+                string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
+                string ext = Path.GetExtension(fuAvatar.FileName).ToLowerInvariant();
+                if (Array.IndexOf(allowed, fuAvatar.PostedFile.ContentType) < 0 ||
+                    Array.IndexOf(allowedExtensions, ext) < 0)
+                { lblProfileStatus.CssClass = "text-danger d-block"; lblProfileStatus.Visible = true; lblProfileStatus.Text = "Images only (JPEG/PNG/GIF)."; return; }
                 if (fuAvatar.PostedFile.ContentLength > 2 * 1024 * 1024)
-                { lblProfileStatus.CssClass = "text-danger d-block"; lblProfileStatus.Text = "Max image size is 2 MB."; return; }
-                string ext = Path.GetExtension(fuAvatar.FileName);
+                { lblProfileStatus.CssClass = "text-danger d-block"; lblProfileStatus.Visible = true; lblProfileStatus.Text = "Max image size is 2 MB."; return; }
                 string dir = Server.MapPath("~/Uploads/Avatars/");
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 newAvatar = "~/Uploads/Avatars/" + userId + ext;
@@ -65,6 +77,24 @@ namespace Aidify_assigment.Learner
             using (var conn = DbHelper.GetConnection())
             {
                 conn.Open();
+
+                var duplicate = new SqlCommand(@"
+                    SELECT COUNT(*)
+                    FROM Users
+                    WHERE Email=@Email
+                      AND UserId<>@UserId
+                      AND ISNULL(IsDeleted, 0)=0", conn);
+                duplicate.Parameters.AddWithValue("@Email", email);
+                duplicate.Parameters.AddWithValue("@UserId", userId);
+
+                if (Convert.ToInt32(duplicate.ExecuteScalar()) > 0)
+                {
+                    lblProfileStatus.CssClass = "text-danger d-block";
+                    lblProfileStatus.Visible = true;
+                    lblProfileStatus.Text = "Another active user already uses this email.";
+                    return;
+                }
+
                 using (var tx = conn.BeginTransaction())
                 {
                     string sql = newAvatar != null
@@ -85,7 +115,15 @@ namespace Aidify_assigment.Learner
             lblDisplayName.Text = fullName;
             if (newAvatar != null) imgAvatar.ImageUrl = ResolveUrl(newAvatar);
             lblProfileStatus.CssClass = "text-success d-block";
+            lblProfileStatus.Visible = true;
             lblProfileStatus.Text     = "Profile updated successfully.";
+        }
+
+        private static bool ContainsMarkup(string value)
+        {
+            return !string.IsNullOrEmpty(value) &&
+                   (value.IndexOf("<", StringComparison.Ordinal) >= 0 ||
+                    value.IndexOf(">", StringComparison.Ordinal) >= 0);
         }
     }
 }

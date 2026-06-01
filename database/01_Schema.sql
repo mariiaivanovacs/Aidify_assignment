@@ -17,14 +17,19 @@ CREATE TABLE Roles (
 CREATE TABLE Users (
     UserId           INT PRIMARY KEY IDENTITY,
     FullName         NVARCHAR(150) NOT NULL,
-    Email            NVARCHAR(255) NOT NULL UNIQUE,
+    Email            NVARCHAR(255) NOT NULL,
     PasswordHash     NVARCHAR(255) NOT NULL,
     RoleId           INT NOT NULL REFERENCES Roles(RoleId),
     IsActive         BIT NOT NULL DEFAULT 1,
     IsEmailConfirmed BIT NOT NULL DEFAULT 0,
     AvatarPath       NVARCHAR(500),
-    CreatedAt        DATETIME2 NOT NULL DEFAULT GETUTCDATE()
+    CreatedAt        DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    IsDeleted        BIT NOT NULL DEFAULT 0
 );
+
+CREATE UNIQUE INDEX UX_Users_Email_Active
+ON Users(Email)
+WHERE IsDeleted = 0;
 
 CREATE TABLE EmailTokens (
     TokenId   INT PRIMARY KEY IDENTITY,
@@ -73,6 +78,7 @@ CREATE TABLE Modules (
     DifficultyLevel NVARCHAR(20),
     CoverImagePath  NVARCHAR(500),
     Status          NVARCHAR(20) NOT NULL DEFAULT 'Draft',
+    RejectionReason NVARCHAR(500),
     IsPreview       BIT NOT NULL DEFAULT 0,
     CreatedBy       INT NOT NULL REFERENCES Users(UserId),
     CreatedAt       DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
@@ -111,7 +117,7 @@ CREATE TABLE Questions (
     QuestionId   INT PRIMARY KEY IDENTITY,
     QuizId       INT NOT NULL REFERENCES Quizzes(QuizId),
     QuestionText NVARCHAR(MAX) NOT NULL,
-    QuestionType NVARCHAR(10) NOT NULL DEFAULT 'MCQ',
+    QuestionType NVARCHAR(20) NOT NULL DEFAULT 'MCQ',
     Points       INT NOT NULL DEFAULT 1
 );
 
@@ -140,7 +146,8 @@ CREATE TABLE Events (
     Location    NVARCHAR(300),
     MeetingUrl  NVARCHAR(500),
     CreatedBy   INT REFERENCES Users(UserId),
-    Status      NVARCHAR(20) DEFAULT 'Draft'
+    Status      NVARCHAR(20) DEFAULT 'Draft',
+    RejectionReason NVARCHAR(500)
 );
 
 CREATE TABLE DiscussionThreads (
@@ -193,6 +200,7 @@ CREATE TABLE AttemptAnswers (
     AttemptId        INT NOT NULL REFERENCES QuizAttempts(AttemptId),
     QuestionId       INT NOT NULL REFERENCES Questions(QuestionId),
     SelectedOptionId INT REFERENCES Options(OptionId),
+    AnswerText       NVARCHAR(500),
     IsCorrect        BIT
 );
 
@@ -235,6 +243,8 @@ CREATE TABLE Challenges (
     EndDate       DATETIME2,
     PointsReward  INT DEFAULT 0,
     BadgeRewardId INT REFERENCES Badges(BadgeId),
+    CreatedBy     INT REFERENCES Users(UserId),
+    RejectionReason NVARCHAR(500),
     Status        NVARCHAR(20) DEFAULT 'Draft'
 );
 

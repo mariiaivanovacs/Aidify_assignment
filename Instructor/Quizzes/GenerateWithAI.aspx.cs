@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,9 +13,8 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor.Quizzes
 {
-    public partial class GenerateWithAI : Page
+    public partial class GenerateWithAI : InstructorBasePage
     {
-        private const int InstructorUserId = 2;
 
         private string ConnectionString
         {
@@ -121,6 +120,7 @@ namespace Aidify_assigment.Instructor.Quizzes
                     rawJson,
                     InstructorUserId
                 );
+                AuditService.Log(InstructorUserId, "GenerateAIQuestions", "AIGeneratedTasks", taskId);
 
                 hfTaskId.Value = taskId.ToString();
 
@@ -181,6 +181,7 @@ namespace Aidify_assigment.Instructor.Quizzes
             try
             {
                 SaveGeneratedQuestions(quizId, generatedQuestions);
+                AuditService.Log(InstructorUserId, "SaveAIQuestions", "Quizzes", quizId);
 
                 string promptUsed = Convert.ToString(Session["AIPromptUsed"]);
                 string responseText = "Saved " + generatedQuestions.Count + " AI-generated questions into dbo.Questions and dbo.Options.";
@@ -266,7 +267,7 @@ namespace Aidify_assigment.Instructor.Quizzes
 
                         foreach (DataRow row in table.Rows)
                         {
-                            string text = Convert.ToString(row["Title"]) + " — " + Convert.ToString(row["ModuleTitle"]);
+                            string text = Convert.ToString(row["Title"]) + " � " + Convert.ToString(row["ModuleTitle"]);
                             string value = Convert.ToString(row["QuizId"]);
 
                             ddlQuiz.Items.Add(new ListItem(text, value));

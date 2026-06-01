@@ -66,6 +66,11 @@
                         </div>
                         <a href="ForgotPassword.aspx" class="auth-link">Forgot Password?</a>
                     </div>
+                    <div class="mb-4">
+                        <div class="g-recaptcha"
+                             data-sitekey="<%= System.Configuration.ConfigurationManager.AppSettings["RecaptchaSiteKey"] %>">
+                        </div>
+                    </div>
                     <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="btn btn-aidify w-100" />
                     <p class="auth-bottom-text">
                         Don't have an account?
@@ -88,5 +93,6 @@
             }
         }
     </script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </asp:Content>

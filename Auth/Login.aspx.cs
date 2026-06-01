@@ -27,6 +27,13 @@ namespace Aidify_assigment.Auth
             string ip    = Request.UserHostAddress;
             var auth     = new AuthService();
 
+            if (!auth.VerifyRecaptcha(Request.Form["g-recaptcha-response"]))
+            {
+                lblError.Text = "Please complete the CAPTCHA.";
+                lblError.Visible = true;
+                return;
+            }
+
             if (auth.IsAccountLocked(email))
             {
                 lblError.Text    = "Account temporarily locked after too many failed attempts. Try again in 5 minutes.";

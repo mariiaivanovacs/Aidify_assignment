@@ -121,6 +121,7 @@
     <Content Include="Learner\Courses\Details.aspx" />
     <Content Include="Learner\Courses\Lesson.aspx" />
     <Content Include="Learner\Dashboard.aspx" />
+    <Content Include="Learner\Discussions.aspx" />
     <Content Include="Learner\Events.aspx" />
     <Content Include="Learner\League.aspx" />
     <Content Include="Learner\Notification.aspx" />
@@ -604,6 +605,13 @@
     <Compile Include="Learner\Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Learner\Discussions.aspx.cs">
+      <DependentUpon>Discussions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Learner\Discussions.aspx.designer.cs">
+      <DependentUpon>Discussions.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Learner\Events.aspx.cs">
       <DependentUpon>Events.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -842,6 +850,14 @@
     <Compile Include="Admin\Analytics.aspx.designer.cs">
       <DependentUpon>Analytics.aspx</DependentUpon>
     </Compile>
+    <Content Include="Admin\Roles.aspx" />
+    <Compile Include="Admin\Roles.aspx.cs">
+      <DependentUpon>Roles.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Roles.aspx.designer.cs">
+      <DependentUpon>Roles.aspx</DependentUpon>
+    </Compile>
     <Content Include="Admin\AuditLogs.aspx" />
     <Compile Include="Admin\AuditLogs.aspx.cs">
       <DependentUpon>AuditLogs.aspx</DependentUpon>
@@ -1010,12 +1026,15 @@
     <Compile Include="Security\BaseRolePage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Security\InstructorBasePage.cs" />
     <Compile Include="Security\AuthHelper.cs" />
     <Compile Include="DAL\DbHelper.cs" />
     <Compile Include="DAL\UserRepository.cs" />
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\AuditService.cs" />
+    <Compile Include="Services\CertificateService.cs" />
+    <Compile Include="Services\LeagueService.cs" />
     <Compile Include="Services\NotificationService.cs" />
     <None Include="database\01_Schema.sql" />
     <None Include="database\02_SeedRoles.sql" />

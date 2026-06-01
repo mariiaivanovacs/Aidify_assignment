@@ -27,7 +27,8 @@ namespace Aidify_assigment
                            r.RoleName, u.IsActive, u.IsEmailConfirmed
                     FROM   Users u
                     JOIN   Roles r ON r.RoleId = u.RoleId
-                    WHERE  u.Email = @Email", conn);
+                    WHERE  u.Email = @Email
+                      AND  u.IsDeleted = 0", conn);
                 cmd.Parameters.AddWithValue("@Email", email);
                 using (var r = cmd.ExecuteReader())
                 {
@@ -46,7 +47,8 @@ namespace Aidify_assigment
                            r.RoleName, u.IsActive, u.IsEmailConfirmed
                     FROM   Users u
                     JOIN   Roles r ON r.RoleId = u.RoleId
-                    WHERE  u.UserId = @Id", conn);
+                    WHERE  u.UserId = @Id
+                      AND  u.IsDeleted = 0", conn);
                 cmd.Parameters.AddWithValue("@Id", userId);
                 using (var r = cmd.ExecuteReader())
                 {
@@ -79,7 +81,7 @@ namespace Aidify_assigment
             {
                 conn.Open();
                 var cmd = new SqlCommand(
-                    "SELECT COUNT(1) FROM Users WHERE Email = @Email", conn);
+                    "SELECT COUNT(1) FROM Users WHERE Email = @Email AND IsDeleted = 0", conn);
                 cmd.Parameters.AddWithValue("@Email", email);
                 return (int)cmd.ExecuteScalar() > 0;
             }

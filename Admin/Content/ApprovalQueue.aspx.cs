@@ -15,6 +15,7 @@ namespace Aidify_assigment.Admin.Content
             string action = Request.QueryString["action"];
             string type = Request.QueryString["type"];
             string idString = Request.QueryString["id"];
+            string reason = Request.QueryString["reason"];
 
             int id;
 
@@ -31,14 +32,21 @@ namespace Aidify_assigment.Admin.Content
                     if (action == "approve")
                         repo.ApproveModule(id, adminId);
                     else if (action == "reject")
-                        repo.RejectModule(id, adminId);
+                        repo.RejectModule(id, adminId, reason);
                 }
                 else if (type == "event")
                 {
                     if (action == "approve")
                         repo.ApproveEvent(id, adminId);
                     else if (action == "reject")
-                        repo.RejectEvent(id, adminId);
+                        repo.RejectEvent(id, adminId, reason);
+                }
+                else if (type == "challenge")
+                {
+                    if (action == "approve")
+                        repo.ApproveChallenge(id, adminId);
+                    else if (action == "reject")
+                        repo.RejectChallenge(id, adminId, reason);
                 }
 
                 Response.Redirect("ApprovalQueue.aspx", false);
@@ -84,6 +92,27 @@ namespace Aidify_assigment.Admin.Content
                     location = e.Location,
                     createdByName = e.CreatedByName,
                     submittedAt = e.EventDate
+                })
+                .ToList();
+        }
+
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(UseHttpGet = false)]
+        public static object GetPendingChallenges()
+        {
+            if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
+                return null;
+
+            return new AdminRepository()
+                .GetPendingChallenges()
+                .Select(c => new
+                {
+                    itemType = "Challenge",
+                    itemId = c.ChallengeId,
+                    title = c.Title,
+                    pointsReward = c.PointsReward,
+                    createdByName = c.CreatedByName,
+                    submittedAt = c.SubmittedAt
                 })
                 .ToList();
         }

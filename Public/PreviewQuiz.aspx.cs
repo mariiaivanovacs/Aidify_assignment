@@ -11,24 +11,9 @@ namespace Aidify_assigment.Public
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
-            btnSubmitPreviewQuiz.Click += btnSubmitPreviewQuiz_Click;
         }
 
         protected void Page_Load(object sender, EventArgs e) { }
-
-        private void btnSubmitPreviewQuiz_Click(object sender, EventArgs e)
-        {
-            const string js = "document.addEventListener('DOMContentLoaded',function(){" +
-                "var d=document.createElement('div');" +
-                "d.className='container py-3';" +
-                "d.innerHTML='<div class=\"alert alert-success\">" +
-                "<strong>Thanks for trying the preview quiz!</strong> " +
-                "<a href=\"../Auth/Register.aspx\">Register for free</a> " +
-                "to access full quizzes with instant scoring, progress tracking, and certificates." +
-                "</div>';" +
-                "document.body.insertBefore(d,document.body.firstChild);});";
-            ClientScript.RegisterStartupScript(GetType(), "quizDone", js, true);
-        }
 
         // Returns module lessons and preview quiz questions without saving an attempt.
         [WebMethod]
@@ -43,16 +28,27 @@ namespace Aidify_assigment.Public
             using (var conn = DbHelper.GetConnection())
             {
                 conn.Open();
+                bool requestedQuiz = quizId > 0;
 
                 if (moduleId <= 0 && quizId > 0)
                 {
-                    var moduleCmd = new SqlCommand(
-                        "SELECT ModuleId FROM Quizzes WHERE QuizId = @QuizId AND IsPreview = 1", conn);
+                    var moduleCmd = new SqlCommand(@"
+                        SELECT q.ModuleId
+                        FROM Quizzes q
+                        JOIN Modules m ON m.ModuleId = q.ModuleId
+                        WHERE q.QuizId = @QuizId
+                          AND q.IsPreview = 1
+                          AND m.Status = 'Published'
+                          AND m.IsDeleted = 0
+                          AND m.IsPreview = 1", conn);
                     moduleCmd.Parameters.AddWithValue("@QuizId", quizId);
                     var moduleIdObj = moduleCmd.ExecuteScalar();
                     if (moduleIdObj != null && moduleIdObj != DBNull.Value)
                         moduleId = Convert.ToInt32(moduleIdObj);
                 }
+
+                if (requestedQuiz && moduleId <= 0)
+                    return new { module, quiz, lessons, questions };
 
                 if (moduleId <= 0)
                 {
@@ -62,7 +58,14 @@ namespace Aidify_assigment.Public
                         WHERE Status = 'Published'
                           AND IsDeleted = 0
                           AND IsPreview = 1
-                        ORDER BY CreatedAt DESC", conn);
+                          AND EXISTS (
+                              SELECT 1
+                              FROM Quizzes q
+                              JOIN Questions qs ON qs.QuizId = q.QuizId
+                              WHERE q.ModuleId = Modules.ModuleId
+                                AND q.IsPreview = 1
+                          )
+                        ORDER BY ModuleId", conn);
                     var moduleIdObj = moduleCmd.ExecuteScalar();
                     if (moduleIdObj == null || moduleIdObj == DBNull.Value)
                         return new { module, quiz, lessons, questions };
@@ -75,7 +78,8 @@ namespace Aidify_assigment.Public
                     FROM Modules
                     WHERE ModuleId = @ModuleId
                       AND Status = 'Published'
-                      AND IsDeleted = 0", conn);
+                      AND IsDeleted = 0
+                      AND IsPreview = 1", conn);
                 moduleDetailsCmd.Parameters.AddWithValue("@ModuleId", moduleId);
 
                 using (var r = moduleDetailsCmd.ExecuteReader())
@@ -91,6 +95,9 @@ namespace Aidify_assigment.Public
                         };
                     }
                 }
+
+                if (module == null)
+                    return new { module, quiz, lessons, questions };
 
                 var lessonCmd = new SqlCommand(@"
                     SELECT LessonId, Title, BodyHtml, SequenceOrder, EstimatedMinutes
@@ -128,11 +135,17 @@ namespace Aidify_assigment.Public
                     return new { module, quiz, lessons, questions };
 
                 var quizDetailsCmd = new SqlCommand(@"
-                    SELECT QuizId, Title, Description
-                    FROM Quizzes
-                    WHERE QuizId = @QuizId
-                      AND IsPreview = 1", conn);
+                    SELECT q.QuizId, q.Title, q.Description
+                    FROM Quizzes q
+                    JOIN Modules m ON m.ModuleId = q.ModuleId
+                    WHERE q.QuizId = @QuizId
+                      AND q.ModuleId = @ModuleId
+                      AND q.IsPreview = 1
+                      AND m.Status = 'Published'
+                      AND m.IsDeleted = 0
+                      AND m.IsPreview = 1", conn);
                 quizDetailsCmd.Parameters.AddWithValue("@QuizId", quizId);
+                quizDetailsCmd.Parameters.AddWithValue("@ModuleId", moduleId);
 
                 using (var r = quizDetailsCmd.ExecuteReader())
                 {
@@ -152,10 +165,11 @@ namespace Aidify_assigment.Public
                            MAX(CASE WHEN rn=1 THEN o.OptionText END) AS Opt1,
                            MAX(CASE WHEN rn=2 THEN o.OptionText END) AS Opt2,
                            MAX(CASE WHEN rn=3 THEN o.OptionText END) AS Opt3,
-                           MAX(CASE WHEN rn=4 THEN o.OptionText END) AS Opt4
+                           MAX(CASE WHEN rn=4 THEN o.OptionText END) AS Opt4,
+                           MAX(CASE WHEN o.IsCorrect = 1 THEN rn END) - 1 AS CorrectIndex
                     FROM   Questions q
                     CROSS APPLY (
-                        SELECT OptionText, ROW_NUMBER() OVER (ORDER BY OptionId) AS rn
+                        SELECT OptionText, IsCorrect, ROW_NUMBER() OVER (ORDER BY OptionId) AS rn
                         FROM   Options WHERE QuestionId = q.QuestionId
                     ) o
                     WHERE  q.QuizId = @Qid
@@ -176,7 +190,8 @@ namespace Aidify_assigment.Public
                         questions.Add(new {
                             questionId   = (int)r["QuestionId"],
                             questionText = r["QuestionText"].ToString(),
-                            options      = opts
+                            options      = opts,
+                            correctIndex = r["CorrectIndex"] != DBNull.Value ? Convert.ToInt32(r["CorrectIndex"]) : -1
                         });
                     }
             }

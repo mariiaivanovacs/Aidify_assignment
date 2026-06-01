@@ -60,6 +60,15 @@ namespace Aidify_assigment.Learner
         protected global::System.Web.UI.WebControls.Label lblLeaguePoints;
 
         /// <summary>
+        /// lblLeagueRank control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblLeagueRank;
+
+        /// <summary>
         /// imgLatestBadge control.
         /// </summary>
         /// <remarks>
@@ -76,6 +85,42 @@ namespace Aidify_assigment.Learner
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblLatestBadgeName;
+
+        /// <summary>
+        /// lblRecommendedTitle control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblRecommendedTitle;
+
+        /// <summary>
+        /// lblRecommendedMeta control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblRecommendedMeta;
+
+        /// <summary>
+        /// lblRecommendedDescription control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblRecommendedDescription;
+
+        /// <summary>
+        /// lnkRecommended control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HyperLink lnkRecommended;
 
         /// <summary>
         /// lnkBrowseAll control.

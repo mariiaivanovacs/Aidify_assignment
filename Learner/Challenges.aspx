@@ -37,7 +37,15 @@
                                 CommandArgument='<%# Eval("ChallengeId") %>'
                                 CssClass="btn btn-primary btn-sm"
                                 Visible='<%# !Convert.ToBoolean(Eval("AlreadyJoined")) %>' />
-                            <%# Convert.ToBoolean(Eval("AlreadyJoined")) ? "<span class=\"badge bg-success px-3 py-2\">✓ Joined</span>" : "" %>
+                            <asp:Button ID="btnComplete" runat="server"
+                                Text="Complete"
+                                CommandName="Complete"
+                                CommandArgument='<%# Eval("ChallengeId") %>'
+                                CssClass="btn btn-success btn-sm"
+                                Visible='<%# Convert.ToBoolean(Eval("AlreadyJoined")) && !Convert.ToBoolean(Eval("IsCompleted")) %>' />
+                            <%# Convert.ToBoolean(Eval("IsCompleted"))
+                                ? "<span class=\"badge bg-success px-3 py-2\">Completed</span>"
+                                : Convert.ToBoolean(Eval("AlreadyJoined")) ? "<span class=\"badge bg-info text-dark px-3 py-2\">Joined</span>" : "" %>
                         </div>
                     </div>
                 </div>

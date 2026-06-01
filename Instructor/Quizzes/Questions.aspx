@@ -90,6 +90,8 @@
                             <label class="form-label">Question Type</label>
                             <asp:DropDownList ID="ddlQuestionType" runat="server" CssClass="form-select">
                                 <asp:ListItem Text="MCQ" Value="MCQ"></asp:ListItem>
+                                <asp:ListItem Text="True / False" Value="TrueFalse"></asp:ListItem>
+                                <asp:ListItem Text="Short Answer" Value="ShortAnswer"></asp:ListItem>
                             </asp:DropDownList>
                         </div>
 
@@ -101,7 +103,7 @@
 
                     <hr />
 
-                    <label class="form-label">Options <span class="required">*</span></label>
+                    <label class="form-label">Answers <span class="required">*</span></label>
 
                     <div class="input-group mb-2">
                         <span class="input-group-text">

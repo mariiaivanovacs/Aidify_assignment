@@ -3,7 +3,7 @@
 <configuration>
   <connectionStrings>
     <add name="AidifyDB"
-         connectionString="Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=AidifyDB;Integrated Security=True"
+         connectionString="Data Source=(LocalDB)\AidifyLocalDB;Initial Catalog=AidifyDB;Integrated Security=True"
          providerName="System.Data.SqlClient" />
   </connectionStrings>
   <appSettings>
@@ -12,6 +12,7 @@
     <add key="SmtpPass"           value="YOUR_GMAIL_APP_PASSWORD_HERE" />
     <add key="RecaptchaSiteKey"   value="YOUR_RECAPTCHA_SITE_KEY_HERE" />
     <add key="RecaptchaSecretKey" value="YOUR_RECAPTCHA_SECRET_KEY_HERE" />
-    <add key="SiteUrl"            value="https://localhost:44357" />
+    <add key="SiteUrl"            value="http://localhost:8080" />
+    <add key="PopQuizProbability" value="0.15" />
   </appSettings>
 </configuration>

@@ -74,6 +74,8 @@ namespace Aidify_assigment.Admin.Modules
                 InsertOptionalLesson(conn, newModuleId, txtLesson2Title.Text, txtLesson2Content.Text, txtLesson2Minutes.Text, 2);
                 InsertOptionalLesson(conn, newModuleId, txtLesson3Title.Text, txtLesson3Content.Text, txtLesson3Minutes.Text, 3);
                 InsertOptionalLesson(conn, newModuleId, txtLesson4Title.Text, txtLesson4Content.Text, txtLesson4Minutes.Text, 4);
+
+                AuditService.Log(createdBy, "CreateModule", "Modules", newModuleId, conn);
             }
 
             lblMessage.CssClass = "alert alert-success d-block mb-3";

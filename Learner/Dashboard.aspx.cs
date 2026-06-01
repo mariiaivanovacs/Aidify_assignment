@@ -17,6 +17,8 @@ namespace Aidify_assigment.Learner
                 lblWelcome.Text = "Welcome back, " + AuthHelper.GetName();
                 BindEnrolledCourses(userId);
                 BindLeague(userId);
+                BindLatestBadge(userId);
+                BindRecommendedModule(userId);
                 SetNextLessonLink(userId);
             }
         }
@@ -58,7 +60,7 @@ namespace Aidify_assigment.Learner
                         {
                             ModuleId    = (int)r["ModuleId"],
                             ModuleTitle = r["Title"].ToString(),
-                            ProgressPct = (int)(decimal)r["ProgressPct"]
+                            ProgressPct = Convert.ToInt32(r["ProgressPct"])
                         });
             }
 
@@ -74,14 +76,20 @@ namespace Aidify_assigment.Learner
             rptEnrolledCourses.DataBind();
         }
 
-        // Reads Tier and Points from League; shows defaults if learner has no row yet.
         private void BindLeague(int userId)
         {
             using (var conn = DbHelper.GetConnection())
             {
                 conn.Open();
-                var cmd = new SqlCommand(
-                    "SELECT Tier, Points FROM League WHERE UserId = @UserId", conn);
+                var cmd = new SqlCommand(@"
+                    WITH RankedLeague AS (
+                        SELECT UserId, Tier, Points,
+                               ROW_NUMBER() OVER (ORDER BY Points DESC, UpdatedAt ASC, UserId ASC) AS RankNo
+                        FROM League
+                    )
+                    SELECT Tier, Points, RankNo
+                    FROM RankedLeague
+                    WHERE UserId = @UserId", conn);
                 cmd.Parameters.AddWithValue("@UserId", userId);
                 using (var r = cmd.ExecuteReader())
                 {
@@ -89,12 +97,95 @@ namespace Aidify_assigment.Learner
                     {
                         lblLeagueTier.Text   = r["Tier"].ToString();
                         lblLeaguePoints.Text = r["Points"].ToString();
+                        lblLeagueRank.Text = "#" + r["RankNo"];
                     }
                     else
                     {
                         lblLeagueTier.Text   = "Bronze";
                         lblLeaguePoints.Text = "0";
+                        lblLeagueRank.Text = "Not ranked yet";
                     }
+                }
+            }
+        }
+
+        private void BindLatestBadge(int userId)
+        {
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+                var cmd = new SqlCommand(@"
+                    SELECT TOP 1 b.Name, b.IconPath, ub.AwardedAt
+                    FROM UserBadges ub
+                    JOIN Badges b ON b.BadgeId = ub.BadgeId
+                    WHERE ub.UserId = @UserId
+                    ORDER BY ub.AwardedAt DESC, ub.UserBadgeId DESC", conn);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                using (var r = cmd.ExecuteReader())
+                {
+                    if (!r.Read())
+                    {
+                        imgLatestBadge.Visible = false;
+                        lblLatestBadgeName.Text = "No badges yet";
+                        return;
+                    }
+
+                    string iconPath = r["IconPath"] == DBNull.Value ? "" : r["IconPath"].ToString();
+                    imgLatestBadge.Visible = !string.IsNullOrWhiteSpace(iconPath);
+                    if (imgLatestBadge.Visible)
+                        imgLatestBadge.ImageUrl = iconPath;
+
+                    lblLatestBadgeName.Text = r["Name"].ToString();
+                }
+            }
+        }
+
+        private void BindRecommendedModule(int userId)
+        {
+            using (var conn = DbHelper.GetConnection())
+            {
+                conn.Open();
+                var cmd = new SqlCommand(@"
+                    SELECT TOP 1 m.ModuleId, m.Title, m.Description, m.DifficultyLevel,
+                           COUNT(l.LessonId) AS LessonCount
+                    FROM Modules m
+                    LEFT JOIN Lessons l ON l.ModuleId = m.ModuleId
+                    WHERE m.Status = 'Published'
+                      AND m.IsDeleted = 0
+                      AND NOT EXISTS (
+                          SELECT 1
+                          FROM Enrollments e
+                          WHERE e.UserId = @UserId
+                            AND e.ModuleId = m.ModuleId
+                      )
+                    GROUP BY m.ModuleId, m.Title, m.Description, m.DifficultyLevel, m.CreatedAt
+                    ORDER BY m.CreatedAt DESC, m.ModuleId DESC", conn);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+
+                using (var r = cmd.ExecuteReader())
+                {
+                    if (!r.Read())
+                    {
+                        lblRecommendedTitle.Text = "Explore more courses";
+                        lblRecommendedMeta.Text = "Catalogue";
+                        lblRecommendedDescription.Text = "You are enrolled in all currently published modules.";
+                        lnkRecommended.NavigateUrl = "~/Learner/Courses/Catalogue.aspx";
+                        lnkRecommended.Text = "Open Catalogue";
+                        return;
+                    }
+
+                    int moduleId = Convert.ToInt32(r["ModuleId"]);
+                    string difficulty = r["DifficultyLevel"] == DBNull.Value ? "Beginner" : r["DifficultyLevel"].ToString();
+                    int lessonCount = Convert.ToInt32(r["LessonCount"]);
+
+                    lblRecommendedTitle.Text = r["Title"].ToString();
+                    lblRecommendedMeta.Text = difficulty + " · " + lessonCount + " lessons";
+                    lblRecommendedDescription.Text = r["Description"] == DBNull.Value
+                        ? "Recommended next course based on modules you have not joined yet."
+                        : r["Description"].ToString();
+                    lnkRecommended.NavigateUrl = "~/Learner/Courses/Details.aspx?moduleId=" + moduleId;
+                    lnkRecommended.Text = "View Course";
                 }
             }
         }

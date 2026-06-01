@@ -77,10 +77,64 @@ namespace Aidify_assigment.Learner
                     ins.Parameters.AddWithValue("@E", eventId);
                     ins.Parameters.AddWithValue("@U", userId);
                     ins.ExecuteNonQuery();
+
+                    SendEventConfirmation(userId, eventId, conn);
                 }
             }
 
             BindEvents();
+        }
+
+        private static void SendEventConfirmation(int userId, int eventId, SqlConnection conn)
+        {
+            string email = "", name = "Aidify learner";
+            var userCmd = new SqlCommand("SELECT Email, FullName FROM Users WHERE UserId=@UserId", conn);
+            userCmd.Parameters.AddWithValue("@UserId", userId);
+            using (var r = userCmd.ExecuteReader())
+            {
+                if (r.Read())
+                {
+                    email = r["Email"].ToString();
+                    name = r["FullName"] == DBNull.Value ? name : r["FullName"].ToString();
+                }
+            }
+
+            string title = "", when = "", location = "";
+            var eventCmd = new SqlCommand(@"
+                SELECT Title, EventDate, Location, MeetingUrl
+                FROM Events
+                WHERE EventId=@EventId", conn);
+            eventCmd.Parameters.AddWithValue("@EventId", eventId);
+            using (var r = eventCmd.ExecuteReader())
+            {
+                if (r.Read())
+                {
+                    title = r["Title"].ToString();
+                    when = r["EventDate"] == DBNull.Value ? "To be announced" : Convert.ToDateTime(r["EventDate"]).ToString("dd MMM yyyy HH:mm");
+                    location = r["MeetingUrl"] != DBNull.Value && !string.IsNullOrWhiteSpace(r["MeetingUrl"].ToString())
+                        ? r["MeetingUrl"].ToString()
+                        : r["Location"].ToString();
+                }
+            }
+
+            NotificationService.Push(userId, "Event Registration Confirmed", "You are registered for " + title + ".", "~/Learner/Events.aspx");
+
+            if (string.IsNullOrWhiteSpace(email)) return;
+
+            try
+            {
+                EmailService.Send(
+                    email,
+                    "Aidify event registration: " + title,
+                    "<p>Hello " + System.Web.HttpUtility.HtmlEncode(name) + ",</p>"
+                    + "<p>You are registered for <strong>" + System.Web.HttpUtility.HtmlEncode(title) + "</strong>.</p>"
+                    + "<p><strong>When:</strong> " + System.Web.HttpUtility.HtmlEncode(when) + "<br/>"
+                    + "<strong>Where:</strong> " + System.Web.HttpUtility.HtmlEncode(location) + "</p>");
+            }
+            catch
+            {
+                NotificationService.Push(userId, "Event Email Not Sent", "Your event registration was saved, but email delivery is not available right now.", "~/Learner/Events.aspx");
+            }
         }
 
         private class EventRow

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Instructor
 {
-    public partial class Events : Page
+    public partial class Events : InstructorBasePage
     {
         private string ConnectionString
         {
@@ -70,13 +70,15 @@ namespace Aidify_assigment.Instructor
             {
                 if (string.IsNullOrWhiteSpace(hfEventId.Value))
                 {
-                    InsertEvent(title, description, eventDate, location, meetingUrl);
+                    int eventId = InsertEvent(title, description, eventDate, location, meetingUrl);
+                    AuditService.Log(InstructorUserId, "CreateEvent", "Events", eventId);
                     ShowMessage("Event created successfully and saved as Draft.", true);
                 }
                 else
                 {
                     int eventId = Convert.ToInt32(hfEventId.Value);
                     UpdateEvent(eventId, title, description, eventDate, location, meetingUrl);
+                    AuditService.Log(InstructorUserId, "UpdateEvent", "Events", eventId);
                     ShowMessage("Event updated successfully.", true);
                 }
 
@@ -143,7 +145,8 @@ namespace Aidify_assigment.Instructor
                 else if (e.CommandName == "PublishEvent")
                 {
                     PublishEvent(eventId);
-                    ShowMessage("Event published successfully.", true);
+                    AuditService.Log(InstructorUserId, "SubmitEventForReview", "Events", eventId);
+                    ShowMessage("Event submitted for admin review successfully.", true);
                     LoadEvents();
                     LoadEventStats();
                 }
@@ -171,6 +174,7 @@ namespace Aidify_assigment.Instructor
                 else if (e.CommandName == "DeleteEvent")
                 {
                     DeleteEvent(eventId);
+                    AuditService.Log(InstructorUserId, "DeleteEvent", "Events", eventId);
                     ShowMessage("Event deleted successfully.", true);
                     LoadEvents();
                     LoadEventStats();
@@ -182,7 +186,7 @@ namespace Aidify_assigment.Instructor
             }
         }
 
-        private void InsertEvent(string title, string description, DateTime eventDate, string location, string meetingUrl)
+        private int InsertEvent(string title, string description, DateTime eventDate, string location, string meetingUrl)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -190,7 +194,9 @@ namespace Aidify_assigment.Instructor
                     INSERT INTO dbo.Events
                         (Title, Description, EventDate, Location, MeetingUrl, CreatedBy, Status)
                     VALUES
-                        (@Title, @Description, @EventDate, @Location, @MeetingUrl, @CreatedBy, @Status);";
+                        (@Title, @Description, @EventDate, @Location, @MeetingUrl, @CreatedBy, @Status);
+
+                    SELECT CAST(SCOPE_IDENTITY() AS int);";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -199,11 +205,11 @@ namespace Aidify_assigment.Instructor
                     cmd.Parameters.AddWithValue("@EventDate", eventDate);
                     cmd.Parameters.AddWithValue("@Location", location);
                     cmd.Parameters.AddWithValue("@MeetingUrl", string.IsNullOrWhiteSpace(meetingUrl) ? (object)DBNull.Value : meetingUrl);
-                    cmd.Parameters.AddWithValue("@CreatedBy", DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
                     cmd.Parameters.AddWithValue("@Status", "Draft");
 
                     con.Open();
-                    cmd.ExecuteNonQuery();
+                    return Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
         }
@@ -241,11 +247,12 @@ namespace Aidify_assigment.Instructor
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
-                string query = "UPDATE dbo.Events SET Status = 'Published' WHERE EventId = @EventId;";
+                string query = "UPDATE dbo.Events SET Status = 'PendingReview' WHERE EventId = @EventId AND CreatedBy = @CreatedBy;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@EventId", eventId);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
 
                     con.Open();
                     cmd.ExecuteNonQuery();

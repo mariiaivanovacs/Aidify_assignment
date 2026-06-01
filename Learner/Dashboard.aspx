@@ -18,6 +18,9 @@
     .side-card         { border-radius: 12px; border: 1px solid #f0d8d8; background: #fff; padding: 24px; text-align: center; margin-bottom: 16px; }
     .side-card h6      { font-weight: 700; margin: 8px 0 4px; }
     .badge-tier        { background: #C0392B; color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 13px; display: inline-block; margin-top: 6px; }
+    .recommend-title   { font-weight: 700; font-size: 15px; line-height: 1.25; }
+    .recommend-meta    { color: #C0392B; font-weight: 700; font-size: 12px; margin: 6px 0; }
+    .recommend-copy    { color: #666; font-size: 12px; line-height: 1.45; margin-bottom: 12px; }
 </style>
 
 <div class="welcome-banner">
@@ -64,6 +67,9 @@
             <div class="text-muted small mt-2">
                 Points: <asp:Label ID="lblLeaguePoints" runat="server" Text="0" />
             </div>
+            <div class="text-muted small">
+                Rank: <asp:Label ID="lblLeagueRank" runat="server" Text="Not ranked yet" />
+            </div>
         </div>
         <div class="side-card">
             <h6>Latest Badge</h6>
@@ -73,6 +79,23 @@
                 <asp:Label ID="lblLatestBadgeName" runat="server"
                     Text="No badges yet" CssClass="text-muted small" />
             </div>
+        </div>
+        <div class="side-card text-start">
+            <h6 class="text-center">Recommended Next</h6>
+            <div class="recommend-title">
+                <asp:Label ID="lblRecommendedTitle" runat="server" Text="Explore more courses" />
+            </div>
+            <div class="recommend-meta">
+                <asp:Label ID="lblRecommendedMeta" runat="server" Text="Catalogue" />
+            </div>
+            <div class="recommend-copy">
+                <asp:Label ID="lblRecommendedDescription" runat="server"
+                    Text="Find another first-aid module to continue learning." />
+            </div>
+            <asp:HyperLink ID="lnkRecommended" runat="server"
+                Text="Open Catalogue"
+                NavigateUrl="~/Learner/Courses/Catalogue.aspx"
+                CssClass="btn btn-outline-danger btn-sm w-100" />
         </div>
     </div>
 </div>

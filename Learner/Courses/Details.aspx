@@ -66,6 +66,10 @@
         </div>
 
         <h5 class="fw-bold mb-3">Lessons</h5>
+        <div class="mb-3">
+            <a href='<%= ResolveUrl("~/Learner/Discussions.aspx?moduleId=" + Request.QueryString["moduleId"]) %>'
+               class="btn btn-outline-danger btn-sm">Open Discussions</a>
+        </div>
         <asp:Repeater ID="rptLessons" runat="server">
             <ItemTemplate>
                 <div class="lesson-row">

@@ -17,3 +17,7 @@ packages/
 
 # Local IIS Express logs
 iisexpress*.log
+
+# Local secrets and runtime-generated files
+Uploads/
+Certificates/

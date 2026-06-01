@@ -79,18 +79,7 @@ namespace Aidify_assigment.Learner.Courses
                         ins.Parameters.AddWithValue("@M", moduleId);
                         ins.ExecuteNonQuery();
 
-                        // Initialise League row on first enrolment
-                        var lchk = new SqlCommand(
-                            "SELECT COUNT(*) FROM League WHERE UserId=@U", conn, tx);
-                        lchk.Parameters.AddWithValue("@U", userId);
-                        if ((int)lchk.ExecuteScalar() == 0)
-                        {
-                            var lins = new SqlCommand(
-                                "INSERT INTO League (UserId, Tier, Points) VALUES (@U,'Bronze',0)",
-                                conn, tx);
-                            lins.Parameters.AddWithValue("@U", userId);
-                            lins.ExecuteNonQuery();
-                        }
+                        LeagueService.EnsureLeagueRow(userId, conn, tx);
                     }
                     tx.Commit();
                 }

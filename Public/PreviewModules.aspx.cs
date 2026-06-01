@@ -39,8 +39,15 @@ namespace Aidify_assigment.Public
                     WHERE m.Status = 'Published'
                       AND m.IsDeleted = 0
                       AND m.IsPreview = 1
+                      AND EXISTS (
+                          SELECT 1
+                          FROM Quizzes q
+                          JOIN Questions qs ON qs.QuizId = q.QuizId
+                          WHERE q.ModuleId = m.ModuleId
+                            AND q.IsPreview = 1
+                      )
                     GROUP BY m.ModuleId, m.Title, m.Description, m.DifficultyLevel, m.CreatedAt, pq.QuizId
-                    ORDER BY m.CreatedAt DESC", conn);
+                    ORDER BY m.ModuleId", conn);
 
                 using (var r = cmd.ExecuteReader())
                     while (r.Read())

@@ -46,8 +46,9 @@ namespace Aidify_assigment.Learner
 
         private class CertRow
         {
-            public string Title, PdfPath;
-            public DateTime IssuedAt;
+            public string Title { get; set; }
+            public string PdfPath { get; set; }
+            public DateTime IssuedAt { get; set; }
         }
     }
 }

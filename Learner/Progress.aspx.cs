@@ -109,8 +109,26 @@ namespace Aidify_assigment.Learner
             lblNoCertificates.Visible = rows.Count == 0;
         }
 
-        private class ProgressRow { public string ModuleName; public int Completed, Total, Pct; }
-        private class BadgeRow    { public string Icon, BadgeName, AwardedDate; }
-        private class CertRow     { public string ModuleName, IssueDate, DownloadUrl; }
+        private class ProgressRow
+        {
+            public string ModuleName { get; set; }
+            public int Completed { get; set; }
+            public int Total { get; set; }
+            public int Pct { get; set; }
+        }
+
+        private class BadgeRow
+        {
+            public string Icon { get; set; }
+            public string BadgeName { get; set; }
+            public string AwardedDate { get; set; }
+        }
+
+        private class CertRow
+        {
+            public string ModuleName { get; set; }
+            public string IssueDate { get; set; }
+            public string DownloadUrl { get; set; }
+        }
     }
 }

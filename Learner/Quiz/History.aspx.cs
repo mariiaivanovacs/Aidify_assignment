@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Learner.Quiz
 {
-    public partial class History : System.Web.UI.Page
+    public partial class History : BaseRolePage
     {
+        protected override string RequiredRole => Constants.RoleLearner;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack) BindAttempts();
@@ -49,10 +47,11 @@ namespace Aidify_assigment.Learner.Quiz
 
         private class AttemptRow
         {
-            public int AttemptId, Score;
-            public string Title;
-            public bool Passed;
-            public DateTime SubmittedAt;
+            public int AttemptId { get; set; }
+            public int Score { get; set; }
+            public string Title { get; set; }
+            public bool Passed { get; set; }
+            public DateTime SubmittedAt { get; set; }
         }
     }
 }

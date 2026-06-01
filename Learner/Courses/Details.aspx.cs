@@ -112,11 +112,19 @@ namespace Aidify_assigment.Learner.Courses
                 conn.Open();
                 using (var tx = conn.BeginTransaction())
                 {
-                    var ins = new SqlCommand(
-                        "INSERT INTO Enrollments (UserId, ModuleId) VALUES (@U, @M)", conn, tx);
-                    ins.Parameters.AddWithValue("@U", userId);
-                    ins.Parameters.AddWithValue("@M", moduleId);
-                    ins.ExecuteNonQuery();
+                    var chk = new SqlCommand(
+                        "SELECT COUNT(*) FROM Enrollments WHERE UserId=@U AND ModuleId=@M",
+                        conn, tx);
+                    chk.Parameters.AddWithValue("@U", userId);
+                    chk.Parameters.AddWithValue("@M", moduleId);
+                    if ((int)chk.ExecuteScalar() == 0)
+                    {
+                        var ins = new SqlCommand(
+                            "INSERT INTO Enrollments (UserId, ModuleId) VALUES (@U, @M)", conn, tx);
+                        ins.Parameters.AddWithValue("@U", userId);
+                        ins.Parameters.AddWithValue("@M", moduleId);
+                        ins.ExecuteNonQuery();
+                    }
 
                     var lchk = new SqlCommand(
                         "SELECT COUNT(*) FROM League WHERE UserId=@U", conn, tx);
@@ -138,9 +146,10 @@ namespace Aidify_assigment.Learner.Courses
 
         private class LessonRow
         {
-            public int    LessonId, EstimatedMinutes;
-            public string LessonTitle;
-            public bool   IsCompleted;
+            public int LessonId { get; set; }
+            public int EstimatedMinutes { get; set; }
+            public string LessonTitle { get; set; }
+            public bool IsCompleted { get; set; }
         }
     }
 }

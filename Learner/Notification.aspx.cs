@@ -24,7 +24,10 @@ namespace Aidify_assigment.Learner
             {
                 conn.Open();
                 var cmd = new SqlCommand(@"
-                    SELECT NotificationId, Message, IsRead, CreatedAt
+                    SELECT NotifId AS NotificationId,
+                           COALESCE(Body, Title, '') AS Message,
+                           IsRead,
+                           CreatedAt
                     FROM   Notifications
                     WHERE  UserId = @UserId
                     ORDER BY CreatedAt DESC", conn);
@@ -57,7 +60,7 @@ namespace Aidify_assigment.Learner
                 conn.Open();
                 var cmd = new SqlCommand(@"
                     UPDATE Notifications SET IsRead = 1
-                    WHERE NotificationId = @Id AND UserId = @U", conn);
+                    WHERE NotifId = @Id AND UserId = @U", conn);
                 cmd.Parameters.AddWithValue("@Id", notificationId);
                 cmd.Parameters.AddWithValue("@U", userId);
                 cmd.ExecuteNonQuery();
@@ -85,10 +88,10 @@ namespace Aidify_assigment.Learner
 
         private class NotifRow
         {
-            public int NotificationId;
-            public string Message;
-            public bool IsRead;
-            public DateTime CreatedAt;
+            public int NotificationId { get; set; }
+            public string Message { get; set; }
+            public bool IsRead { get; set; }
+            public DateTime CreatedAt { get; set; }
         }
     }
 }

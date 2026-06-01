@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace Aidify_assigment.Learner
 {
-    public partial class Badges : System.Web.UI.Page
+    public partial class Badges : BaseRolePage
     {
+        protected override string RequiredRole => Constants.RoleLearner;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack) BindBadges();
@@ -47,8 +45,9 @@ namespace Aidify_assigment.Learner
 
         private class BadgeRow
         {
-            public string Name, IconPath;
-            public DateTime AwardedAt;
+            public string Name { get; set; }
+            public string IconPath { get; set; }
+            public DateTime AwardedAt { get; set; }
         }
     }
 }

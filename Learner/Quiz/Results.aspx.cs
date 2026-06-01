@@ -94,8 +94,11 @@ namespace Aidify_assigment.Learner.Quiz
 
         private class FeedbackRow
         {
-            public string QuestionText, YourAnswer, CorrectAnswer, Explanation;
-            public bool   IsCorrect;
+            public string QuestionText { get; set; }
+            public string YourAnswer { get; set; }
+            public string CorrectAnswer { get; set; }
+            public string Explanation { get; set; }
+            public bool IsCorrect { get; set; }
         }
     }
 }

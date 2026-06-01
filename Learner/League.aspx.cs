@@ -90,9 +90,11 @@ namespace Aidify_assigment.Learner
 
         private class LeaderRow
         {
-            public string FullName, Tier;
-            public int Points, Rank;
-            public bool IsCurrentUser;
+            public string FullName { get; set; }
+            public string Tier { get; set; }
+            public int Points { get; set; }
+            public int Rank { get; set; }
+            public bool IsCurrentUser { get; set; }
         }
     }
 }

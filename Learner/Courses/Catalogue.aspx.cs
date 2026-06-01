@@ -112,8 +112,11 @@ namespace Aidify_assigment.Learner.Courses
 
         private class CourseRow
         {
-            public int    ModuleId;
-            public string ModuleTitle, Difficulty, Description, CoverImageUrl;
+            public int ModuleId { get; set; }
+            public string ModuleTitle { get; set; }
+            public string Difficulty { get; set; }
+            public string Description { get; set; }
+            public string CoverImageUrl { get; set; }
         }
     }
 }

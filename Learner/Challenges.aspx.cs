@@ -85,11 +85,13 @@ namespace Aidify_assigment.Learner
 
         private class ChallengeRow
         {
-            public int ChallengeId, PointsReward;
-            public string Title, Description;
-            public DateTime StartDate;
-            public DateTime? EndDate;
-            public bool AlreadyJoined;
+            public int ChallengeId { get; set; }
+            public int PointsReward { get; set; }
+            public string Title { get; set; }
+            public string Description { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime? EndDate { get; set; }
+            public bool AlreadyJoined { get; set; }
         }
     }
 }

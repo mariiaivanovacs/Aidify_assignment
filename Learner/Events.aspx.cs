@@ -85,10 +85,13 @@ namespace Aidify_assigment.Learner
 
         private class EventRow
         {
-            public int EventId;
-            public string Title, Description, Location, MeetingUrl;
-            public DateTime EventDate;
-            public bool AlreadyRegistered;
+            public int EventId { get; set; }
+            public string Title { get; set; }
+            public string Description { get; set; }
+            public string Location { get; set; }
+            public string MeetingUrl { get; set; }
+            public DateTime EventDate { get; set; }
+            public bool AlreadyRegistered { get; set; }
         }
     }
 }

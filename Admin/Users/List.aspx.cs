@@ -67,7 +67,8 @@ namespace Aidify_assigment.Admin.Users
                 using (var r = cmd.ExecuteReader())
                     if (r.Read())
                     {
-                        int total = (int)r["Total"], done = (int)r["Done"];
+                        int total = Convert.ToInt32(r["Total"] == DBNull.Value ? 0 : r["Total"]);
+                        int done = Convert.ToInt32(r["Done"] == DBNull.Value ? 0 : r["Done"]);
                         completionRate = total > 0
                             ? System.Math.Round(done * 100m / total, 1) : 0;
                     }
@@ -79,6 +80,25 @@ namespace Aidify_assigment.Admin.Users
                 pendingModules = stats.PendingModules,
                 completionRate
             };
+        }
+
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(UseHttpGet = false)]
+        public static object GetRecentAuditLogs()
+        {
+            if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
+                return null;
+
+            return new AdminRepository()
+                .GetAuditLogs(withinHours: 168)
+                .Take(3)
+                .Select(x => new
+                {
+                    x.Action,
+                    x.ActorName,
+                    x.Timestamp
+                })
+                .ToList();
         }
 
         // Enables or disables a user account. Writes to AuditLogs inside the same transaction.

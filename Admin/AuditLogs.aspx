@@ -24,24 +24,7 @@
         z-index: 50;
     }
 
-    .audit-brand {
-        color: #E53935;
-        font-size: 26px;
-        font-weight: 800;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .admin-badge {
-        background-color: #db322f;
-        color: #fff;
-        font-size: 11px;
-        padding: 3px 9px;
-        border-radius: 20px;
-        font-weight: 700;
-    }
+    
 
     .audit-nav a {
         color: #3d2a28;
@@ -57,17 +40,39 @@
         padding-bottom: 8px;
     }
 
-    .admin-avatar {
+    .audit-logo {
         width: 42px;
         height: 42px;
-        border-radius: 50%;
-        background: #E53935;
-        color: white;
+        object-fit: contain;
+    }
+
+    .audit-brand {
+        color: #E53935;
+        font-size: 26px;
+        font-weight: 800;
+        text-decoration: none;
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        flex-shrink: 0;
+        gap: 12px;
+    }
+
+    .audit-dropdown {
+        text-decoration: none;
+        color: #1f2937;
+        font-weight: 700;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .audit-dropdown:hover {
+        color: #E53935;
+    }
+
+    .dropdown-menu {
+        min-width: 180px;
+        border-radius: 12px;
     }
 
     /* ── PAGE ── */
@@ -285,6 +290,18 @@
         border-color: #E53935;
     }
 
+    .page-btn.ellipsis {
+        border: none;
+        background: transparent;
+        cursor: default;
+        color: #888;
+    }
+
+    .page-btn.ellipsis:hover {
+        border: none;
+        color: #888;
+    }
+
     /* ── STAT CARDS ── */
     .stat-card {
         background: white;
@@ -304,6 +321,18 @@
         justify-content: center;
         font-size: 17px;
         flex-shrink: 0;
+    }
+
+    /* ── ERROR ALERT ── */
+    .audit-error-alert {
+        background: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 14px;
+        display: none;
+        margin-bottom: 16px;
     }
 
     /* ── FOOTER ── */
@@ -339,26 +368,49 @@
     <div class="container d-flex justify-content-between align-items-center">
 
         <a href="Dashboard.aspx" class="audit-brand">
-            Aidify
-            <span class="admin-badge">ADMIN</span>
+            <img src="<%= ResolveUrl("~/Images/aidify-kit.png") %>"
+                 alt="Aidify Logo"
+                 class="audit-logo" />
+
+            <span>Aidify</span>
         </a>
 
         <nav class="audit-nav">
             <a href="Dashboard.aspx">Dashboard</a>
             <a href="Users/List.aspx">Users</a>
-            <a href="Roles.aspx">Roles</a>
-            <a href="Content/ManagePublicPages.aspx">Public Pages</a>
             <a href="Content/ApprovalQueue.aspx">Approvals</a>
             <a href="Analytics.aspx">Analytics</a>
+            <a href="AuditLogs.aspx" class="active">Audit Logs</a>
         </nav>
 
-        <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-bell fs-5"></i>
-            <div class="text-end d-none d-md-block">
-                <div class="fw-bold" style="font-size:14px;"><%: Aidify_assigment.AuthHelper.GetName() %></div>
-                <small class="text-muted"><%: Aidify_assigment.AuthHelper.GetRole() %></small>
-            </div>
-            <div class="admin-avatar">A</div>
+        <div class="dropdown">
+
+            <a href="#"
+               class="audit-dropdown"
+               data-bs-toggle="dropdown"
+               aria-expanded="false">
+                Admin
+                <i class="bi bi-chevron-down"></i>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <a class="dropdown-item"
+                       href="<%= ResolveUrl("~/Account/Profile.aspx") %>">
+                        <i class="bi bi-person me-2"></i>
+                        Profile
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item text-danger"
+                       href="<%= ResolveUrl("~/Auth/Logout.aspx") %>">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+
         </div>
 
     </div>
@@ -368,7 +420,6 @@
 <main class="audit-page">
     <div class="container">
 
-        <!-- Page Header -->
         <div class="mb-4">
             <h1>Audit Logs</h1>
             <p class="text-muted" style="font-size:15px;">
@@ -376,43 +427,50 @@
             </p>
         </div>
 
-        <!-- Filter Card -->
+        <!-- Error alert (shown on AJAX failure or session expiry) -->
+        <div id="auditErrorAlert" class="audit-error-alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="auditErrorMsg">Failed to load audit logs. Please refresh the page or log in again.</span>
+        </div>
+
         <div class="audit-filter-card">
             <div class="row g-3 align-items-end">
 
                 <div class="col-md-5">
                     <label class="form-label">Search Activity</label>
                     <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text"
-                               class="form-control"
-                               placeholder="Search User ID, Action, or IP Address..." />
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="txtSearch" class="form-control"
+                               placeholder="Search user, action, or IP address..." />
                     </div>
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label">Action Type</label>
-                    <select class="form-select">
-                        <option>All Actions</option>
-                        <option>User Login</option>
-                        <option>Module Update</option>
-                        <option>Security Alert</option>
+                    <select id="ddlAction" class="form-select">
+                        <option value="">All Actions</option>
+                        <option value="CreateUser">CreateUser</option>
+                        <option value="UpdateUser">UpdateUser</option>
+                        <option value="EnableUser">EnableUser</option>
+                        <option value="DisableUser">DisableUser</option>
+                        <option value="ApproveModule">ApproveModule</option>
+                        <option value="RejectModule">RejectModule</option>
+                        <option value="ForceResetPassword">ForceResetPassword</option>
                     </select>
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label">Date Range</label>
-                    <select class="form-select">
-                        <option>Last 24 Hours</option>
-                        <option>Last 7 Days</option>
-                        <option>Last 30 Days</option>
+                    <select id="ddlDateRange" class="form-select">
+                        <option value="24">Last 24 Hours</option>
+                        <option value="168" selected>Last 7 Days</option>
+                        <option value="720">Last 30 Days</option>
+                        <option value="0">All Time</option>
                     </select>
                 </div>
 
                 <div class="col-md-3">
-                    <button class="btn-apply-filter">
+                    <button type="button" class="btn-apply-filter" onclick="loadLogs(1)">
                         <i class="bi bi-funnel"></i> Apply
                     </button>
                 </div>
@@ -420,89 +478,57 @@
             </div>
         </div>
 
-        <!-- Audit Table -->
         <div class="audit-card mb-4">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-
                     <thead class="audit-card-header">
                         <tr>
                             <th class="ps-4 py-3">Timestamp</th>
-                            <th>User ID / Actor</th>
+                            <th>User / Actor</th>
                             <th>Action</th>
-                            <th>Result</th>
-                            <th>Origin</th>
-                            <th class="text-end pe-4">Details</th>
+                            <th>Target</th>
+                            <th>IP Address</th>
+                            <th class="text-end pe-4">Log ID</th>
                         </tr>
                     </thead>
-
                     <tbody id="auditTableBody">
                         <tr><td colspan="6" class="text-center text-muted py-4">Loading audit logs…</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination row -->
             <div class="pagination-row">
-                <div class="small text-muted">Showing 1 to 25 of 1,204 results</div>
-                <div class="pagination-btns">
-                    <a class="page-btn arrow">&lsaquo;</a>
-                    <a class="page-btn active">1</a>
-                    <a class="page-btn">2</a>
-                    <a class="page-btn">3</a>
-                    <a class="page-btn arrow">&rsaquo;</a>
-                </div>
+                <div id="paginationInfo" class="small text-muted">Loading results...</div>
+                <div id="paginationBtns" class="pagination-btns"></div>
             </div>
         </div>
 
-        <!-- Stat Cards -->
         <div class="row g-4">
 
             <div class="col-md-4">
                 <div class="stat-card">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="stat-icon-box text-danger">
-                            <i class="bi bi-exclamation-triangle"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-0">Failed Logins</h6>
-                            <small class="text-muted">Last 24 Hours</small>
-                        </div>
-                    </div>
-                    <div class="h2 fw-bold text-danger mb-1">12</div>
-                    <small class="text-danger">↑ 8% increase from yesterday</small>
+                    <h6 class="fw-bold mb-1">Failed Logins</h6>
+                    <small class="text-muted">Last 24 Hours</small>
+                    <div id="statFailedLogins" class="h2 fw-bold text-danger mt-3">—</div>
+                    <small class="text-muted">Failed login attempts today</small>
                 </div>
             </div>
 
             <div class="col-md-4">
                 <div class="stat-card">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="stat-icon-box" style="color:#4B50C7;">
-                            <i class="bi bi-shield-lock"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-0">Privileged Access</h6>
-                            <small class="text-muted">Active Sessions</small>
-                        </div>
-                    </div>
-                    <div class="h2 fw-bold mb-1">3</div>
-                    <small class="text-success">All verified identities</small>
+                    <h6 class="fw-bold mb-1">Total Actions</h6>
+                    <small class="text-muted">Last 24 Hours</small>
+                    <div id="statTotalActions" class="h2 fw-bold mt-3">—</div>
+                    <small class="text-muted">All recorded audit events</small>
                 </div>
             </div>
 
             <div class="col-md-4">
                 <div class="stat-card">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="stat-icon-box" style="color:#0ea5e9;">
-                            <i class="bi bi-database"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-0">Data Integrity</h6>
-                            <small class="text-muted">System Status</small>
-                        </div>
-                    </div>
-                    <div class="h2 fw-bold mb-1">100%</div>
-                    <small class="text-success">Secure &amp; Consistent</small>
+                    <h6 class="fw-bold mb-1">Password Resets</h6>
+                    <small class="text-muted">Last 24 Hours</small>
+                    <div id="statResets" class="h2 fw-bold mt-3">—</div>
+                    <small class="text-muted">Admin-forced resets today</small>
                 </div>
             </div>
 
@@ -519,13 +545,6 @@
                 <div class="footer-brand">Aidify</div>
                 <p class="text-muted small mb-0">Administrative control center for the Aidify learning platform.</p>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <a href="Dashboard.aspx">Dashboard</a>
-                <span class="text-muted">|</span>
-                <a href="#">Privacy Policy</a>
-                <span class="text-muted">|</span>
-                <a href="#">Terms of Service</a>
-            </div>
         </div>
         <hr class="mt-1 mb-2" />
         <p class="text-muted small mb-0 text-center">© 2026 Aidify Admin Panel. Educational use only.</p>
@@ -533,52 +552,185 @@
 </footer>
 
 <script type="text/javascript">
-$(document).ready(function () {
-    $.ajax({
-        type: 'POST', url: 'AuditLogs.aspx/GetAuditLogs',
-        data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
-        success: function (r) {
-            var logs = r.d;
-            var body = document.getElementById('auditTableBody');
-            if (!logs || logs.length === 0) {
-                body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No audit logs found.</td></tr>';
-                return;
-            }
-            var html = '';
-            for (var i = 0; i < logs.length; i++) {
-                var l = logs[i];
-                var dt = new Date(parseInt(l.timestamp.replace('/Date(', '').replace(')/', '')));
-                var dateStr = dt.toISOString().slice(0, 10);
-                var timeStr = dt.toISOString().slice(11, 19) + ' UTC';
-                html +=
-                    '<tr>' +
-                    '<td class="ps-4 py-3">' +
-                        '<div class="fw-medium">' + dateStr + '</div>' +
-                        '<small class="text-muted">' + timeStr + '</small>' +
-                    '</td>' +
-                    '<td>' +
-                        '<div class="d-flex align-items-center gap-2">' +
-                        '<div class="audit-avatar" style="background:#ffe2de;color:#93000a;">' + esc(l.actorInitials) + '</div>' +
-                        '<span class="fw-medium">' + esc(l.actorName) + '</span>' +
-                        '</div>' +
-                    '</td>' +
-                    '<td>' + esc(l.action) + '</td>' +
-                    '<td><span class="badge-success-custom">' + esc(l.targetEntity || '—') + '</span></td>' +
-                    '<td class="text-muted">' + esc(l.iPAddress || '—') + '</td>' +
-                    '<td class="text-end pe-4"><span class="text-muted small">#' + l.auditId + '</span></td>' +
-                    '</tr>';
-            }
-            body.innerHTML = html;
-        },
-        error: function () {
-            document.getElementById('auditTableBody').innerHTML =
-                '<tr><td colspan="6" class="text-danger text-center py-4">Failed to load audit logs.</td></tr>';
-        }
+
+    var currentPage = 1;
+    var pageSize = 10;
+
+    $(document).ready(function () {
+        loadLogs(1);
+        loadStats();
+
+        // Search fires when user types
+        $('#txtSearch').on('keyup', function () {
+            loadLogs(1);
+        });
     });
-});
-function esc(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+
+    function showError(msg) {
+        $('#auditErrorMsg').text(msg || 'An unexpected error occurred. Please refresh the page.');
+        $('#auditErrorAlert').show();
+    }
+
+    function hideError() {
+        $('#auditErrorAlert').hide();
+    }
+
+    function loadLogs(page) {
+
+        currentPage = page;
+        hideError();
+
+        $.ajax({
+            type: 'POST',
+            url: 'AuditLogs.aspx/GetAuditLogs',
+            data: JSON.stringify({
+                search: $('#txtSearch').val(),
+                action: $('#ddlAction').val(),
+                withinHours: parseInt($('#ddlDateRange').val()) || 0,
+                page: page,
+                pageSize: pageSize
+            }),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (r) {
+
+                // Guard against null (e.g. session expired / unauthorised)
+                if (!r || !r.d) {
+                    $('#auditTableBody').html(
+                        '<tr><td colspan="6" class="text-center text-muted py-4">Session expired. Please log in again.</td></tr>'
+                    );
+                    $('#paginationInfo').text('');
+                    $('#paginationBtns').html('');
+                    showError('Your session has expired. Please log in again.');
+                    return;
+                }
+
+                var result = r.d;
+                var logs = result.logs;
+                var total = result.totalCount;
+                var body = document.getElementById('auditTableBody');
+
+                if (!logs || logs.length === 0) {
+                    body.innerHTML =
+                        '<tr><td colspan="6" class="text-center text-muted py-4">No audit logs found.</td></tr>';
+                    $('#paginationInfo').text('No results found');
+                    $('#paginationBtns').html('');
+                    return;
+                }
+
+                var html = '';
+
+                for (var i = 0; i < logs.length; i++) {
+                    var l = logs[i];
+
+                    // Support both /Date(ms)/ (ASP.NET JSON) and ISO 8601 strings
+                    var rawTs = l.Timestamp || '';
+                    var ms = parseInt(rawTs.replace('/Date(', '').replace(')/', ''));
+                    var dt = isNaN(ms) ? new Date(rawTs) : new Date(ms);
+
+                    html +=
+                        '<tr>' +
+                        '<td class="ps-4 py-3">' +
+                        '<div class="fw-medium">' + dt.toLocaleDateString('en-MY') + '</div>' +
+                        '<small class="text-muted">' + dt.toLocaleTimeString('en-MY') + '</small>' +
+                        '</td>' +
+                        '<td>' +
+                        '<div class="d-flex align-items-center gap-2">' +
+                        '<div class="audit-avatar" style="background:#ffe2de;color:#93000a;">' + esc(l.ActorInitials || '?') + '</div>' +
+                        '<span class="fw-medium">' + esc(l.ActorName || 'Unknown') + '</span>' +
+                        '</div>' +
+                        '</td>' +
+                        '<td>' + esc(l.Action) + '</td>' +
+                        '<td><span class="badge-success-custom">' +
+                        esc(l.TargetEntity || '—') +
+                        (l.TargetId && l.TargetId !== 0 ? ' #' + l.TargetId : '') +
+                        '</span></td>' +
+                        '<td class="text-muted">' + esc(l.IPAddress || '—') + '</td>' +
+                        '<td class="text-end pe-4"><span class="text-muted small">#' + l.AuditId + '</span></td>' +
+                        '</tr>';
+                }
+
+                body.innerHTML = html;
+
+                var from = ((page - 1) * pageSize) + 1;
+                var to = Math.min(page * pageSize, total);
+
+                $('#paginationInfo').text(
+                    'Showing ' + from + ' to ' + to + ' of ' + total + ' result(s)'
+                );
+
+                buildPagination(page, Math.ceil(total / pageSize));
+            },
+            error: function (xhr) {
+                $('#auditTableBody').html(
+                    '<tr><td colspan="6" class="text-center text-muted py-4">Failed to load audit logs.</td></tr>'
+                );
+                $('#paginationInfo').text('');
+                $('#paginationBtns').html('');
+                showError('Could not retrieve audit logs (HTTP ' + xhr.status + '). Please try again.');
+            }
+        });
+    }
+
+    // Pagination
+    function buildPagination(current, totalPages) {
+
+        if (totalPages <= 1) {
+            $('#paginationBtns').html('');
+            return;
+        }
+
+        var html = '';
+
+        html += '<a class="page-btn arrow ' + (current === 1 ? 'disabled' : '') + '" ' +
+            'onclick="if(' + current + '>1) loadLogs(' + (current - 1) + ')">&lsaquo;</a>';
+
+        for (var i = 1; i <= totalPages; i++) {
+            html += '<a class="page-btn ' + (i === current ? 'active' : '') +
+                '" onclick="loadLogs(' + i + ')">' + i + '</a>';
+        }
+
+        html += '<a class="page-btn arrow ' + (current === totalPages ? 'disabled' : '') + '" ' +
+            'onclick="if(' + current + '<' + totalPages + ') loadLogs(' + (current + 1) + ')">&rsaquo;</a>';
+
+        $('#paginationBtns').html(html);
+    }
+
+    
+
+    function loadStats() {
+        $.ajax({
+            type: 'POST',
+            url: 'AuditLogs.aspx/GetAuditStats',
+            data: '{}',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (r) {
+                if (!r || !r.d) {
+                    $('#statFailedLogins, #statTotalActions, #statResets').text('N/A');
+                    return;
+                }
+                var s = r.d;
+                $('#statFailedLogins').text(s.FailedLogins);
+                $('#statTotalActions').text(s.TotalActions);
+                $('#statResets').text(s.PasswordResets);
+            },
+            error: function () {
+                $('#statFailedLogins, #statTotalActions, #statResets').text('—');
+            }
+        });
+    }
+
+    // Encodes &, <, >, " and ' to prevent XSS in innerHTML contexts
+    function esc(s) {
+        return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
 </script>
 
 </asp:Content>

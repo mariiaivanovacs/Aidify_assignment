@@ -166,18 +166,31 @@ $.ajax({
         var html = '';
         for (var i = 0; i < modules.length; i++) {
             var m = modules[i];
+            var quizButton = m.previewQuizId > 0
+                ? '<a href="PreviewQuiz.aspx?quizId=' + m.previewQuizId + '&startQuiz=1" class="btn btn-sm btn-outline-aidify mt-3 ms-2">Attempt Quiz</a>'
+                : '';
+            var minutes = m.estimatedMinutes > 0 ? ' • ' + m.estimatedMinutes + ' mins' : '';
             html += '<div class="col-md-4"><div class="module-card">' +
                 '<h4>' + esc(m.title) + '</h4>' +
                 '<p>' + esc(m.description) + '</p>' +
-                '<span>' + esc(m.difficulty) + '</span>' +
-                '<a href="../Auth/Register.aspx" class="btn btn-sm btn-aidify mt-3">Register to Access</a>' +
+                '<span>' + esc(m.difficulty) + ' • ' + m.lessonCount + ' lessons' + minutes + '</span>' +
+                '<div><a href="PreviewQuiz.aspx?moduleId=' + m.moduleId + '" class="btn btn-sm btn-aidify mt-3">Preview Lessons</a>' +
+                quizButton + '</div>' +
                 '</div></div>';
         }
         row.innerHTML = html;
     },
     error: function() { document.getElementById('liveModulesRow').innerHTML = ''; }
 });
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function repairText(s) {
+    return String(s || '')
+        .replace(/â€“/g, '-')
+        .replace(/â€”/g, '-')
+        .replace(/â€˜|â€™/g, "'")
+        .replace(/â€œ|â€�/g, '"')
+        .replace(/Â/g, '');
+}
+function esc(s) { return repairText(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 
 </asp:Content>

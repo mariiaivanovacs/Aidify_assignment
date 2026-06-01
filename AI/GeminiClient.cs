@@ -16,7 +16,7 @@ namespace Aidify_assigment
         public async Task<string> GenerateAsync(string prompt, bool jsonMode = true)
         {
             var url = "https://generativelanguage.googleapis.com/v1beta/models/" +
-                      "gemini-1.5-flash:generateContent?key=" + _apiKey;
+                "gemini-2.5-flash:generateContent?key=" + _apiKey;
 
             var body = Newtonsoft.Json.JsonConvert.SerializeObject(new
             {
@@ -30,7 +30,11 @@ namespace Aidify_assigment
 
             var content = new StringContent(body, Encoding.UTF8, "application/json");
             var resp = await _http.PostAsync(url, content);
-            resp.EnsureSuccessStatusCode();
+            if (!resp.IsSuccessStatusCode)
+            {
+                var error = await resp.Content.ReadAsStringAsync();
+                throw new Exception("Gemini API error: " + resp.StatusCode + " - " + error);
+            }
 
             var raw    = await resp.Content.ReadAsStringAsync();
             var parsed = JObject.Parse(raw);

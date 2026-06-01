@@ -24,6 +24,12 @@
         z-index: 50;
     }
 
+    .ai-logo {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+    }
+
     .ai-brand {
         color: #E53935;
         font-size: 26px;
@@ -31,16 +37,7 @@
         text-decoration: none;
         display: flex;
         align-items: center;
-        gap: 10px;
-    }
-
-    .admin-badge {
-        background-color: #db322f;
-        color: #fff;
-        font-size: 11px;
-        padding: 3px 9px;
-        border-radius: 20px;
-        font-weight: 700;
+        gap: 12px;
     }
 
     .ai-nav a {
@@ -57,18 +54,25 @@
         padding-bottom: 8px;
     }
 
-    .admin-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background: #E53935;
-        color: white;
+    .ai-dropdown {
+        text-decoration: none;
+        color: #1f2937;
+        font-weight: 700;
+        font-size: 18px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        flex-shrink: 0;
+        gap: 6px;
     }
+
+    .ai-dropdown:hover {
+        color: #E53935;
+    }
+
+    .dropdown-menu {
+        min-width: 180px;
+        border-radius: 12px;
+    }
+    
 
     /* ── PAGE ── */
     .ai-page {
@@ -174,26 +178,49 @@
     <div class="container d-flex justify-content-between align-items-center">
 
         <a href="Dashboard.aspx" class="ai-brand">
-            Aidify
-            <span class="admin-badge">ADMIN</span>
+            <img src="<%= ResolveUrl("~/Images/aidify-kit.png") %>"
+                 alt="Aidify Logo"
+                 class="ai-logo" />
+
+            <span>Aidify</span>
         </a>
 
         <nav class="ai-nav">
             <a href="Dashboard.aspx">Dashboard</a>
             <a href="Users/List.aspx">Users</a>
-            <a href="Roles.aspx">Roles</a>
-            <a href="Content/ManagePublicPages.aspx">Public Pages</a>
+          
             <a href="Content/ApprovalQueue.aspx">Approvals</a>
             <a href="Analytics.aspx">Analytics</a>
         </nav>
 
-        <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-bell fs-5"></i>
-            <div class="text-end d-none d-md-block">
-                <div class="fw-bold" style="font-size:14px;"><%: Aidify_assigment.AuthHelper.GetName() %></div>
-                <small class="text-muted"><%: Aidify_assigment.AuthHelper.GetRole() %></small>
-            </div>
-            <div class="admin-avatar">A</div>
+        <div class="dropdown">
+
+            <a href="#"
+               class="ai-dropdown"
+               data-bs-toggle="dropdown"
+               aria-expanded="false">
+                Admin
+                <i class="bi bi-chevron-down"></i>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <a class="dropdown-item"
+                       href="<%= ResolveUrl("~/Account/Profile.aspx") %>">
+                        <i class="bi bi-person me-2"></i>
+                        Profile
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item text-danger"
+                       href="<%= ResolveUrl("~/Auth/Logout.aspx") %>">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+
         </div>
 
     </div>
@@ -213,205 +240,117 @@
 
         <div class="row g-4">
 
-            <!-- Heatmap card — large -->
-            <div class="col-lg-8">
+            <!-- Dynamic Overview Cards -->
+            <div class="col-lg-6">
                 <div class="ai-card">
+                    <h3 class="h5 fw-bold mb-3">User Overview</h3>
+                    <p class="text-muted small mb-4">Live user distribution from the Aidify database.</p>
 
-                    <div class="d-flex justify-content-between align-items-start mb-4">
-                        <div>
-                            <h2 class="h5 fw-bold mb-1">Student Competency Heatmap</h2>
-                            <p class="text-muted small mb-0">
-                                Visualizing certification readiness across all active cohorts.
-                            </p>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <div class="stat-mini-label">Total Users</div>
+                            <div class="h4 fw-bold" id="cardTotalUsers">—</div>
                         </div>
-                        <div class="d-flex gap-2">
-                            <span class="badge bg-light text-dark border" style="font-size:11px;">
-                                <span class="text-danger">●</span> High Risk
-                            </span>
-                            <span class="badge bg-light text-dark border" style="font-size:11px;">
-                                <span style="color:#4B50C7;">●</span> On Track
-                            </span>
+                        <div class="col-4">
+                            <div class="stat-mini-label">Learners</div>
+                            <div class="h4 fw-bold" id="cardActiveLearners">—</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-mini-label">Instructors</div>
+                            <div class="h4 fw-bold" id="cardTotalInstructors">—</div>
                         </div>
                     </div>
-
-                    <!-- Row 1 -->
-                    <div class="heatmap-grid">
-                        <div class="heatmap-cell" style="background:#f5c6c6;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#7b80d4;"></div>
-                        <div class="heatmap-cell" style="background:#E53935;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#9da1e0;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#f5a0a0;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#c5c8ee;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#9da1e0;"></div>
-
-                        <!-- Row 2 -->
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#c5c8ee;"></div>
-                        <div class="heatmap-cell" style="background:#E53935;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#7b80d4;"></div>
-                        <div class="heatmap-cell" style="background:#f5a0a0;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#c5c8ee;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#7b80d4;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-
-                        <!-- Row 3 -->
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#dfe0f7;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#E53935;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#7b80d4;"></div>
-                        <div class="heatmap-cell" style="background:#9da1e0;"></div>
-                        <div class="heatmap-cell" style="background:#fadadd;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                        <div class="heatmap-cell" style="background:#7b80d4;"></div>
-                        <div class="heatmap-cell" style="background:#4B50C7;"></div>
-                    </div>
-
-                    <div class="alert alert-light border d-flex align-items-center gap-3 mb-0" style="border-radius:10px;">
-                        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
-                        <p class="mb-0 small fw-medium">
-                            AI Observation: A 14% drop in practical test performance detected in the Southeast Cohort.
-                            Immediate review recommended.
-                        </p>
-                    </div>
-
                 </div>
             </div>
 
-            <!-- Critical alert card -->
-            <div class="col-lg-4">
-                <div class="ai-card ai-card-critical d-flex flex-column">
+            <div class="col-lg-6">
+                <div class="ai-card">
+                    <h3 class="h5 fw-bold mb-3">Module Overview</h3>
+                    <p class="text-muted small mb-4">Current module status based on database records.</p>
 
-                    <div class="mb-auto">
-                        <div class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center mb-4"
-                             style="width:52px;height:52px;">
-                            <i class="bi bi-cpu-fill text-danger fs-4"></i>
+                    <div class="row g-3">
+                        <div class="col-3">
+                            <div class="stat-mini-label">Total</div>
+                            <div class="h4 fw-bold" id="cardTotalModules">—</div>
                         </div>
-
-                        <h3 class="h5 fw-bold mb-3">
-                            Identify students at risk of failing CPR certification
-                        </h3>
-
-                        <p class="text-muted small">
-                            Predictive analysis indicates 28 students are trending below the passing threshold for
-                            upcoming assessments based on manual skill simulations.
-                        </p>
+                        <div class="col-3">
+                            <div class="stat-mini-label">Published</div>
+                            <div class="h4 fw-bold" id="cardPublishedModules">—</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="stat-mini-label">Draft</div>
+                            <div class="h4 fw-bold" id="cardDraftModules">—</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="stat-mini-label">Pending</div>
+                            <div class="h4 fw-bold" id="cardPendingModules">—</div>
+                        </div>
                     </div>
-
-                    <button type="button" class="btn btn-aidify w-100 py-3 mt-4">
-                        Send Remedial Material
-                    </button>
-
                 </div>
             </div>
 
-            <!-- Low engagement card -->
-            <div class="col-md-6 col-lg-4">
+            <div class="col-lg-6">
                 <div class="ai-card">
+                    <h3 class="h5 fw-bold mb-3">Learning Activity</h3>
+                    <p class="text-muted small mb-4">Learner progress and quiz participation summary.</p>
 
-                    <div class="d-flex justify-content-between mb-4">
-                        <i class="bi bi-graph-down-arrow fs-4" style="color:#4B50C7;"></i>
-                        <span class="badge bg-danger bg-opacity-10 text-danger" style="font-size:12px;">Alert</span>
+                    <div class="row g-3">
+                        <div class="col-4">
+                            <div class="stat-mini-label">Quiz Attempts</div>
+                            <div class="h4 fw-bold" id="cardTotalAttempts">—</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-mini-label">Completed Lessons</div>
+                            <div class="h4 fw-bold" id="cardCompletedLessons">—</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-mini-label">Completion Rate</div>
+                            <div class="h4 fw-bold" id="cardCompletionRate">—</div>
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <h3 class="h5 fw-bold mb-2">Highlight modules with low engagement</h3>
-
-                    <p class="text-muted small mb-4">
-                        "Pediatric Airway Management" has a 45% drop-off rate at the 3-minute mark.
-                        Suggested update: Interactive video elements.
+            <div class="col-lg-6">
+                <div class="ai-card ai-card-critical">
+                    <h3 class="h5 fw-bold mb-3">Platform Health Insight</h3>
+                    <p class="text-muted small mb-4" id="cardHealthInsight">
+                        Loading platform insight...
                     </p>
 
-                    <button type="button" class="btn btn-outline-secondary w-100 fw-bold">
-                        View Analytics
-                    </button>
-
+                    <a href="Analytics.aspx" class="btn btn-aidify w-100 py-3"
+                        style="background:#E53935;border-color:#E53935;color:#fff;">
+                        Review Platform Activity
+                    </a>
                 </div>
             </div>
-
-            <!-- Bottlenecks card -->
-            <div class="col-md-6 col-lg-4">
-                <div class="ai-card">
-
-                    <div class="d-flex justify-content-between mb-4">
-                        <i class="bi bi-stopwatch fs-4" style="color:#4B50C7;"></i>
-                        <span class="badge bg-info bg-opacity-10 text-info" style="font-size:12px;">Optimization</span>
-                    </div>
-
-                    <h3 class="h5 fw-bold mb-2">Review Certification Bottlenecks</h3>
-
-                    <p class="text-muted small mb-4">
-                        Wait times for clinical check-offs have increased by 3 days.
-                        AI recommends opening 2 additional simulation slots on Fridays.
-                    </p>
-
-                    <button type="button" class="btn btn-outline-secondary w-100 fw-bold">
-                        Adjust Schedule
-                    </button>
-
-                </div>
-            </div>
-
-            <!-- Forecast chart card -->
-            <div class="col-lg-4">
-                <div class="ai-card">
-
-                    <h3 class="h5 fw-bold mb-4">Certification Growth Forecast</h3>
-
-                    <div class="forecast-chart">
-                        <div class="forecast-bar" style="height:40%;background:#d0d0d0;"></div>
-                        <div class="forecast-bar" style="height:55%;background:#d0d0d0;"></div>
-                        <div class="forecast-bar" style="height:50%;background:#d0d0d0;"></div>
-                        <div class="forecast-bar" style="height:70%;background:#4B50C7;"></div>
-                        <div class="forecast-bar" style="height:85%;background:#7b80d4;"></div>
-                        <div class="forecast-bar" style="height:95%;background:#c5c8ee;"></div>
-                    </div>
-
-                    <p class="text-muted small mb-0">
-                        Projecting a 22% increase in certified learners by Q4 based on current enrollment patterns.
-                    </p>
-
-                </div>
-            </div>
-
+            
             <!-- Bottom stat mini boxes -->
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stat-mini-box">
-                    <div class="stat-mini-label">System Health</div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="rounded-circle bg-success" style="width:12px;height:12px;flex-shrink:0;"></span>
-                        <span class="h5 mb-0 fw-bold">99.9% Uptime</span>
-                    </div>
+                    <div class="stat-mini-label">Total Users</div>
+                    <div class="h5 mb-0 fw-bold" id="aiTotalUsers">—</div>
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stat-mini-box">
                     <div class="stat-mini-label">Active Learners</div>
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-people-fill" style="color:#4B50C7;"></i>
-                        <span class="h5 mb-0 fw-bold" id="aiActiveLearners">— Online</span>
-                    </div>
+                    <div class="h5 mb-0 fw-bold" id="aiActiveLearners">—</div>
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stat-mini-box">
-                    <div class="stat-mini-label">Protocol Updates</div>
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-shield-check text-danger"></i>
-                        <span class="h5 mb-0 fw-bold">AHA 2026 Compliant</span>
-                    </div>
+                    <div class="stat-mini-label">Pending Modules</div>
+                    <div class="h5 mb-0 fw-bold" id="aiPendingModules">—</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stat-mini-box">
+                    <div class="stat-mini-label">Completion Rate</div>
+                    <div class="h5 mb-0 fw-bold" id="aiCompletionRate">—</div>
                 </div>
             </div>
 
@@ -442,7 +381,7 @@
             <input type="text" id="txtAIQuestion" class="form-control"
                    placeholder="e.g. Which module has the lowest completion rate?"
                    maxlength="300" style="border-radius:10px;" />
-            <button onclick="askAI()" class="btn btn-aidify px-4 fw-bold"
+            <button type="button" onclick="askAI()" class="btn btn-aidify px-4 fw-bold"
                     style="background:#E53935;border-color:#E53935;color:#fff;
                            border-radius:10px;white-space:nowrap;">
                 Ask AI
@@ -500,9 +439,15 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         var input = document.getElementById('txtAIQuestion');
-        if (input) input.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') askAI();
-        });
+
+        if (input) {
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    askAI();
+                }
+            });
+        }
     });
 </script>
 
@@ -514,13 +459,6 @@
                 <div class="footer-brand">Aidify</div>
                 <p class="text-muted small mb-0">Administrative control center for the Aidify learning platform.</p>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <a href="Dashboard.aspx">Dashboard</a>
-                <span class="text-muted">|</span>
-                <a href="#">Privacy Policy</a>
-                <span class="text-muted">|</span>
-                <a href="#">Terms of Service</a>
-            </div>
         </div>
         <hr class="mt-1 mb-2" />
         <p class="text-muted small mb-0 text-center">© 2026 Aidify Admin Panel. Educational use only.</p>
@@ -528,11 +466,56 @@
 </footer>
 
 <script type="text/javascript">
-$(document).ready(function(){
-    $.ajax({type:"POST",url:"AI_Insights.aspx/GetActiveLearners",data:"{}",
-    contentType:"application/json; charset=utf-8",dataType:"json",
-    success:function(r){if(r.d!=null)document.getElementById("aiActiveLearners").textContent=r.d.toLocaleString()+" Online";}});
-});
+    $(document).ready(function () {
+        $.ajax({
+            type: "POST",
+            url: "AI_Insights.aspx/GetStats",
+            data: "{}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (r) {
+                if (r.d == null) return;
+
+                $("#aiTotalUsers").text(r.d.TotalUsers.toLocaleString());
+                $("#aiActiveLearners").text(r.d.ActiveLearners.toLocaleString());
+                $("#aiPendingModules").text(r.d.PendingModules.toLocaleString());
+                $("#aiCompletionRate").text(r.d.CompletionRate + "%");
+
+                $("#cardTotalUsers").text(r.d.TotalUsers.toLocaleString());
+                $("#cardActiveLearners").text(r.d.ActiveLearners.toLocaleString());
+                $("#cardTotalInstructors").text(r.d.TotalInstructors.toLocaleString());
+
+                $("#cardTotalModules").text(r.d.TotalModules.toLocaleString());
+                $("#cardPublishedModules").text(r.d.PublishedModules.toLocaleString());
+                $("#cardDraftModules").text(r.d.DraftModules.toLocaleString());
+                $("#cardPendingModules").text(r.d.PendingModules.toLocaleString());
+
+                $("#cardTotalAttempts").text(r.d.TotalAttempts.toLocaleString());
+                $("#cardCompletedLessons").text(r.d.CompletedLessons.toLocaleString());
+                $("#cardCompletionRate").text(r.d.CompletionRate + "%");
+
+                var insight = "";
+
+                if (r.d.CompletionRate === 0) {
+                    insight = "Learning activity is currently very low. There are active learners, but no completed lessons yet. The admin should check whether learners can access modules and quizzes properly.";
+                }
+                else if (r.d.PendingModules > 0) {
+                    insight = "There are modules waiting for admin review. Approving or rejecting pending modules can help keep the learning content available and up to date.";
+                }
+                else {
+                    insight = "The platform is operating normally based on the available database metrics. Continue monitoring learner progress and quiz participation.";
+                }
+
+                $("#cardHealthInsight").text(insight);
+            },
+            error: function () {
+                $("#aiTotalUsers").text("Error");
+                $("#aiActiveLearners").text("Error");
+                $("#aiPendingModules").text("Error");
+                $("#aiCompletionRate").text("Error");
+            }
+        });
+    });
 </script>
 
 </asp:Content>

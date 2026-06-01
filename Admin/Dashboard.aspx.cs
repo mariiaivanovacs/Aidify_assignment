@@ -12,60 +12,101 @@ namespace Aidify_assigment.Admin
 
         protected void Page_Load(object sender, EventArgs e) { }
 
-        // Returns live platform stats for the four stat cards.
         [WebMethod(EnableSession = true)]
         [ScriptMethod(UseHttpGet = false)]
         public static object GetStats()
         {
             if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
                 return null;
+
             var s = new AdminRepository().GetPlatformStats();
             return new
             {
-                totalUsers     = s.TotalUsers,
+                totalUsers = s.TotalUsers,
                 activeLearners = s.ActiveLearners,
                 pendingModules = s.PendingModules,
-                totalAttempts  = s.TotalAttempts
+                totalAttempts = s.TotalAttempts,
+
+                completionRate = s.CompletionRate,
+                completedLessons = s.CompletedLessons,
+                expectedCompletions = s.ExpectedCompletions,
+                completionLabel = s.CompletedLessons + " of " + s.ExpectedCompletions + " completed",
+
+                userGrowthLabel = s.TotalUsers > 0 ? "Live" : "No users",
+                learnerStatusLabel = s.CompletedLessons + " completed",
+                attemptsStatusLabel = s.TotalAttempts > 0 ? s.TotalAttempts + " recorded" : "No attempts",
+                alertStatusLabel = s.PendingModules > 0 ? "Priority" : "Clear",
+
+                learnerProgressPercent = s.CompletionRate
             };
         }
 
-        // Returns the last 5 audit log entries for the Recent Activity table.
         [WebMethod(EnableSession = true)]
         [ScriptMethod(UseHttpGet = false)]
         public static object GetRecentActivity()
         {
             if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
                 return null;
+
             var logs = new AdminRepository().GetAuditLogs(withinHours: 168);
-            int take = System.Math.Min(5, logs.Count);
+            int take = Math.Min(5, logs.Count);
+
             var result = new System.Collections.Generic.List<object>();
+
             for (int i = 0; i < take; i++)
             {
                 var l = logs[i];
-                result.Add(new {
-                    action        = l.Action,
-                    targetEntity  = l.TargetEntity,
-                    timestamp     = l.Timestamp,
-                    actorName     = l.ActorName,
+
+                result.Add(new
+                {
+                    action = l.Action,
+                    targetEntity = l.TargetEntity,
+                    timestamp = l.Timestamp,
+                    actorName = l.ActorName,
                     actorInitials = l.ActorInitials
                 });
             }
+
             return result;
         }
 
-        // Called via $.ajax() from the AI summary card on the dashboard.
-        // Returns the daily insight string (cached 24 h server-side).
         [WebMethod(EnableSession = true)]
         [ScriptMethod(UseHttpGet = false)]
         public static string GetDailySummary()
         {
             var role = HttpContext.Current.Session[Constants.SessionRole] as string;
+
             if (role != Constants.RoleAdmin)
                 return "Access denied.";
 
             var service = new AIInsightsService();
+
             return Task.Run(() => service.GetDailySummaryAsync())
-                        .GetAwaiter().GetResult();
+                       .GetAwaiter()
+                       .GetResult();
+        }
+
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(UseHttpGet = false)]
+        public static object GetEngagementTrend(int days)
+        {
+            if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
+                return null;
+
+            if (days != 7 && days != 30)
+                days = 7;
+
+            return new AdminRepository().GetEngagementTrend(days);
+        }
+
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(UseHttpGet = false)]
+        public static object GetSystemAlerts()
+        {
+            if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
+                return null;
+
+            return new AdminRepository().GetSystemAlerts();
         }
     }
 }

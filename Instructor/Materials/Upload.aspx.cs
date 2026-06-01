@@ -1,151 +1,705 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Web.UI;
 using System.Web.UI.WebControls;
-using Aidify_assigment;
 
 namespace Aidify_assigment.Instructor.Materials
 {
-    public partial class Upload : BaseRolePage
+    public partial class Upload : Page
     {
-        protected override string RequiredRole => Constants.RoleInstructor;
+        private const int InstructorUserId = 2;
+
+        private string ConnectionString
+        {
+            get
+            {
+                return ConfigurationManager.ConnectionStrings["AidifyDB"].ConnectionString;
+            }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                lblUploadStatus.Text = string.Empty;
-                BindModules();
-                BindMaterials();
+                LoadModules();
+                LoadModuleFilter();
+                LoadLessonsForSelectedModule();
+                LoadMaterials();
+                LoadMaterialStats();
             }
         }
 
-        private void BindModules()
+        protected void ddlModule_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int userId = AuthHelper.GetUserId();
-            ddlTargetModule.Items.Clear();
-            ddlTargetModule.Items.Add(new ListItem("— Select a module —", ""));
-            using (var conn = DbHelper.GetConnection())
+            LoadLessonsForSelectedModule();
+        }
+
+        protected void btnUploadMaterial_Click(object sender, EventArgs e)
+        {
+            ClearMessage();
+
+            if (string.IsNullOrWhiteSpace(ddlModule.SelectedValue))
             {
-                conn.Open();
-                var cmd = new SqlCommand(
-                    "SELECT ModuleId, Title FROM Modules WHERE CreatedBy=@U AND IsDeleted=0 ORDER BY Title", conn);
-                cmd.Parameters.AddWithValue("@U", userId);
-                using (var r = cmd.ExecuteReader())
-                    while (r.Read())
-                        ddlTargetModule.Items.Add(
-                            new ListItem(r["Title"].ToString(), r["ModuleId"].ToString()));
+                ShowMessage("Please select a module.", false);
+                return;
+            }
+
+            string title = txtMaterialTitle.Text.Trim();
+            string type = ddlType.SelectedValue;
+            string caption = txtCaption.Text.Trim();
+            string externalUrl = txtExternalUrl.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                ShowMessage("Please enter the material title.", false);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                ShowMessage("Please select the material type.", false);
+                return;
+            }
+
+            int moduleId = Convert.ToInt32(ddlModule.SelectedValue);
+            int? lessonId = null;
+
+            if (!string.IsNullOrWhiteSpace(ddlLesson.SelectedValue))
+            {
+                lessonId = Convert.ToInt32(ddlLesson.SelectedValue);
+            }
+
+            if (!InstructorOwnsModule(moduleId))
+            {
+                ShowMessage("Invalid module selected.", false);
+                return;
+            }
+
+            if (lessonId.HasValue && !LessonBelongsToModule(lessonId.Value, moduleId))
+            {
+                ShowMessage("Invalid lesson selected for this module.", false);
+                return;
+            }
+
+            string filePath = "";
+
+            if (type == "Link")
+            {
+                if (string.IsNullOrWhiteSpace(externalUrl))
+                {
+                    ShowMessage("Please enter an external URL for Link type.", false);
+                    return;
+                }
+
+                filePath = externalUrl;
+            }
+            else
+            {
+                if (!fuMaterial.HasFile)
+                {
+                    ShowMessage("Please upload a file or choose Link type.", false);
+                    return;
+                }
+
+                filePath = SaveUploadedFile(type);
+
+                if (string.IsNullOrWhiteSpace(filePath))
+                {
+                    return;
+                }
+            }
+
+            string captionToSave = title;
+
+            if (!string.IsNullOrWhiteSpace(caption))
+            {
+                captionToSave = title + " - " + caption;
+            }
+
+            try
+            {
+                InsertMaterial(moduleId, lessonId, type, filePath, captionToSave);
+
+                ShowMessage("Material uploaded successfully.", true);
+                ClearForm();
+                LoadMaterials();
+                LoadMaterialStats();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage("Error while uploading material: " + ex.Message, false);
             }
         }
 
-        protected void ddlTargetModule_SelectedIndexChanged(object sender, EventArgs e)
+        protected void btnClear_Click(object sender, EventArgs e)
         {
-            BindLessons();
+            ClearForm();
+            ShowMessage("Form cleared.", true);
         }
 
-        private void BindLessons()
+        protected void btnRefresh_Click(object sender, EventArgs e)
         {
-            ddlTargetLesson.Items.Clear();
-            ddlTargetLesson.Items.Add(new ListItem("Module-level (no specific lesson)", ""));
-            int moduleId;
-            if (!int.TryParse(ddlTargetModule.SelectedValue, out moduleId) || moduleId == 0) return;
-            using (var conn = DbHelper.GetConnection())
+            ClearMessage();
+
+            LoadModules();
+            LoadModuleFilter();
+
+            if (ddlModuleFilter.Items.FindByValue("All") != null)
             {
-                conn.Open();
-                var cmd = new SqlCommand(
-                    "SELECT LessonId, Title FROM Lessons WHERE ModuleId=@M ORDER BY SequenceOrder", conn);
-                cmd.Parameters.AddWithValue("@M", moduleId);
-                using (var r = cmd.ExecuteReader())
-                    while (r.Read())
-                        ddlTargetLesson.Items.Add(
-                            new ListItem(r["Title"].ToString(), r["LessonId"].ToString()));
+                ddlModuleFilter.SelectedValue = "All";
             }
+
+            if (ddlModule.Items.Count > 0)
+            {
+                ddlModule.SelectedIndex = 0;
+            }
+
+            LoadLessonsForSelectedModule();
+            LoadMaterials();
+            LoadMaterialStats();
+
+            ShowMessage("Materials refreshed successfully.", true);
         }
 
-        private void BindMaterials()
+        protected void btnApplyFilter_Click(object sender, EventArgs e)
         {
-            int userId = AuthHelper.GetUserId();
-            var rows   = new List<MaterialItem>();
-            using (var conn = DbHelper.GetConnection())
+            ClearMessage();
+            LoadMaterials();
+            LoadMaterialStats();
+        }
+
+        protected void rptMaterials_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (!int.TryParse(Convert.ToString(e.CommandArgument), out int materialId))
             {
-                conn.Open();
-                var cmd = new SqlCommand(@"
-                    SELECT lm.FilePath, lm.Type, m.Title AS ModuleTitle,
-                           l.Title AS LessonTitle
-                    FROM   LearningMaterials lm
-                    JOIN   Modules m  ON m.ModuleId  = lm.ModuleId
-                    LEFT JOIN Lessons l ON l.LessonId = lm.LessonId
-                    WHERE  m.CreatedBy = @U AND m.IsDeleted = 0
-                    ORDER BY lm.MaterialId DESC", conn);
-                cmd.Parameters.AddWithValue("@U", userId);
-                using (var r = cmd.ExecuteReader())
-                    while (r.Read())
+                ShowMessage("Invalid material selected.", false);
+                return;
+            }
+
+            try
+            {
+                DataRow material = GetMaterialById(materialId);
+
+                if (material == null)
+                {
+                    ShowMessage("Material not found.", false);
+                    return;
+                }
+
+                string filePath = Convert.ToString(material["FilePath"]);
+
+                if (e.CommandName == "ViewMaterial")
+                {
+                    if (string.IsNullOrWhiteSpace(filePath))
                     {
-                        string lessonTitle = r["LessonTitle"] == DBNull.Value ? "" : r["LessonTitle"].ToString();
-                        rows.Add(new MaterialItem {
-                            Title  = r["FilePath"] == DBNull.Value ? "(no file)" : Path.GetFileName(r["FilePath"].ToString()),
-                            Detail = r["ModuleTitle"] + (lessonTitle != "" ? " · " + lessonTitle : " · Module-level"),
-                            Status = "Published"
-                        });
+                        ShowMessage("No file path found for this material.", false);
+                        return;
                     }
+
+                    Response.Redirect(filePath, false);
+                    Context.ApplicationInstance.CompleteRequest();
+                }
+                else if (e.CommandName == "DownloadMaterial")
+                {
+                    DownloadMaterial(filePath);
+                }
+                else if (e.CommandName == "DeleteMaterial")
+                {
+                    DeleteMaterial(materialId);
+                    LoadMaterials();
+                    LoadMaterialStats();
+                    ShowMessage("Material deleted successfully.", true);
+                }
             }
-            rptUploadedMaterials.DataSource = rows;
-            rptUploadedMaterials.DataBind();
-        }
-
-        protected void btnUpload_Click(object sender, EventArgs e)
-        {
-            if (!Page.IsValid) return;
-
-            int moduleId;
-            if (!int.TryParse(ddlTargetModule.SelectedValue, out moduleId) || moduleId == 0)
-            { ShowError("Please select a module."); return; }
-
-            if (!fuMaterial.HasFile)
-            { ShowError("Please choose a file to upload."); return; }
-
-            string[] allowed = { ".pdf", ".jpg", ".jpeg", ".png", ".mp4", ".mov" };
-            string ext = Path.GetExtension(fuMaterial.FileName).ToLower();
-            if (Array.IndexOf(allowed, ext) < 0)
-            { ShowError("Allowed types: PDF, JPG, PNG, MP4, MOV."); return; }
-            if (fuMaterial.PostedFile.ContentLength > 50 * 1024 * 1024)
-            { ShowError("File must be under 50 MB."); return; }
-
-            string dir  = Server.MapPath("~/Uploads/Materials/" + moduleId + "/");
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            string path = "~/Uploads/Materials/" + moduleId + "/" + Guid.NewGuid() + ext;
-            fuMaterial.SaveAs(Server.MapPath(path));
-
-            string type = ext == ".pdf" ? "PDF" : (ext == ".mp4" || ext == ".mov") ? "Video" : "Image";
-
-            int lessonId;
-            bool hasLesson = int.TryParse(ddlTargetLesson.SelectedValue, out lessonId) && lessonId > 0;
-
-            using (var conn = DbHelper.GetConnection())
+            catch (Exception ex)
             {
-                conn.Open();
-                var ins = new SqlCommand(@"
-                    INSERT INTO LearningMaterials (ModuleId, LessonId, Type, FilePath, Caption)
-                    VALUES (@M, @L, @T, @P, @C)", conn);
-                ins.Parameters.AddWithValue("@M", moduleId);
-                ins.Parameters.AddWithValue("@L", hasLesson ? (object)lessonId : DBNull.Value);
-                ins.Parameters.AddWithValue("@T", type);
-                ins.Parameters.AddWithValue("@P", path);
-                ins.Parameters.AddWithValue("@C",
-                    !string.IsNullOrEmpty(txtCaption.Text) ? (object)txtCaption.Text.Trim() : DBNull.Value);
-                ins.ExecuteNonQuery();
+                ShowMessage("Error while processing material: " + ex.Message, false);
             }
-
-            txtCaption.Text          = "";
-            lblUploadStatus.CssClass = "text-success d-block";
-            lblUploadStatus.Text     = "File uploaded successfully.";
-            BindMaterials();
         }
 
-        private void ShowError(string msg)
-        { lblUploadStatus.CssClass = "text-danger d-block"; lblUploadStatus.Text = msg; }
+        private void LoadModules()
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    SELECT ModuleId, Title
+                    FROM dbo.Modules
+                    WHERE CreatedBy = @CreatedBy AND IsDeleted = 0
+                    ORDER BY Title;";
 
-        private class MaterialItem { public string Title, Detail, Status; }
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        DataTable table = new DataTable();
+                        adapter.Fill(table);
+
+                        ddlModule.Items.Clear();
+                        ddlModule.Items.Add(new ListItem("Select Module", ""));
+
+                        foreach (DataRow row in table.Rows)
+                        {
+                            ddlModule.Items.Add(new ListItem(
+                                Convert.ToString(row["Title"]),
+                                Convert.ToString(row["ModuleId"])
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        private void LoadModuleFilter()
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    SELECT ModuleId, Title
+                    FROM dbo.Modules
+                    WHERE CreatedBy = @CreatedBy AND IsDeleted = 0
+                    ORDER BY Title;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        DataTable table = new DataTable();
+                        adapter.Fill(table);
+
+                        ddlModuleFilter.Items.Clear();
+                        ddlModuleFilter.Items.Add(new ListItem("All Modules", "All"));
+
+                        foreach (DataRow row in table.Rows)
+                        {
+                            ddlModuleFilter.Items.Add(new ListItem(
+                                Convert.ToString(row["Title"]),
+                                Convert.ToString(row["ModuleId"])
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        private void LoadLessonsForSelectedModule()
+        {
+            ddlLesson.Items.Clear();
+            ddlLesson.Items.Add(new ListItem("No specific lesson", ""));
+
+            if (string.IsNullOrWhiteSpace(ddlModule.SelectedValue))
+            {
+                return;
+            }
+
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    SELECT LessonId, Title
+                    FROM dbo.Lessons
+                    WHERE ModuleId = @ModuleId
+                    ORDER BY SequenceOrder, LessonId;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@ModuleId", Convert.ToInt32(ddlModule.SelectedValue));
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        DataTable table = new DataTable();
+                        adapter.Fill(table);
+
+                        foreach (DataRow row in table.Rows)
+                        {
+                            ddlLesson.Items.Add(new ListItem(
+                                Convert.ToString(row["Title"]),
+                                Convert.ToString(row["LessonId"])
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        private void LoadMaterials()
+        {
+            string moduleFilter = "All";
+
+            if (ddlModuleFilter.Items.Count > 0 && !string.IsNullOrWhiteSpace(ddlModuleFilter.SelectedValue))
+            {
+                moduleFilter = ddlModuleFilter.SelectedValue;
+            }
+
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    SELECT
+                        lm.MaterialId,
+                        lm.ModuleId,
+                        lm.LessonId,
+                        ISNULL(NULLIF(lm.Caption, ''), lm.FilePath) AS DisplayTitle,
+                        lm.Type,
+                        lm.FilePath,
+                        lm.Caption,
+                        ISNULL(m.Title, '-') AS ModuleTitle,
+                        ISNULL(l.Title, '-') AS LessonTitle
+                    FROM dbo.LearningMaterials lm
+                    LEFT JOIN dbo.Modules m ON lm.ModuleId = m.ModuleId
+                    LEFT JOIN dbo.Lessons l ON lm.LessonId = l.LessonId
+                    WHERE
+                        m.CreatedBy = @CreatedBy
+                        AND m.IsDeleted = 0
+                        AND (@ModuleId = 0 OR lm.ModuleId = @ModuleId)
+                    ORDER BY lm.MaterialId DESC;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    int moduleId = moduleFilter == "All" ? 0 : Convert.ToInt32(moduleFilter);
+
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
+                    cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        DataTable table = new DataTable();
+                        adapter.Fill(table);
+
+                        rptMaterials.DataSource = table;
+                        rptMaterials.DataBind();
+
+                        pnlEmptyState.Visible = table.Rows.Count == 0;
+                        lblMaterialCount.Text = table.Rows.Count + " Records";
+                    }
+                }
+            }
+        }
+
+        private void LoadMaterialStats()
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    SELECT
+                        COUNT(lm.MaterialId) AS TotalMaterials,
+                        SUM(CASE WHEN lm.Type = 'Link' THEN 0 ELSE 1 END) AS FileMaterials,
+                        SUM(CASE WHEN lm.Type = 'Link' THEN 1 ELSE 0 END) AS LinkMaterials
+                    FROM dbo.LearningMaterials lm
+                    INNER JOIN dbo.Modules m ON lm.ModuleId = m.ModuleId
+                    WHERE m.CreatedBy = @CreatedBy AND m.IsDeleted = 0;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
+
+                    con.Open();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            lblTotalMaterials.Text = Convert.ToString(reader["TotalMaterials"] == DBNull.Value ? 0 : reader["TotalMaterials"]);
+                            lblFileMaterials.Text = Convert.ToString(reader["FileMaterials"] == DBNull.Value ? 0 : reader["FileMaterials"]);
+                            lblLinkMaterials.Text = Convert.ToString(reader["LinkMaterials"] == DBNull.Value ? 0 : reader["LinkMaterials"]);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void InsertMaterial(int moduleId, int? lessonId, string type, string filePath, string caption)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    INSERT INTO dbo.LearningMaterials
+                        (ModuleId, LessonId, Type, FilePath, Caption)
+                    VALUES
+                        (@ModuleId, @LessonId, @Type, @FilePath, @Caption);";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+                    cmd.Parameters.AddWithValue("@LessonId", lessonId.HasValue ? (object)lessonId.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Type", type);
+                    cmd.Parameters.AddWithValue("@FilePath", filePath);
+                    cmd.Parameters.AddWithValue("@Caption", string.IsNullOrWhiteSpace(caption) ? (object)DBNull.Value : caption);
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private DataRow GetMaterialById(int materialId)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    SELECT
+                        lm.MaterialId,
+                        lm.FilePath
+                    FROM dbo.LearningMaterials lm
+                    INNER JOIN dbo.Modules m ON lm.ModuleId = m.ModuleId
+                    WHERE
+                        lm.MaterialId = @MaterialId
+                        AND m.CreatedBy = @CreatedBy
+                        AND m.IsDeleted = 0;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@MaterialId", materialId);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        DataTable table = new DataTable();
+                        adapter.Fill(table);
+
+                        if (table.Rows.Count == 0)
+                        {
+                            return null;
+                        }
+
+                        return table.Rows[0];
+                    }
+                }
+            }
+        }
+
+        private void DeleteMaterial(int materialId)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    DELETE lm
+                    FROM dbo.LearningMaterials lm
+                    INNER JOIN dbo.Modules m ON lm.ModuleId = m.ModuleId
+                    WHERE
+                        lm.MaterialId = @MaterialId
+                        AND m.CreatedBy = @CreatedBy;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@MaterialId", materialId);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        private string SaveUploadedFile(string type)
+        {
+            string extension = Path.GetExtension(fuMaterial.FileName).ToLower();
+
+            if (!IsAllowedExtension(type, extension))
+            {
+                ShowMessage("This file extension is not allowed for the selected material type.", false);
+                return "";
+            }
+
+            string folderVirtualPath = "~/Uploads/LearningMaterials/";
+            string folderPhysicalPath = Server.MapPath(folderVirtualPath);
+
+            if (!Directory.Exists(folderPhysicalPath))
+            {
+                Directory.CreateDirectory(folderPhysicalPath);
+            }
+
+            string fileName = "material_" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + extension;
+            string filePhysicalPath = Path.Combine(folderPhysicalPath, fileName);
+
+            fuMaterial.SaveAs(filePhysicalPath);
+
+            return ResolveUrl(folderVirtualPath + fileName);
+        }
+
+        private bool IsAllowedExtension(string type, string extension)
+        {
+            if (type == "PDF")
+            {
+                return extension == ".pdf";
+            }
+
+            if (type == "Image")
+            {
+                return extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif";
+            }
+
+            if (type == "Video")
+            {
+                return extension == ".mp4" || extension == ".mov" || extension == ".avi";
+            }
+
+            if (type == "Document")
+            {
+                return extension == ".doc" || extension == ".docx" || extension == ".ppt" || extension == ".pptx" || extension == ".txt";
+            }
+
+            return false;
+        }
+
+        private void DownloadMaterial(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                ShowMessage("No file path found for this material.", false);
+                return;
+            }
+
+            if (filePath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                filePath.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                Response.Redirect(filePath, false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
+
+            string physicalPath = Server.MapPath(filePath);
+
+            if (!File.Exists(physicalPath))
+            {
+                ShowMessage("File not found on server.", false);
+                return;
+            }
+
+            string fileName = Path.GetFileName(physicalPath);
+
+            Response.Clear();
+            Response.ContentType = "application/octet-stream";
+            Response.AppendHeader("Content-Disposition", "attachment; filename=" + fileName);
+            Response.TransmitFile(physicalPath);
+            Response.Flush();
+            Context.ApplicationInstance.CompleteRequest();
+        }
+
+        private bool InstructorOwnsModule(int moduleId)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    SELECT COUNT(*)
+                    FROM dbo.Modules
+                    WHERE ModuleId = @ModuleId
+                      AND CreatedBy = @CreatedBy
+                      AND IsDeleted = 0;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InstructorUserId);
+
+                    con.Open();
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    return count > 0;
+                }
+            }
+        }
+
+        private bool LessonBelongsToModule(int lessonId, int moduleId)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string query = @"
+                    SELECT COUNT(*)
+                    FROM dbo.Lessons
+                    WHERE LessonId = @LessonId
+                      AND ModuleId = @ModuleId;";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@LessonId", lessonId);
+                    cmd.Parameters.AddWithValue("@ModuleId", moduleId);
+
+                    con.Open();
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    return count > 0;
+                }
+            }
+        }
+
+        private void ClearForm()
+        {
+            if (ddlModule.Items.Count > 0)
+            {
+                ddlModule.SelectedIndex = 0;
+            }
+
+            LoadLessonsForSelectedModule();
+
+            txtMaterialTitle.Text = "";
+            ddlType.SelectedIndex = 0;
+            txtExternalUrl.Text = "";
+            txtCaption.Text = "";
+        }
+
+        private void ShowMessage(string message, bool success)
+        {
+            lblMaterialStatus.Visible = true;
+            lblMaterialStatus.Text = message;
+            lblMaterialStatus.CssClass = success
+                ? "message-box message-success d-block"
+                : "message-box message-error d-block";
+        }
+
+        private void ClearMessage()
+        {
+            lblMaterialStatus.Visible = false;
+            lblMaterialStatus.Text = "";
+            lblMaterialStatus.CssClass = "";
+        }
+
+        protected string ShortText(object value)
+        {
+            string text = Convert.ToString(value);
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return "-";
+            }
+
+            if (text.Length <= 70)
+            {
+                return text;
+            }
+
+            return text.Substring(0, 70) + "...";
+        }
+
+        protected string GetTypeIcon(object value)
+        {
+            string type = Convert.ToString(value);
+
+            if (type == "PDF")
+            {
+                return "bi bi-file-earmark-pdf";
+            }
+
+            if (type == "Image")
+            {
+                return "bi bi-image";
+            }
+
+            if (type == "Video")
+            {
+                return "bi bi-camera-video";
+            }
+
+            if (type == "Link")
+            {
+                return "bi bi-link-45deg";
+            }
+
+            return "bi bi-file-earmark";
+        }
     }
 }

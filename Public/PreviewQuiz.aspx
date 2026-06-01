@@ -12,15 +12,16 @@
                     <div class="quiz-header">
                         <span class="quiz-label">Module Preview</span>
 
-                        <h1>Basic First Aid Awareness</h1>
+                        <h1 id="previewModuleTitle">Basic First Aid Awareness</h1>
 
-                        <p>
+                        <p id="previewModuleDescription">
                             This preview content introduces visitors to basic emergency response awareness
                             and first aid concepts before attempting the preview quiz.
                         </p>
                     </div>
 
-                    <!-- Learning Content -->
+                    <!-- Learning Content loaded from DB when a module is selected -->
+                    <div id="previewLessonsContainer">
                     <div class="quiz-question-card">
                         <h3>What is First Aid?</h3>
 
@@ -55,6 +56,7 @@
                             In real emergencies, always contact emergency services immediately.
                         </p>
                     </div>
+                    </div>
 
                     <!-- Attempt Quiz Button -->
                     <div class="quiz-action-box">
@@ -81,8 +83,8 @@
 
                         <div class="quiz-progress-box mt-5">
                             <div class="d-flex justify-content-between">
-                                <span>Question 1 of 3</span>
-                                <span>Preview Quiz</span>
+                                <span id="quizProgressLabel">Preview Questions</span>
+                                <span id="previewQuizTitle">Preview Quiz</span>
                             </div>
 
                             <div class="progress mt-2">
@@ -153,46 +155,116 @@
     </section>
 
     <script>
-        var questionsLoaded = false;
+        var previewLoaded = false;
+
+        function getQueryInt(name) {
+            var match = new RegExp('[?&]' + name + '=([^&]+)').exec(window.location.search);
+            return match ? parseInt(decodeURIComponent(match[1]), 10) || 0 : 0;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadPreviewContent(function () {
+                if (getQueryInt('startQuiz') === 1) showQuiz();
+            });
+        });
 
         function showQuiz() {
             document.getElementById("quizSection").style.display = "block";
             document.getElementById("quizSection").scrollIntoView({ behavior: "smooth" });
-            if (!questionsLoaded) loadPreviewQuestions();
+            if (!previewLoaded) loadPreviewContent();
         }
 
-        function loadPreviewQuestions() {
+        function loadPreviewContent(afterLoad) {
             $.ajax({
-                type: 'POST', url: 'PreviewQuiz.aspx/GetPreviewQuestions',
-                data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
+                type: 'POST', url: 'PreviewQuiz.aspx/GetPreviewContent',
+                data: JSON.stringify({
+                    moduleId: getQueryInt('moduleId'),
+                    quizId: getQueryInt('quizId')
+                }),
+                contentType: 'application/json; charset=utf-8', dataType: 'json',
                 success: function (r) {
-                    questionsLoaded = true;
-                    var qs = r.d;
-                    var container = document.getElementById('previewQuestionsContainer');
-                    if (!qs || qs.length === 0) {
-                        container.innerHTML = '<p class="text-muted">No preview questions available yet.</p>';
-                        return;
-                    }
-                    var html = '';
-                    for (var i = 0; i < qs.length; i++) {
-                        var q = qs[i];
-                        html += '<div class="quiz-question-card"><h3>' + esc(q.questionText) + '</h3><div class="quiz-options">';
-                        for (var j = 0; j < q.options.length; j++) {
-                            html += '<label><input type="radio" name="pq' + q.questionId + '" value="' + j + '" /> ' + esc(q.options[j]) + '</label>';
-                        }
-                        html += '</div></div>';
-                    }
-                    container.innerHTML = html;
+                    previewLoaded = true;
+                    var data = r.d || {};
+                    renderModule(data.module, data.lessons || []);
+                    renderQuestions(data.quiz, data.questions || []);
+                    if (typeof afterLoad === 'function') afterLoad();
                 },
                 error: function () {
                     document.getElementById('previewQuestionsContainer').innerHTML =
                         '<p class="text-muted">Could not load questions. Please try again.</p>';
+                    if (typeof afterLoad === 'function') afterLoad();
                 }
             });
         }
 
+        function renderModule(module, lessons) {
+            if (module) {
+                document.getElementById('previewModuleTitle').textContent = module.title || 'Module Preview';
+                document.getElementById('previewModuleDescription').textContent = module.description || 'Review the preview lessons before attempting the quiz.';
+            }
+
+            if (!lessons || lessons.length === 0) return;
+
+            var html = '';
+            for (var i = 0; i < lessons.length; i++) {
+                var lesson = lessons[i];
+                var minutes = lesson.estimatedMinutes > 0 ? '<span class="quiz-label">' + lesson.estimatedMinutes + ' mins</span>' : '';
+                html += '<div class="quiz-question-card">' +
+                    minutes +
+                    '<h3>' + esc(lesson.title) + '</h3>' +
+                    '<div>' + cleanLessonHtml(lesson.bodyHtml) + '</div>' +
+                    '</div>';
+            }
+            document.getElementById('previewLessonsContainer').innerHTML = html;
+        }
+
+        function renderQuestions(quiz, qs) {
+            if (quiz) {
+                document.getElementById('previewQuizTitle').textContent = quiz.title || 'Preview Quiz';
+            }
+
+            document.getElementById('quizProgressLabel').textContent =
+                qs && qs.length ? 'Question 1 of ' + qs.length : 'Preview Questions';
+
+            var container = document.getElementById('previewQuestionsContainer');
+            if (!qs || qs.length === 0) {
+                container.innerHTML = '<p class="text-muted">No preview questions available yet.</p>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < qs.length; i++) {
+                var q = qs[i];
+                html += '<div class="quiz-question-card"><h3>' + esc(q.questionText) + '</h3><div class="quiz-options">';
+                for (var j = 0; j < q.options.length; j++) {
+                    html += '<label><input type="radio" name="pq' + q.questionId + '" value="' + j + '" /> ' + esc(q.options[j]) + '</label>';
+                }
+                html += '</div></div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function cleanLessonHtml(html) {
+            if (!html) return '<p class="text-muted">Preview lesson content is being prepared.</p>';
+            var wrapper = document.createElement('div');
+            wrapper.innerHTML = repairText(html);
+            var unsafe = wrapper.querySelectorAll('script, iframe, object, embed');
+            for (var i = 0; i < unsafe.length; i++) unsafe[i].remove();
+            return wrapper.innerHTML;
+        }
+
         function esc(s) {
+            s = repairText(s);
             return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function repairText(s) {
+            return String(s || '')
+                .replace(/â€“/g, '-')
+                .replace(/â€”/g, '-')
+                .replace(/â€˜|â€™/g, "'")
+                .replace(/â€œ|â€�/g, '"')
+                .replace(/Â/g, '');
         }
     </script>
 

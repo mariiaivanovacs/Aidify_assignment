@@ -14,3 +14,6 @@ Release/
 # NuGet
 *.nupkg
 packages/
+
+# Local IIS Express logs
+iisexpress*.log

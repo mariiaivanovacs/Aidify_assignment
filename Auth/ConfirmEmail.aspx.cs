@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 
 namespace Aidify_assigment.Auth
@@ -9,37 +9,51 @@ namespace Aidify_assigment.Auth
         {
             if (IsPostBack) return;
 
-            // If the user clicked the link in their email (e.g. ?t=<token>), auto-confirm.
             string token = Request.QueryString["t"];
-            if (!string.IsNullOrEmpty(token))
-            {
-                bool ok = new AuthService().ConfirmEmail(token);
-                lblMessage.ForeColor = ok ? Color.Green : Color.Red;
-                lblMessage.Text = ok
-                    ? "Email confirmed! You can now <a href='Login.aspx'>log in</a>."
-                    : "This confirmation link is invalid or has already been used. " +
-                      "Please register again or contact support.";
-            }
-        }
 
-        // Fallback: user manually types the token/code from the email body.
-        protected void btnVerify_Click(object sender, EventArgs e)
-        {
-            string code = txtCode.Text.Trim();
-
-            if (string.IsNullOrWhiteSpace(code))
+            if (string.IsNullOrWhiteSpace(token))
             {
-                lblMessage.ForeColor = Color.Red;
-                lblMessage.Text = "Please enter the verification code from your email.";
+                ShowResult(
+                    false,
+                    "Invalid Confirmation Link",
+                    "No confirmation token was found in the link.",
+                    "This confirmation link is missing required information. Please use the link sent to your email."
+                );
                 return;
             }
 
-            bool ok = new AuthService().ConfirmEmail(code);
-            lblMessage.ForeColor = ok ? Color.Green : Color.Red;
-            lblMessage.Text = ok
-                ? "Email confirmed! You can now <a href='Login.aspx'>log in</a>."
-                : "The code is invalid or has already been used. " +
-                  "Please request a new confirmation email by registering again.";
+            bool ok = new AuthService().ConfirmEmail(token);
+
+            if (ok)
+            {
+                ShowResult(
+                    true,
+                    "Email Confirmed",
+                    "Your email has been verified successfully.",
+                    "Email confirmed successfully. You can now log in."
+                );
+            }
+            else
+            {
+                ShowResult(
+                    false,
+                    "Confirmation Failed",
+                    "This confirmation link is invalid, expired, or already used.",
+                    "Please request a new confirmation link or contact support."
+                );
+            }
+        }
+
+        private void ShowResult(bool success, string title, string subtitle, string message)
+        {
+            litIcon.Text = success ? "✅" : "⚠️";
+            litTitle.Text = title;
+            litSubtitle.Text = subtitle;
+
+            lblMessage.ForeColor = success ? Color.Green : Color.Red;
+            lblMessage.Text = message;
+
+            lnkResend.Visible = !success;
         }
     }
 }

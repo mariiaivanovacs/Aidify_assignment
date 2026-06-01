@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -84,7 +84,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Account\Profile.aspx" />
-    <Content Include="Account\Settings.aspx" />
+    <Content Include="Admin\Events\Create.aspx" />
+    <Content Include="Admin\Modules\Create.aspx" />
+    <Content Include="Admin\Users\Create.aspx" />
+    <Content Include="Auth\ResendConfirmation.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -107,18 +110,23 @@
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Instructor\Dashboard.aspx" />
-    <Content Include="Instructor\Lessons\Edit.aspx" />
-    <Content Include="Instructor\Materials\Upload.aspx" />
-    <Content Include="Instructor\Modules\Edit.aspx" />
-    <Content Include="Instructor\Quizzes\Edit.aspx" />
-    <Content Include="Instructor\Quizzes\GenerateWithAI.aspx" />
+    <Content Include="Images\aidify-kit.png" />
+    <Content Include="Images\user-management-banner.jpeg" />
+    <Content Include="Learner\Badges.aspx" />
+    <Content Include="Learner\Certificate.aspx" />
+    <Content Include="Learner\Challenges.aspx" />
+    <Content Include="Learner\Controls\BadgeCard.ascx" />
+    <Content Include="Learner\Controls\NotificationBell.ascx" />
     <Content Include="Learner\Courses\Catalogue.aspx" />
     <Content Include="Learner\Courses\Details.aspx" />
     <Content Include="Learner\Courses\Lesson.aspx" />
     <Content Include="Learner\Dashboard.aspx" />
+    <Content Include="Learner\Events.aspx" />
+    <Content Include="Learner\League.aspx" />
+    <Content Include="Learner\Notification.aspx" />
     <Content Include="Learner\Profile.aspx" />
     <Content Include="Learner\Progress.aspx" />
+    <Content Include="Learner\Quiz\History.aspx" />
     <Content Include="Learner\Quiz\Results.aspx" />
     <Content Include="Learner\Quiz\Take.aspx" />
     <Content Include="packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll" />
@@ -469,6 +477,21 @@
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />
     <Content Include="Site.Mobile.Master" />
+    <Content Include="Instructor\Challenges.aspx" />
+    <Content Include="Instructor\Dashboard.aspx" />
+    <Content Include="Instructor\Discussions.aspx" />
+    <Content Include="Instructor\Events.aspx" />
+    <Content Include="Instructor\Lessons\Edit.aspx" />
+    <Content Include="Instructor\Lessons\List.aspx" />
+    <Content Include="Instructor\Materials\Upload.aspx" />
+    <Content Include="Instructor\Modules\Edit.aspx" />
+    <Content Include="Instructor\Modules\List.aspx" />
+    <Content Include="Instructor\Performance.aspx" />
+    <Content Include="Instructor\Quizzes\Edit.aspx" />
+    <Content Include="Instructor\Quizzes\GenerateWithAI.aspx" />
+    <Content Include="Instructor\Quizzes\List.aspx" />
+    <Content Include="Instructor\Quizzes\Questions.aspx" />
+    <Content Include="Instructor\TestConnection.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account\Profile.aspx.cs">
@@ -478,15 +501,36 @@
     <Compile Include="Account\Profile.aspx.designer.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Account\Settings.aspx.cs">
-      <DependentUpon>Settings.aspx</DependentUpon>
+    <Compile Include="Admin\Events\Create.aspx.cs">
+      <DependentUpon>Create.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Account\Settings.aspx.designer.cs">
-      <DependentUpon>Settings.aspx</DependentUpon>
+    <Compile Include="Admin\Events\Create.aspx.designer.cs">
+      <DependentUpon>Create.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Modules\Create.aspx.cs">
+      <DependentUpon>Create.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Modules\Create.aspx.designer.cs">
+      <DependentUpon>Create.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Users\Create.aspx.cs">
+      <DependentUpon>Create.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Users\Create.aspx.designer.cs">
+      <DependentUpon>Create.aspx</DependentUpon>
     </Compile>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Auth\ResendConfirmation.aspx.cs">
+      <DependentUpon>ResendConfirmation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Auth\ResendConfirmation.aspx.designer.cs">
+      <DependentUpon>ResendConfirmation.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -497,47 +541,40 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Instructor\Dashboard.aspx.cs">
-      <DependentUpon>Dashboard.aspx</DependentUpon>
+    <Compile Include="Learner\Badges.aspx.cs">
+      <DependentUpon>Badges.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Instructor\Dashboard.aspx.designer.cs">
-      <DependentUpon>Dashboard.aspx</DependentUpon>
+    <Compile Include="Learner\Badges.aspx.designer.cs">
+      <DependentUpon>Badges.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Instructor\Lessons\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Learner\Certificate.aspx.cs">
+      <DependentUpon>Certificate.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Instructor\Lessons\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Learner\Certificate.aspx.designer.cs">
+      <DependentUpon>Certificate.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Instructor\Materials\Upload.aspx.cs">
-      <DependentUpon>Upload.aspx</DependentUpon>
+    <Compile Include="Learner\Challenges.aspx.cs">
+      <DependentUpon>Challenges.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Instructor\Materials\Upload.aspx.designer.cs">
-      <DependentUpon>Upload.aspx</DependentUpon>
+    <Compile Include="Learner\Challenges.aspx.designer.cs">
+      <DependentUpon>Challenges.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Instructor\Modules\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Learner\Controls\BadgeCard.ascx.cs">
+      <DependentUpon>BadgeCard.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Instructor\Modules\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Learner\Controls\BadgeCard.ascx.designer.cs">
+      <DependentUpon>BadgeCard.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Instructor\Quizzes\Edit.aspx.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
+    <Compile Include="Learner\Controls\NotificationBell.ascx.cs">
+      <DependentUpon>NotificationBell.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Instructor\Quizzes\Edit.aspx.designer.cs">
-      <DependentUpon>Edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Instructor\Quizzes\GenerateWithAI.aspx.cs">
-      <DependentUpon>GenerateWithAI.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Instructor\Quizzes\GenerateWithAI.aspx.designer.cs">
-      <DependentUpon>GenerateWithAI.aspx</DependentUpon>
+    <Compile Include="Learner\Controls\NotificationBell.ascx.designer.cs">
+      <DependentUpon>NotificationBell.ascx</DependentUpon>
     </Compile>
     <Compile Include="Learner\Courses\Catalogue.aspx.cs">
       <DependentUpon>Catalogue.aspx</DependentUpon>
@@ -567,6 +604,27 @@
     <Compile Include="Learner\Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Learner\Events.aspx.cs">
+      <DependentUpon>Events.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Learner\Events.aspx.designer.cs">
+      <DependentUpon>Events.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Learner\League.aspx.cs">
+      <DependentUpon>League.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Learner\League.aspx.designer.cs">
+      <DependentUpon>League.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Learner\Notification.aspx.cs">
+      <DependentUpon>Notification.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Learner\Notification.aspx.designer.cs">
+      <DependentUpon>Notification.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Learner\Profile.aspx.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -580,6 +638,13 @@
     </Compile>
     <Compile Include="Learner\Progress.aspx.designer.cs">
       <DependentUpon>Progress.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Learner\Quiz\History.aspx.cs">
+      <DependentUpon>History.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Learner\Quiz\History.aspx.designer.cs">
+      <DependentUpon>History.aspx</DependentUpon>
     </Compile>
     <Compile Include="Learner\Quiz\Results.aspx.cs">
       <DependentUpon>Results.aspx</DependentUpon>
@@ -618,8 +683,99 @@
     <Compile Include="ViewSwitcher.ascx.designer.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Instructor\Challenges.aspx.cs">
+      <DependentUpon>Challenges.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Dashboard.aspx.cs">
+      <DependentUpon>Dashboard.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Discussions.aspx.cs">
+      <DependentUpon>Discussions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Events.aspx.cs">
+      <DependentUpon>Events.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Lessons\Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Lessons\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Materials\Upload.aspx.cs">
+      <DependentUpon>Upload.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Modules\Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Modules\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Performance.aspx.cs">
+      <DependentUpon>Performance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\GenerateWithAI.aspx.cs">
+      <DependentUpon>GenerateWithAI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\Questions.aspx.cs">
+      <DependentUpon>Questions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\TestConnection.aspx.cs">
+      <DependentUpon>TestConnection.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Challenges.aspx.designer.cs">
+      <DependentUpon>Challenges.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Dashboard.aspx.designer.cs">
+      <DependentUpon>Dashboard.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Discussions.aspx.designer.cs">
+      <DependentUpon>Discussions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Events.aspx.designer.cs">
+      <DependentUpon>Events.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Lessons\Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Lessons\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Materials\Upload.aspx.designer.cs">
+      <DependentUpon>Upload.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Modules\Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Modules\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Performance.aspx.designer.cs">
+      <DependentUpon>Performance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\GenerateWithAI.aspx.designer.cs">
+      <DependentUpon>GenerateWithAI.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\Quizzes\Questions.aspx.designer.cs">
+      <DependentUpon>Questions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Instructor\TestConnection.aspx.designer.cs">
+      <DependentUpon>TestConnection.aspx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
     <Folder Include="Certificates\" />
     <Folder Include="Uploads\Avatars\" />
@@ -629,6 +785,7 @@
   <ItemGroup>
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
+    <Content Include="Templates\UserImportTemplate.csv" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -677,14 +834,6 @@
     <Compile Include="Admin\Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
-    <Content Include="Admin\Roles.aspx" />
-    <Compile Include="Admin\Roles.aspx.cs">
-      <DependentUpon>Roles.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Admin\Roles.aspx.designer.cs">
-      <DependentUpon>Roles.aspx</DependentUpon>
-    </Compile>
     <Content Include="Admin\Analytics.aspx" />
     <Compile Include="Admin\Analytics.aspx.cs">
       <DependentUpon>Analytics.aspx</DependentUpon>
@@ -732,14 +881,6 @@
     </Compile>
     <Compile Include="Admin\Content\ApprovalQueue.aspx.designer.cs">
       <DependentUpon>ApprovalQueue.aspx</DependentUpon>
-    </Compile>
-    <Content Include="Admin\Content\ManagePublicPages.aspx" />
-    <Compile Include="Admin\Content\ManagePublicPages.aspx.cs">
-      <DependentUpon>ManagePublicPages.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Admin\Content\ManagePublicPages.aspx.designer.cs">
-      <DependentUpon>ManagePublicPages.aspx</DependentUpon>
     </Compile>
     <Content Include="Auth\Login.aspx" />
     <Compile Include="Auth\Login.aspx.cs">

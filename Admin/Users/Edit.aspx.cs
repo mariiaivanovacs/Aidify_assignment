@@ -22,16 +22,14 @@ namespace Aidify_assigment.Admin.Users
             base.OnInit(e);
             btnSave.Click += btnSave_Click;
 
-            // Markup has wrong items ("Administrator","Supervisor") — replace with Constants values
             ddlRole.Items.Clear();
-            ddlRole.Items.Add(new ListItem("Learner",    Constants.RoleLearner));
+            ddlRole.Items.Add(new ListItem("Learner", Constants.RoleLearner));
             ddlRole.Items.Add(new ListItem("Instructor", Constants.RoleInstructor));
-            ddlRole.Items.Add(new ListItem("Admin",      Constants.RoleAdmin));
+            ddlRole.Items.Add(new ListItem("Admin", Constants.RoleAdmin));
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Handle force-reset postback before the IsPostBack guard
             if (IsPostBack && Request.Form["forceReset"] == "1")
             {
                 HandleForceReset();
@@ -51,9 +49,9 @@ namespace Aidify_assigment.Admin.Users
             EditUserId = userId;
 
             int space = user.FullName.IndexOf(' ');
-            txtFirstName.Text = space > 0 ? user.FullName.Substring(0, space)       : user.FullName;
-            txtLastName.Text  = space > 0 ? user.FullName.Substring(space + 1)      : string.Empty;
-            txtEmail.Text     = user.Email;
+            txtFirstName.Text = space > 0 ? user.FullName.Substring(0, space) : user.FullName;
+            txtLastName.Text = space > 0 ? user.FullName.Substring(space + 1) : string.Empty;
+            txtEmail.Text = user.Email;
 
             var item = ddlRole.Items.FindByValue(user.RoleName);
             if (item != null) item.Selected = true;
@@ -62,9 +60,9 @@ namespace Aidify_assigment.Admin.Users
         private void btnSave_Click(object sender, EventArgs e)
         {
             string first = txtFirstName.Text.Trim();
-            string last  = txtLastName.Text.Trim();
+            string last = txtLastName.Text.Trim();
             string email = txtEmail.Text.Trim();
-            string role  = ddlRole.SelectedValue;
+            string role = ddlRole.SelectedValue;
 
             if (string.IsNullOrEmpty(first) || string.IsNullOrEmpty(email))
             {
@@ -106,8 +104,8 @@ namespace Aidify_assigment.Admin.Users
                 var user = _repo.GetUserById(userId);
                 if (user == null) { SetFlash("User not found.", "danger"); DoRedirect(); return; }
 
-                var auth   = new AuthService();
-                string token   = auth.CreateEmailToken(userId, "Reset", expiryHours: 24);
+                var auth = new AuthService();
+                string token = auth.CreateEmailToken(userId, "Reset", expiryHours: 24);
                 string siteUrl = ConfigurationManager.AppSettings["SiteUrl"]
                                  ?? Request.Url.GetLeftPart(UriPartial.Authority);
                 string link = siteUrl + ResolveUrl("~/Auth/ResetPassword.aspx") + "?t=" + token;
@@ -131,14 +129,14 @@ namespace Aidify_assigment.Admin.Users
 
         private void SetFlash(string msg, string type)
         {
-            Session["AdminEditMsg"]  = msg;
+            Session["AdminEditMsg"] = msg;
             Session["AdminEditType"] = type;
         }
 
         private void ShowFlash()
         {
             if (Session["AdminEditMsg"] == null) return;
-            string msg  = Session["AdminEditMsg"].ToString();
+            string msg = Session["AdminEditMsg"].ToString();
             string type = Session["AdminEditType"]?.ToString() ?? "info";
             Session.Remove("AdminEditMsg");
             Session.Remove("AdminEditType");

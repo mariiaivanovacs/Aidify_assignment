@@ -23,11 +23,18 @@ namespace Aidify_assigment
                 return null;
             }
 
+            // If account is disabled, return the user so Login.aspx.cs can show disabled message.
+            // Do not log it as failed password because the account exists but is blocked.
+            if (!user.IsActive)
+            {
+                return user;
+            }
+
             bool ok = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
 
             _repo.LogLoginAttempt(user.UserId, ok, ipAddress);
 
-            if (!ok || !user.IsActive)
+            if (!ok)
                 return null;
 
             return user;
@@ -45,7 +52,7 @@ namespace Aidify_assigment
 
         public bool IsAccountLocked(string email)
         {
-            return _repo.GetRecentFailCount(email, withinMinutes: 15) >= 5;
+            return _repo.GetRecentFailCount(email, withinMinutes: 5) >= 5;
         }
 
         public bool VerifyRecaptcha(string responseToken)
@@ -122,6 +129,13 @@ namespace Aidify_assigment
             _repo.MarkTokenUsed(Convert.ToInt32(row["TokenId"]));
 
             return true;
+        }
+
+        public string CreateEmailTokenMinutes(int userId, string purpose, int expiryMinutes)
+        {
+            string token = Guid.NewGuid().ToString("N");
+            _repo.InsertEmailToken(userId, token, purpose, DateTime.UtcNow.AddMinutes(expiryMinutes));
+            return token;
         }
     }
 }

@@ -12,28 +12,40 @@ namespace Aidify_assigment.Admin.Content
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Handle approve / reject from query string links
-            string action   = Request.QueryString["action"];
+            string action = Request.QueryString["action"];
+            string type = Request.QueryString["type"];
             string idString = Request.QueryString["id"];
-            int moduleId;
 
-            if (!string.IsNullOrEmpty(action) && int.TryParse(idString, out moduleId) && moduleId > 0)
+            int id;
+
+            if (!string.IsNullOrEmpty(action) &&
+                !string.IsNullOrEmpty(type) &&
+                int.TryParse(idString, out id) &&
+                id > 0)
             {
                 int adminId = AuthHelper.GetUserId();
-                var repo    = new AdminRepository();
+                var repo = new AdminRepository();
 
-                if (action == "approve")
-                    repo.ApproveModule(moduleId, adminId);
-                else if (action == "reject")
-                    repo.RejectModule(moduleId, adminId);
+                if (type == "module")
+                {
+                    if (action == "approve")
+                        repo.ApproveModule(id, adminId);
+                    else if (action == "reject")
+                        repo.RejectModule(id, adminId);
+                }
+                else if (type == "event")
+                {
+                    if (action == "approve")
+                        repo.ApproveEvent(id, adminId);
+                    else if (action == "reject")
+                        repo.RejectEvent(id, adminId);
+                }
 
-                // PRG — redirect back to clean URL so F5 doesn't repeat the action
                 Response.Redirect("ApprovalQueue.aspx", false);
                 Context.ApplicationInstance.CompleteRequest();
             }
         }
 
-        // Returns pending modules as JSON for the JS card renderer.
         [WebMethod(EnableSession = true)]
         [ScriptMethod(UseHttpGet = false)]
         public static object GetPendingModules()
@@ -45,11 +57,33 @@ namespace Aidify_assigment.Admin.Content
                 .GetPendingModules()
                 .Select(m => new
                 {
-                    moduleId       = m.ModuleId,
-                    title          = m.Title,
-                    difficultyLevel= m.DifficultyLevel,
-                    createdByName  = m.CreatedByName,
-                    submittedAt    = m.CreatedAt
+                    itemType = "Module",
+                    itemId = m.ModuleId,
+                    title = m.Title,
+                    difficultyLevel = m.DifficultyLevel,
+                    createdByName = m.CreatedByName,
+                    submittedAt = m.CreatedAt
+                })
+                .ToList();
+        }
+
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(UseHttpGet = false)]
+        public static object GetPendingEvents()
+        {
+            if (HttpContext.Current.Session[Constants.SessionRole] as string != Constants.RoleAdmin)
+                return null;
+
+            return new AdminRepository()
+                .GetPendingEvents()
+                .Select(e => new
+                {
+                    itemType = "Event",
+                    itemId = e.EventId,
+                    title = e.Title,
+                    location = e.Location,
+                    createdByName = e.CreatedByName,
+                    submittedAt = e.EventDate
                 })
                 .ToList();
         }

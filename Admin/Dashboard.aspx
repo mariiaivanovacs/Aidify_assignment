@@ -10,7 +10,10 @@
         }
 
         .admin-footer {
-            margin-top: 0;
+            background-color: #eeeeee;
+            border-top: 1px solid #e2e2e2;
+            padding: 40px 48px 20px;
+            margin-left: 0;
         }
 
         .admin-shell {
@@ -46,22 +49,19 @@
             z-index: 50;
         }
 
+        .admin-logo {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+        }
+
         .admin-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-weight: 800;
-            font-size: 26px;
+            font-size: 30px;
             color: #E53935;
-        }
-
-        .admin-badge {
-            background-color: #db322f;
-            color: #ffffff;
-            font-size: 11px;
-            padding: 3px 9px;
-            border-radius: 20px;
-            font-weight: 700;
         }
 
         .admin-top-links {
@@ -351,13 +351,6 @@
             margin-right: 10px;
         }
 
-        .admin-footer {
-            background-color: #eeeeee;
-            border-top: 1px solid #e2e2e2;
-            padding: 40px 48px 20px;
-            margin-left: 260px;
-        }
-
         .admin-footer h5 {
             color: #E53935;
             font-weight: 800;
@@ -365,6 +358,30 @@
 
         .admin-card:last-child {
             margin-bottom: 0;
+        }
+
+        .admin-dropdown-toggle {
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-dropdown-toggle:hover {
+            color: #E53935;
+        }
+
+        .dropdown-menu {
+            min-width: 180px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
         }
 
         
@@ -378,9 +395,7 @@
                 padding: 28px 20px;
             }
 
-            .admin-footer {
-                margin-left: 0;
-            }
+           
 
             .admin-top-links {
                 display: none;
@@ -399,61 +414,56 @@
         <!-- Admin Topbar -->
         <div class="admin-topbar">
             <div class="admin-brand">
-                Aidify
-                <span class="admin-badge">ADMIN</span>
+                <img src="<%= ResolveUrl("~/Images/aidify-kit.png") %>"
+                     alt="Aidify Logo"
+                     class="admin-logo" />
+                <span>Aidify</span>
             </div>
 
             <div class="admin-top-links">
                 <a href="Dashboard.aspx" class="active">Dashboard</a>
                 <a href="Users/List.aspx">Users</a>
-                <a href="Roles.aspx">Roles</a>
-                <a href="Content/ManagePublicPages.aspx">Public Pages</a>
+             
+             
                 <a href="Content/ApprovalQueue.aspx">Approvals</a>
                 <a href="Analytics.aspx">Analytics</a>
             </div>
            
 
-            <div class="dropdown">
-                <a class="admin-profile text-decoration-none text-dark dropdown-toggle"
-                   href="#"
-                   role="button"
+            <div class="admin-profile dropdown">
+
+                <a href="#"
+                   class="admin-dropdown-toggle"
                    data-bs-toggle="dropdown"
                    aria-expanded="false">
 
-                    <i class="bi bi-bell fs-5"></i>
-
-                    <div class="text-end d-none d-md-block">
-                        <div class="fw-bold"><%: Aidify_assigment.AuthHelper.GetName() %></div>
-                        <small class="text-muted"><%: Aidify_assigment.AuthHelper.GetRole() %></small>
-                    </div>
-
-                    <div class="admin-avatar">A</div>
+                    Admin
+                    <i class="bi bi-chevron-down"></i>
                 </a>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                <ul class="dropdown-menu dropdown-menu-end">
+
                     <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bi bi-person me-2"></i> Profile
+                        <a class="dropdown-item"
+                           href="../Account/Profile.aspx">
+                            <i class="bi bi-person me-2"></i>
+                            Profile
                         </a>
                     </li>
 
                     <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bi bi-gear me-2"></i> Settings
+                        <a class="dropdown-item text-danger"
+                           href="../Auth/Logout.aspx">
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Logout
                         </a>
                     </li>
 
-                    <li><hr class="dropdown-divider"></li>
-
-                    <li>
-                        <a class="dropdown-item text-danger" href="../Auth/Logout.aspx">
-                            <i class="bi bi-box-arrow-right me-2"></i> Logout
-                        </a>
-                    </li>
                 </ul>
+
             </div>
 
-        </div>
+        </div> <!-- admin-topbar -->
 
         <div class="admin-layout">
 
@@ -469,9 +479,7 @@
                     <i class="bi bi-people"></i> User Management
                 </a>
 
-                <a href="Roles.aspx" class="admin-side-link">
-                    <i class="bi bi-shield-check"></i> Roles & Permissions
-                </a>
+                
 
                 <div class="admin-sidebar-heading">Content</div>
 
@@ -479,9 +487,7 @@
                         <i class="bi bi-book"></i> Approval Queue
                     </a>
 
-                    <a href="Content/ManagePublicPages.aspx" class="admin-side-link">
-                        <i class="bi bi-layout-text-window-reverse"></i> Public Pages
-                    </a>
+                   
 
                     <a href="AI_Insights.aspx" class="admin-side-link">
                         <i class="bi bi-stars"></i> AI Insights
@@ -518,14 +524,16 @@
                         <p>System status and user engagement metrics for today.</p>
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <a href="Analytics.aspx" class="btn btn-outline-secondary">
-                            <i class="bi bi-download"></i> Export Data
-                        </a>
 
-                        <a href="Content/ApprovalQueue.aspx" class="btn btn-aidify">
+                    <div class="d-flex gap-2">
+                        <a href="Modules/Create.aspx" class="btn btn-aidify">
                             <i class="bi bi-plus-lg"></i> New Module
                         </a>
+
+                        <a href="Events/Create.aspx" class="btn btn-aidify">
+                            <i class="bi bi-plus-lg"></i> New Event
+                        </a>
+
                     </div>
                 </div>
 
@@ -538,7 +546,7 @@
                                 <div class="admin-stat-icon icon-blue">
                                     <i class="bi bi-people"></i>
                                 </div>
-                                <small class="text-success fw-bold">+12% ↑</small>
+                                <small id="statUserGrowthLabel" class="text-success fw-bold">—</small>
                             </div>
                             <span>Total active users</span>
                             <h2 id="statTotalUsers">—</h2>
@@ -552,13 +560,20 @@
                                 <div class="admin-stat-icon icon-purple">
                                     <i class="bi bi-check-circle"></i>
                                 </div>
-                                <small class="text-success fw-bold">+5% ↑</small>
+                                <small id="statLearnerStatusLabel" class="text-success fw-bold">—</small>
                             </div>
-                            <span>Module completion rate</span>
-                            <h2 id="statActiveLearners">—</h2>
-                            <div class="progress mt-2" style="height: 6px;">
-                                <div class="progress-bar bg-danger" style="width: 68%;"></div>
-                            </div>
+                            <span>Module Completion Rate</span>
+
+                                <h2 id="statActiveLearners">—</h2>
+
+                                <div class="progress mt-2" style="height: 6px;">
+                                    <div id="learnerProgressBar"
+                                         class="progress-bar bg-danger"
+                                         style="width: 0%;">
+                                    </div>
+                                </div>
+
+                                <p id="completionLabel">Loading...</p>
                         </div>
                     </div>
 
@@ -568,11 +583,11 @@
                                 <div class="admin-stat-icon icon-green">
                                     <i class="bi bi-shield-plus"></i>
                                 </div>
-                                <small class="text-muted fw-bold">Stable</small>
+                                <small id="statAttemptsStatusLabel" class="text-muted fw-bold">—</small>
                             </div>
-                            <span>System Uptime</span>
+                            <span>Module Attempts</span>
                             <h2 id="statTotalAttempts">—</h2>
-                            <p>All systems operational</p>
+                            <p>Total learning activity recorded</p>
                         </div>
                     </div>
 
@@ -582,7 +597,7 @@
                                 <div class="admin-stat-icon icon-red">
                                     <i class="bi bi-exclamation-triangle"></i>
                                 </div>
-                                <small class="text-danger fw-bold">Priority</small>
+                                <small id="statAlertStatusLabel" class="text-danger fw-bold">—</small>
                             </div>
                             <span>Critical Alerts</span>
                             <h2 id="statPendingModules">—</h2>
@@ -605,11 +620,11 @@
 
                 <script type="text/javascript">
                     $.ajax({
-                        type:        'POST',
-                        url:         'Dashboard.aspx/GetDailySummary',
-                        data:        '{}',
+                        type: 'POST',
+                        url: 'Dashboard.aspx/GetDailySummary',
+                        data: '{}',
                         contentType: 'application/json; charset=utf-8',
-                        dataType:    'json',
+                        dataType: 'json',
                         success: function (data) {
                             document.getElementById('aiInsightText').textContent = data.d;
                         },
@@ -627,10 +642,36 @@
                         dataType: 'json',
                         success: function (r) {
                             var d = r.d;
-                            document.getElementById('statTotalUsers').textContent     = d.totalUsers.toLocaleString();
-                            document.getElementById('statActiveLearners').textContent = d.activeLearners.toLocaleString();
-                            document.getElementById('statTotalAttempts').textContent  = d.totalAttempts.toLocaleString();
-                            document.getElementById('statPendingModules').textContent = d.pendingModules + ' Pending';
+
+                            document.getElementById('statTotalUsers').textContent =
+                                d.totalUsers.toLocaleString();
+
+                            document.getElementById('statActiveLearners').textContent =
+                                d.completionRate + '%';
+
+                            document.getElementById('statTotalAttempts').textContent =
+                                d.totalAttempts.toLocaleString();
+
+                            document.getElementById('statPendingModules').textContent =
+                                d.pendingModules + ' Pending';
+
+                            document.getElementById('statUserGrowthLabel').textContent =
+                                d.userGrowthLabel;
+
+                            document.getElementById('statLearnerStatusLabel').textContent =
+                                d.learnerStatusLabel;
+
+                            document.getElementById('completionLabel').textContent =
+                                d.completionLabel;
+
+                            document.getElementById('statAttemptsStatusLabel').textContent =
+                                d.attemptsStatusLabel;
+
+                            document.getElementById('statAlertStatusLabel').textContent =
+                                d.alertStatusLabel;
+
+                            document.getElementById('learnerProgressBar').style.width =
+                                d.learnerProgressPercent + '%';
                         }
                     });
                 </script>
@@ -642,7 +683,7 @@
                     success: function(r) {
                         var rows = r.d, body = document.getElementById('activityTableBody');
                         if (!rows || rows.length === 0) {
-                            body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No activity yet.</td></tr>';
+                            body.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No activity yet.</td></tr>';
                             return;
                         }
                         var chips = ['bg-primary-subtle text-primary','bg-danger-subtle text-danger',
@@ -659,13 +700,120 @@
                                 '<td>' + esc(l.action) + '</td>' +
                                 '<td>' + esc(l.targetEntity || '—') + '</td>' +
                                 '<td>' + dt + '</td>' +
-                                '<td><span class="badge bg-success-subtle text-success">Done</span></td>' +
-                                '<td><i class="bi bi-three-dots-vertical"></i></td></tr>';
+                                '<td><span class="badge bg-success-subtle text-success">Done</span></td></tr>';
                         }
                         body.innerHTML = html;
                     }
                 });
                 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+                </script>
+
+                <script type="text/javascript">
+                    function loadEngagementTrend(days) {
+
+                        $.ajax({
+                            type: 'POST',
+                            url: 'Dashboard.aspx/GetEngagementTrend',
+                            data: JSON.stringify({ days: days }),
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+
+                            success: function (r) {
+
+                                var rows = r.d;
+                                var chart = document.getElementById('engagementChartBox');
+                                var daysBox = document.getElementById('engagementChartDays');
+
+                                if (!rows || rows.length === 0) {
+                                    chart.innerHTML = '<p class="text-muted">No engagement data yet.</p>';
+                                    daysBox.innerHTML = '';
+                                    return;
+                                }
+
+                                var chartHtml = '';
+                                var daysHtml = '';
+
+                                for (var i = 0; i < rows.length; i++) {
+                                    chartHtml += '<div class="chart-bar" title="' +
+                                        rows[i].Count +
+                                        ' activity record(s)" style="height:' +
+                                        rows[i].Percent +
+                                        '%;"></div>';
+
+                                    if (rows.length <= 7 || i % 5 === 0 || i === rows.length - 1) {
+                                        daysHtml += '<span>' + esc(rows[i].DayLabel) + '</span>';
+                                    }
+                                    else {
+                                        daysHtml += '<span></span>';
+                                    }
+                                }
+
+                                chart.innerHTML = chartHtml;
+                                daysBox.innerHTML = daysHtml;
+                            },
+
+                            error: function () {
+                                document.getElementById('engagementChartBox').innerHTML =
+                                    '<p class="text-muted">Unable to load engagement trend.</p>';
+                            }
+                        });
+                    }
+
+                    $(document).ready(function () {
+
+                        loadEngagementTrend(7);
+
+                        $('#trendRange').change(function () {
+                            loadEngagementTrend(parseInt(this.value));
+                        });
+
+                    });
+
+                    $.ajax({
+                        type: 'POST',
+                        url: 'Dashboard.aspx/GetSystemAlerts',
+                        data: '{}',
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function (r) {
+                            var alerts = r.d;
+                            var body = document.getElementById('systemAlertsBody');
+                            var count = document.getElementById('alertCount');
+
+                            if (!alerts || alerts.length === 0) {
+                                count.textContent = '0 New';
+                                body.innerHTML = '<p class="text-muted">No system alerts.</p>';
+                                return;
+                            }
+
+                            count.textContent = alerts.length + ' New';
+
+                            var html = '';
+
+                            for (var i = 0; i < alerts.length; i++) {
+                                var a = alerts[i];
+                                var css = a.Severity === 'danger' ? 'admin-alert danger' : 'admin-alert';
+                                var icon = a.Severity === 'danger'
+                                    ? 'bi bi-exclamation-triangle text-danger fs-4'
+                                    : 'bi bi-info-circle text-primary fs-4';
+
+                                html += '<div class="' + css + '">' +
+                                    '<i class="' + icon + '"></i>' +
+                                    '<div>' +
+                                    '<strong>' + esc(a.Title) + '</strong>' +
+                                    '<p>' + esc(a.Message) + '</p>' +
+                                    '<small class="text-muted">' + esc(a.TimeLabel) + '</small>' +
+                                    '</div>' +
+                                    '</div>';
+                            }
+
+                            body.innerHTML = html;
+                        },
+                        error: function () {
+                            document.getElementById('systemAlertsBody').innerHTML =
+                                '<p class="text-muted">Unable to load system alerts.</p>';
+                        }
+                    });
                 </script>
 
                 <!-- Chart + Alerts -->
@@ -675,34 +823,20 @@
                             <div class="admin-card-header">
                                 <div>
                                     <h4>User Engagement Trend</h4>
-                                    <small class="text-muted">Sessions and module interactions per day</small>
+                                    <small class="text-muted">Login activity per day</small>
                                 </div>
 
-                                <select class="form-select w-auto">
-                                    <option>Last 7 Days</option>
-                                    <option>Last 30 Days</option>
+                                <select id="trendRange" class="form-select w-auto">
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30">Last 30 Days</option>
                                 </select>
                             </div>
 
-                            <div class="chart-box">
-                                <div class="chart-bar" style="height: 40%;"></div>
-                                <div class="chart-bar" style="height: 60%;"></div>
-                                <div class="chart-bar" style="height: 55%;"></div>
-                                <div class="chart-bar" style="height: 80%;"></div>
-                                <div class="chart-bar" style="height: 70%;"></div>
-                                <div class="chart-bar" style="height: 95%;"></div>
-                                <div class="chart-bar" style="height: 85%;"></div>
+                            <div class="chart-box" id="engagementChartBox">
+                                <p class="text-muted">Loading engagement trend...</p>
                             </div>
 
-                            <div class="chart-days">
-                                <span>Mon</span>
-                                <span>Tue</span>
-                                <span>Wed</span>
-                                <span>Thu</span>
-                                <span>Fri</span>
-                                <span>Sat</span>
-                                <span>Sun</span>
-                            </div>
+                            <div class="chart-days" id="engagementChartDays"></div>
                         </div>
                     </div>
 
@@ -710,34 +844,11 @@
                         <div class="admin-card">
                             <div class="admin-card-header">
                                 <h4>System Alerts</h4>
-                                <span class="badge bg-danger">3 New</span>
+                                <span class="badge bg-danger" id="alertCount">0 New</span>
                             </div>
 
-                            <div class="admin-alert danger">
-                                <i class="bi bi-x-circle text-danger fs-4"></i>
-                                <div>
-                                    <strong>API Response Latency</strong>
-                                    <p>AI service response is slower than usual.</p>
-                                    <small class="text-muted">2 mins ago</small>
-                                </div>
-                            </div>
-
-                            <div class="admin-alert">
-                                <i class="bi bi-info-circle text-primary fs-4"></i>
-                                <div>
-                                    <strong>Scheduled Backup</strong>
-                                    <p>Database backup will start at 02:00 UTC.</p>
-                                    <small class="text-muted">45 mins ago</small>
-                                </div>
-                            </div>
-
-                            <div class="admin-alert">
-                                <i class="bi bi-shield-check text-danger fs-4"></i>
-                                <div>
-                                    <strong>New Admin Role</strong>
-                                    <p>Junior Editor role has been added.</p>
-                                    <small class="text-muted">2 hours ago</small>
-                                </div>
+                            <div id="systemAlertsBody">
+                                <p class="text-muted">Loading alerts...</p>
                             </div>
                         </div>
                     </div>
@@ -746,15 +857,12 @@
                 <!-- Recent Activity -->
                 <div class="admin-card">
                     <div class="admin-card-header">
-                        <h4>Recent Activity</h4>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-light rounded-circle">
-                                <i class="bi bi-filter"></i>
-                            </button>
-                            <button type="button" class="btn btn-light rounded-circle">
-                                <i class="bi bi-search"></i>
-                            </button>
+                        <div>
+                            <h4>Recent Activity</h4>
+                            <small class="text-muted">Latest logged admin and system actions</small>
                         </div>
+
+                       
                     </div>
 
                     <div class="table-responsive">
@@ -766,20 +874,21 @@
                                     <th>Module</th>
                                     <th>Timestamp</th>
                                     <th>Status</th>
-                                    <th></th>
+                                  
                                 </tr>
                             </thead>
 
                             <tbody id="activityTableBody">
-                                <tr><td colspan="6" class="text-center text-muted py-3">Loading activity…</td></tr>
+                                <tr><td colspan="5" class="text-center text-muted py-3">Loading activity…</td></tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="text-center bg-light p-3 rounded-bottom">
-                        <button type="button" class="btn btn-link text-muted text-decoration-none fw-bold">
-                            Load 50 More Activities <i class="bi bi-chevron-down"></i>
-                        </button>
+                        <a href="AuditLogs.aspx"
+                           class="btn btn-link text-muted text-decoration-none fw-bold">
+                            View Full Audit Log <i class="bi bi-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
 
@@ -793,13 +902,6 @@
                 <div>
                     <h5>Aidify</h5>
                     <p class="text-muted small mb-0">Administrative control center for the Aidify learning platform.</p>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <a href="Dashboard.aspx" class="text-muted text-decoration-none small">Dashboard</a>
-                    <span class="text-muted">|</span>
-                    <a href="#" class="text-muted text-decoration-none small">Privacy Policy</a>
-                    <span class="text-muted">|</span>
-                    <a href="#" class="text-muted text-decoration-none small">Terms of Service</a>
                 </div>
             </div>
             <hr class="mt-1 mb-2" />

@@ -24,6 +24,12 @@
         z-index: 50;
     }
 
+    .analytics-logo {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+    }
+
     .analytics-brand {
         color: #E53935;
         font-size: 26px;
@@ -31,16 +37,26 @@
         text-decoration: none;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
-    .admin-badge {
-        background-color: #db322f;
-        color: #fff;
-        font-size: 11px;
-        padding: 3px 9px;
-        border-radius: 20px;
+    .analytics-dropdown {
+        text-decoration: none;
+        color: #1f2937;
         font-weight: 700;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .analytics-dropdown:hover {
+        color: #E53935;
+    }
+
+    .dropdown-menu {
+        min-width: 180px;
+        border-radius: 12px;
     }
 
     .analytics-nav a {
@@ -57,18 +73,7 @@
         padding-bottom: 8px;
     }
 
-    .admin-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        background: #E53935;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        flex-shrink: 0;
-    }
+    
 
     /* ── PAGE ── */
     .analytics-page {
@@ -163,29 +168,7 @@
         margin-bottom: 0;
     }
 
-    /* Bar chart */
-    .fake-bar-chart {
-        height: 220px;
-        display: flex;
-        align-items: flex-end;
-        gap: 10px;
-        margin-bottom: 12px;
-    }
-
-    .fake-bar-chart .bar {
-        flex: 1;
-        background: rgba(229, 57, 53, 0.22);
-        border-radius: 6px 6px 0 0;
-    }
-
-    .chart-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        font-weight: 700;
-        color: #999;
-        padding: 0 2px;
-    }
+   
 
     /* Progress bars */
     .ranking-row {
@@ -239,6 +222,12 @@
         color: #4B50C7;
         font-size: 18px;
         flex-shrink: 0;
+    }
+
+    .quiz-dist-card h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1a1a1a;
     }
 
     .dist-bar-wrap {
@@ -325,15 +314,6 @@
         font-size: 18px;
     }
 
-    .analytics-footer a {
-        color: #555;
-        text-decoration: none;
-        font-size: 13px;
-    }
-
-    .analytics-footer a:hover {
-        color: #E53935;
-    }
 
     @media (max-width: 992px) {
         .analytics-nav { display: none; }
@@ -345,26 +325,49 @@
     <div class="container d-flex justify-content-between align-items-center">
 
         <a href="Dashboard.aspx" class="analytics-brand">
-            Aidify
-            <span class="admin-badge">ADMIN</span>
+            <img src="<%= ResolveUrl("~/Images/aidify-kit.png") %>"
+                 alt="Aidify Logo"
+                 class="analytics-logo" />
+
+            <span>Aidify</span>
         </a>
 
         <nav class="analytics-nav">
                 <a href="Dashboard.aspx">Dashboard</a>
                 <a href="Users/List.aspx">Users</a>
-                <a href="Roles.aspx">Roles</a>
-                <a href="Content/ManagePublicPages.aspx">Public Pages</a>
+           
                 <a href="Content/ApprovalQueue.aspx">Approvals</a>
                 <a href="Analytics.aspx" class="active">Analytics</a>
         </nav>
 
-        <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-bell fs-5"></i>
-            <div class="text-end d-none d-md-block">
-                <div class="fw-bold" style="font-size:14px;"><%: Aidify_assigment.AuthHelper.GetName() %></div>
-                <small class="text-muted"><%: Aidify_assigment.AuthHelper.GetRole() %></small>
-            </div>
-            <div class="admin-avatar">A</div>
+        <div class="dropdown">
+
+            <a href="#"
+               class="analytics-dropdown"
+               data-bs-toggle="dropdown"
+               aria-expanded="false">
+                Admin
+                <i class="bi bi-chevron-down"></i>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                    <a class="dropdown-item"
+                       href="<%= ResolveUrl("~/Account/Profile.aspx") %>">
+                        <i class="bi bi-person me-2"></i>
+                        Profile
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item text-danger"
+                       href="<%= ResolveUrl("~/Auth/Logout.aspx") %>">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+
         </div>
 
     </div>
@@ -386,154 +389,108 @@
                 <a href="Analytics.aspx?export=users_csv" class="btn-export-csv">
                     <i class="bi bi-download"></i> Export Users CSV
                 </a>
-                <button class="btn-export-pdf" disabled title="PDF export requires Rotativa NuGet (install via VS)">
-                    <i class="bi bi-file-earmark-pdf"></i> Export PDF
-                </button>
+               
             </div>
         </div>
 
-        <!-- Filter Card -->
-        <div class="filter-card">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <span class="mini-label">Date Range</span>
-                    <select class="form-select">
-                        <option>Last 30 Days</option>
-                        <option>Last 3 Months</option>
-                        <option>Year to Date</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <span class="mini-label">Course Module</span>
-                    <select class="form-select">
-                        <option>All Modules</option>
-                        <option>Basic CPR</option>
-                        <option>First Aid Fundamentals</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <span class="mini-label">User Group</span>
-                    <select class="form-select">
-                        <option>General Public</option>
-                        <option>Healthcare Staff</option>
-                        <option>Corporate Teams</option>
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button class="btn-apply">Apply Filters</button>
-                </div>
-            </div>
-        </div>
-
+        
         <!-- Stat Cards -->
         <div class="row g-4 mb-4">
             <div class="col-sm-6 col-lg-3">
                 <div class="analytics-card">
-                    <span class="mini-label">Total Enrollments</span>
+                    <span class="mini-label">Total Users</span>
                     <div class="d-flex align-items-baseline gap-2">
                         <div class="stat-number" id="anTotalUsers">—</div>
-                        <small class="text-danger fw-bold">↑ 12%</small>
+                        <small class="text-muted fw-bold">Live Data</small>
                     </div>
                 </div>
             </div>
+
             <div class="col-sm-6 col-lg-3">
                 <div class="analytics-card">
-                    <span class="mini-label">Avg. Quiz Score</span>
+                    <span class="mini-label">Active Learners</span>
                     <div class="d-flex align-items-baseline gap-2">
                         <div class="stat-number" id="anActiveLearners">—</div>
-                        <small class="text-danger fw-bold">↑ 3%</small>
+                        <small class="text-muted fw-bold">Live Data</small>
                     </div>
                 </div>
             </div>
+
             <div class="col-sm-6 col-lg-3">
                 <div class="analytics-card">
                     <span class="mini-label">Completion Rate</span>
                     <div class="d-flex align-items-baseline gap-2">
                         <div class="stat-number" id="anCompletionRate">—</div>
-                        <small class="text-muted fw-bold">Steady</small>
+                        <small class="text-muted fw-bold">Live Data</small>
                     </div>
                 </div>
             </div>
+
             <div class="col-sm-6 col-lg-3">
                 <div class="analytics-card">
-                    <span class="mini-label">Active Learners</span>
+                    <span class="mini-label">Quiz Attempts</span>
                     <div class="d-flex align-items-baseline gap-2">
                         <div class="stat-number" id="anTotalAttempts">—</div>
-                        <small class="text-danger fw-bold">↑ 8%</small>
+                        <small class="text-muted fw-bold">Live Data</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Row -->
-        <div class="row g-4 mb-4">
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
 
-            <!-- Bar Chart -->
-            <div class="col-lg-8">
-                <div class="chart-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3>Performance Trends</h3>
-                        <small class="text-muted fw-bold">2024 Performance</small>
-                    </div>
-                    <canvas id="chartAttempts" style="max-height:240px;"></canvas>
-                </div>
+    <!-- Performance Trends -->
+    <div class="col-lg-8">
+        <div class="chart-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Performance Trends</h3>
+                <small class="text-muted fw-bold">Live Platform Data</small>
             </div>
 
-            <!-- Popular Modules -->
-            <div class="col-lg-4">
-                <div class="chart-card">
-                    <h3 class="mb-4">Popular Modules</h3>
-
-                    <div id="popularModulesContainer">
-                        <p class="text-muted small">Loading…</p>
-                    </div>
-                    <div style="display:none;"><!-- replaced static rows -->
-                        <div class="ranking-row" style="margin-bottom:24px;">
-                        <div class="ranking-track">
-                            <div class="ranking-fill" style="width:30%;"></div>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-outline-secondary w-100" style="font-size:13px;">
-                        View Full Ranking
-                    </button>
-                </div>
-            </div>
-
+            <canvas id="chartAttempts" height="120"></canvas>
         </div>
-
-        <!-- Quiz Score Distribution -->
-        <div class="quiz-dist-card">
-            <div class="d-flex align-items-center gap-3 mb-1">
-                <div class="quiz-icon-box">
-                    <i class="bi bi-clipboard-data"></i>
-                </div>
-                <div>
-                    <h3 style="font-size:17px;font-weight:800;margin:0;color:#1a1a1a;">
-                        Quiz Score Distribution
-                    </h3>
-                    <small class="text-muted">Last assessment cycle</small>
-                </div>
-            </div>
-
-            <div class="dist-bar-wrap">
-                <div class="dbar dbar-grey" style="height:25%;"></div>
-                <div class="dbar dbar-grey" style="height:35%;"></div>
-                <div class="dbar dbar-grey" style="height:45%;"></div>
-                <div class="dbar dbar-grey" style="height:55%;"></div>
-                <div class="dbar dbar-red"  style="height:100%;"></div>
-                <div class="dbar dbar-grey" style="height:40%;"></div>
-            </div>
-
-            <div class="dist-labels">
-                <span>&lt;50%</span>
-                <span>70%</span>
-                <span>85%</span>
-                <span>100%</span>
-            </div>
-        </div>
-
     </div>
+
+    <!-- Popular Modules -->
+    <div class="col-lg-4">
+        <div class="chart-card">
+            <h3 class="mb-4">Popular Modules</h3>
+
+            <div id="popularModulesContainer">
+                <p class="text-muted small">
+                    Loading module enrolment data...
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Quiz Distribution -->
+<div class="quiz-dist-card">
+
+    <div class="d-flex align-items-start gap-3 mb-3">
+        <div class="quiz-icon-box">
+            <i class="bi bi-bar-chart"></i>
+        </div>
+
+        <div>
+            <h3 class="mb-0">Quiz Score Distribution</h3>
+            <small class="text-muted">
+                Last assessment cycle
+            </small>
+        </div>
+    </div>
+
+    <div id="scoreDistributionContainer">
+        <p class="text-muted small mt-4 mb-0">
+            Loading quiz score distribution...
+        </p>
+    </div>
+
+</div>
+  </div>
 </main>
 
 <!-- ── FOOTER ── -->
@@ -543,13 +500,6 @@
             <div>
                 <div class="footer-brand">Aidify</div>
                 <p class="text-muted small mb-0">Administrative control center for the Aidify learning platform.</p>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <a href="Dashboard.aspx">Dashboard</a>
-                <span class="text-muted">|</span>
-                <a href="#">Privacy Policy</a>
-                <span class="text-muted">|</span>
-                <a href="#">Terms of Service</a>
             </div>
         </div>
         <hr class="mt-1 mb-2" />
@@ -598,31 +548,75 @@ $(document).ready(function () {
 
             // Popular Modules ranking bars
             var container = document.getElementById('popularModulesContainer');
+
             if (!d.popularModules || d.popularModules.length === 0) {
-                container.innerHTML = '<p class="text-muted small">No enrolment data yet.</p>';
-                return;
+                container.innerHTML =
+                    '<p class="text-muted small">No enrolment data yet.</p>';
             }
-            var maxEnrol = d.popularModules[0].enrolments || 1;
-            var html = '';
-            for (var j = 0; j < d.popularModules.length; j++) {
-                var m   = d.popularModules[j];
-                var pct = Math.round(m.enrolments / maxEnrol * 100);
-                html +=
-                    '<div class="ranking-row">' +
-                    '<div class="ranking-info">' +
+            else {
+                var maxEnrol = d.popularModules[0].enrolments || 1;
+                var html = '';
+
+                for (var j = 0; j < d.popularModules.length; j++) {
+                    var m = d.popularModules[j];
+                    var pct = Math.round(m.enrolments / maxEnrol * 100);
+
+                    html +=
+                        '<div class="ranking-row">' +
+                        '<div class="ranking-info">' +
                         '<span>' + esc(m.title) + '</span>' +
                         '<span>' + m.enrolments + ' enrolled</span>' +
-                    '</div>' +
-                    '<div class="ranking-track">' +
+                        '</div>' +
+                        '<div class="ranking-track">' +
                         '<div class="ranking-fill" data-width="' + pct + '" style="width:0%"></div>' +
-                    '</div>' +
-                    '</div>';
+                        '</div>' +
+                        '</div>';
+                }
+
+                container.innerHTML = html;
+
+                // Animate bars
+                container.querySelectorAll('.ranking-fill[data-width]').forEach(function (el) {
+                    el.style.width = el.getAttribute('data-width') + '%';
+                });
             }
-            container.innerHTML = html;
-            // Animate bars
-            container.querySelectorAll('.ranking-fill[data-width]').forEach(function (el) {
-                el.style.width = el.getAttribute('data-width') + '%';
-            });
+
+            var scoreBox = document.getElementById('scoreDistributionContainer');
+
+            if (!d.scoreDistribution || d.scoreDistribution.length === 0 || d.totalAttempts === 0) {
+                scoreBox.innerHTML =
+                    '<p class="text-muted small mt-4 mb-0">' +
+                    'No quiz attempts recorded yet. Score distribution will appear once learners submit quizzes.' +
+                    '</p>';
+            }
+            else {
+                var maxScoreCount = 1;
+
+                for (var k = 0; k < d.scoreDistribution.length; k++) {
+                    if (d.scoreDistribution[k].total > maxScoreCount) {
+                        maxScoreCount = d.scoreDistribution[k].total;
+                    }
+                }
+
+                var scoreHtml =
+                    '<div class="dist-bar-wrap" style="height:140px;">';
+
+                for (var s = 0; s < d.scoreDistribution.length; s++) {
+                    var item = d.scoreDistribution[s];
+                    var height = Math.max(20, Math.round(item.total / maxScoreCount * 120));
+
+                    scoreHtml +=
+                        '<div style="flex:1;text-align:center;">' +
+                        '<div class="dbar dbar-red" style="height:' + height + 'px;min-height:12px;"></div>' +
+                        '<small class="text-muted fw-bold mt-2">' + esc(item.range) + '</small>' +
+                        '<br><small class="text-muted">' + item.total + '</small>' +
+                        '</div>';
+                }
+
+                scoreHtml += '</div>';
+
+                scoreBox.innerHTML = scoreHtml;
+            }
         },
         error: function () {
             console.warn('Analytics data failed to load.');

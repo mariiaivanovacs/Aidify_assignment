@@ -60,7 +60,7 @@
                         runat="server"
                         CssClass="auth-success"
                         Visible="false">
-                        Account created successfully. You can now log in.
+                        Account created successfully. Please check your email to confirm your account before logging in.
                     </asp:Panel>
 
                     <asp:Label ID="lblError"
@@ -138,6 +138,10 @@
                             CssClass="text-danger"
                             Display="Dynamic">
                         </asp:RequiredFieldValidator>
+
+                        <small style="display:block; margin-top:6px; color:#6c757d; font-size:12px; line-height:1.4;">
+                            Use at least 8 characters with uppercase, lowercase, number, and special symbol.
+                        </small>
                     </div>
 
                     <!-- Confirm Password -->
@@ -186,6 +190,13 @@
                     <!-- General error -->
                     <div id="generalError" class="text-danger" style="display:none; margin-bottom:10px; font-size:13px;">
                         ⚠ Please fill in all the fields.
+                    </div>
+
+                    <!-- reCAPTCHA -->
+                    <div class="mb-3">
+                        <div class="g-recaptcha"
+                             data-sitekey="<%= System.Configuration.ConfigurationManager.AppSettings["RecaptchaSiteKey"] %>">
+                        </div>
                     </div>
 
                     <!-- Button -->
@@ -255,5 +266,7 @@
             return true;
         }
     </script>
+    
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </asp:Content>

@@ -20,6 +20,11 @@ namespace Aidify_assigment
             return HttpContext.Current.Session[Constants.SessionName] as string ?? string.Empty;
         }
 
+        public static string GetEmail()
+        {
+            return HttpContext.Current.Session[Constants.SessionEmail] as string ?? string.Empty;
+        }
+
         public static bool IsLoggedIn()
         {
             return HttpContext.Current.Session[Constants.SessionUserId] != null;

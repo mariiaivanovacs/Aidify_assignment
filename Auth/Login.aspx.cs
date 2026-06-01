@@ -29,7 +29,7 @@ namespace Aidify_assigment.Auth
 
             if (auth.IsAccountLocked(email))
             {
-                lblError.Text    = "Account temporarily locked after too many failed attempts. Try again in 15 minutes.";
+                lblError.Text    = "Account temporarily locked after too many failed attempts. Try again in 5 minutes.";
                 lblError.Visible = true;
                 return;
             }
@@ -39,6 +39,13 @@ namespace Aidify_assigment.Auth
             if (user == null)
             {
                 lblError.Text    = "Invalid email or password.";
+                lblError.Visible = true;
+                return;
+            }
+
+            if (!user.IsActive)
+            {
+                lblError.Text = "Your account has been disabled. Please contact the administrator.";
                 lblError.Visible = true;
                 return;
             }
@@ -53,9 +60,9 @@ namespace Aidify_assigment.Auth
             Session[Constants.SessionUserId] = user.UserId;
             Session[Constants.SessionRole]   = user.RoleName;
             Session[Constants.SessionName]   = user.FullName;
+            Session[Constants.SessionEmail] = user.Email;
 
-            if (chkRememberMe.Checked)
-                FormsAuthentication.SetAuthCookie(user.UserId.ToString(), true);
+            FormsAuthentication.SetAuthCookie(user.UserId.ToString(), chkRememberMe.Checked);
 
             RedirectByRole(user.RoleName);
         }

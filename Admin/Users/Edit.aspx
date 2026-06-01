@@ -3,7 +3,6 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
     <style>
-        /* Hide public navbar and footer */
         .aidify-navbar,
         .aidify-footer {
             display: none !important;
@@ -88,98 +87,27 @@
             border-radius: 8px;
             padding: 10px 28px;
             text-decoration: none;
+            display: inline-block;
         }
 
         .btn-cancel:hover {
-            border-color: #E53935;
-            color: #E53935;
-        }
-
-        .activity-card {
-            background-color: #ffffff;
-            border: 1px solid #e2e2e2;
-            border-radius: 16px;
-            padding: 25px;
-            height: 100%;
-        }
-
-        .activity-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-        }
-
-        .activity-row:last-child {
-            border-bottom: none;
-        }
-
-        .certified-card {
-            background-color: #E53935;
+            background-color: #6c757d;
+            border-color: #6c757d;
             color: #ffffff;
-            border-radius: 16px;
-            padding: 32px 24px;
-            text-align: center;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
 
-        .certified-card h5 {
+        .btn-aidify {
+            background: #d90429;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 28px;
             font-weight: 800;
-            margin-top: 14px;
-            margin-bottom: 6px;
         }
 
-        .certified-card p {
-            font-size: 13px;
-            opacity: 0.9;
-            margin: 0;
-        }
-
-        /* Simple footer matching Image 2 */
-        .admin-edit-footer {
-            background-color: #1f2933;
-            color: #ffffff;
-            padding: 36px 0 20px;
-            margin-top: 60px;
-        }
-
-        .admin-edit-footer .footer-brand {
-            font-size: 18px;
-            font-weight: 800;
-            color: #ffffff;
-        }
-
-        .admin-edit-footer .footer-tagline {
-            color: #aaa;
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
-        .admin-edit-footer .footer-disclaimer {
-            color: #E53935;
-            font-size: 12px;
-            margin-top: 8px;
-        }
-
-        .admin-edit-footer a {
-            color: #ccc;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .admin-edit-footer a:hover {
-            color: #ffffff;
-        }
-
-        .admin-edit-footer .copyright {
-            color: #aaa;
-            font-size: 13px;
-            margin-top: 6px;
+        .btn-aidify:hover {
+            background: #b70323;
+            color: white;
         }
 
         /* Toggle Switch */
@@ -225,56 +153,47 @@
             transform: translateX(22px);
         }
 
-        .certified-card {
-            background: linear-gradient(145deg, #E53935 0%, #c62828 100%);
-            position: relative;
-            overflow: hidden;
+        /* Footer */
+        .admin-edit-footer {
+            background-color: #1f2933;
+            color: #ffffff;
+            padding: 36px 0 20px;
+            margin-top: 60px;
         }
 
-        .certified-card::before {
-            content: "";
-            position: absolute;
-            top: -30px;
-            right: -30px;
-            width: 120px;
-            height: 120px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 50%;
+        .admin-edit-footer .footer-brand {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
         }
 
-        .certified-card::after {
-            content: "";
-            position: absolute;
-            bottom: -20px;
-            left: -20px;
-            width: 80px;
-            height: 80px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 50%;
+        .admin-edit-footer .footer-tagline {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 4px;
         }
 
-        .certified-icon-wrap {
-            width: 64px;
-            height: 64px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin-bottom: 4px;
-        }
-
-        .certified-badge {
-            margin-top: 12px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 20px;
-            padding: 4px 16px;
+        .admin-edit-footer .footer-disclaimer {
+            color: #E53935;
             font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            margin-top: 8px;
         }
 
+        .admin-edit-footer a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .admin-edit-footer a:hover {
+            color: #ffffff;
+        }
+
+        .admin-edit-footer .copyright {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 6px;
+        }
     </style>
 
     <div class="admin-edit-page">
@@ -298,39 +217,27 @@
                 <div class="row g-4 mb-4">
                     <div class="col-md-6">
                         <label>First Name</label>
-                        <asp:TextBox ID="txtFirstName" runat="server" CssClass="form-control" Text="Julian" placeholder="Enter first name"></asp:TextBox>
+                        <asp:TextBox ID="txtFirstName" runat="server" CssClass="form-control" placeholder="Enter first name"></asp:TextBox>
                     </div>
                     <div class="col-md-6">
                         <label>Last Name</label>
-                        <asp:TextBox ID="txtLastName" runat="server" CssClass="form-control" Text="Vance" placeholder="Enter last name"></asp:TextBox>
+                        <asp:TextBox ID="txtLastName" runat="server" CssClass="form-control" placeholder="Enter last name"></asp:TextBox>
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <label>Email Address</label>
-                    <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email" Text="julian.vance@medical-center.org" placeholder="Enter email address"></asp:TextBox>
+                    <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" TextMode="Email" placeholder="Enter email address"></asp:TextBox>
                     <small class="text-muted">Professional email used for system notifications.</small>
                 </div>
 
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <label>Role Selection</label>
-                        <asp:DropDownList ID="ddlRole" runat="server" CssClass="form-select">
-                            <asp:ListItem>Learner</asp:ListItem>
-                            <asp:ListItem>Instructor</asp:ListItem>
-                            <asp:ListItem Selected="True">Administrator</asp:ListItem>
-                            <asp:ListItem>Supervisor</asp:ListItem>
-                        </asp:DropDownList>
-                    </div>
-                    <div class="col-md-6">
-                        <label>Department</label>
-                        <asp:DropDownList ID="ddlDepartment" runat="server" CssClass="form-select">
-                            <asp:ListItem>Emergency Response</asp:ListItem>
-                            <asp:ListItem Selected="True">First Aid Training</asp:ListItem>
-                            <asp:ListItem>Clinical Operations</asp:ListItem>
-                            <asp:ListItem>Logistics</asp:ListItem>
-                        </asp:DropDownList>
-                    </div>
+                <div class="mb-4">
+                    <label>Role Selection</label>
+                    <asp:DropDownList ID="ddlRole" runat="server" CssClass="form-select">
+                        <asp:ListItem>Learner</asp:ListItem>
+                        <asp:ListItem>Instructor</asp:ListItem>
+                        <asp:ListItem>Admin</asp:ListItem>
+                    </asp:DropDownList>
                 </div>
 
                 <div class="status-box mb-4">
@@ -344,8 +251,12 @@
                     </label>
                 </div>
 
+                <%-- ONE button row only --%>
                 <div class="d-flex justify-content-end gap-3">
-                    <a href="List.aspx" class="btn-cancel">Cancel</a>
+                    <button type="button" onclick="clearFields()" class="btn-cancel">
+                        Clear
+                    </button>
+                    <a href="List.aspx" class="btn-cancel">Go Back</a>
                     <button type="submit" name="forceReset" value="1"
                             class="btn btn-outline-danger px-4"
                             onclick="return confirm('Send a password-reset link to this user?');">
@@ -356,41 +267,10 @@
 
             </div>
 
-            <!-- Bottom: Activity + Certified -->
-            <div class="row g-4">
-                <div class="col-md-8">
-                    <div class="activity-card">
-                        <h5 class="fw-bold mb-3">
-                            <i class="bi bi-clock-history text-danger me-2"></i>
-                            Recent Activity
-                        </h5>
-                        <div class="activity-row">
-                            <span>Completed CPR Module</span>
-                            <small class="text-muted">2h ago</small>
-                        </div>
-                        <div class="activity-row">
-                            <span>Password Reset</span>
-                            <small class="text-muted">Oct 12</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="certified-card">
-                        <div class="certified-icon-wrap">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <h5>Certified User</h5>
-                        <p>Level 4 First Responder Access</p>
-                        <div class="certified-badge">✓ Verified</div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <!-- Footer matching Image 2 dark style -->
+    <!-- Footer -->
     <footer class="admin-edit-footer">
         <div class="container">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-4">
@@ -416,5 +296,14 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function clearFields() {
+            document.getElementById('<%= txtFirstName.ClientID %>').value = '';
+            document.getElementById('<%= txtLastName.ClientID %>').value = '';
+            document.getElementById('<%= txtEmail.ClientID %>').value = '';
+            document.getElementById('<%= ddlRole.ClientID %>').selectedIndex = 0;
+        }
+    </script>
 
 </asp:Content>

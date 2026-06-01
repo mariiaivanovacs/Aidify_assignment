@@ -2,7 +2,16 @@
 
 <nav class="navbar navbar-expand-lg aidify-navbar">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="<%= ResolveUrl("~/Default.aspx") %>">Aidify</a>
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2"
+           href="<%= ResolveUrl("~/Default.aspx") %>">
+
+            <img src="<%= ResolveUrl("~/Images/aidify-kit.png") %>"
+                 alt="Aidify Logo"
+                 style="width:40px;height:40px;object-fit:contain;" />
+
+            <span>Aidify</span>
+
+        </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
             <span class="navbar-toggler-icon"></span>

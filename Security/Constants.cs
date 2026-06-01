@@ -13,5 +13,6 @@ namespace Aidify_assigment
         public const string SessionUserId = "UserId";
         public const string SessionRole   = "Role";
         public const string SessionName   = "Name";
+        public const string SessionEmail = "Email";
     }
 }

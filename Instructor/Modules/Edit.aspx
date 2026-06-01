@@ -1,926 +1,758 @@
-<%@ Page Title="Create / Edit Module" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Edit.aspx.cs" Inherits="Aidify_assigment.Instructor.Modules.Edit" %>
+﻿<%@ Page Title="Create Module" Language="C#" AutoEventWireup="true" CodeBehind="Edit.aspx.cs" Inherits="Aidify_assigment.Instructor.Modules.Edit" %>
 
-<asp:Content ID="ModuleEditContent" ContentPlaceHolderID="MainContent" runat="server">
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <title>Aidify - Create Module</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f9fafb;
+            margin: 0;
+            background-color: #fff8f7;
+            color: #121c2c;
+            font-family: Arial, sans-serif;
         }
 
-        .module-page {
+        .instructor-shell {
             min-height: 100vh;
-            background: #f9fafb;
-            color: #281715;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff8f7;
         }
 
-        .module-topbar {
-            height: 64px;
-            background: #fff8f7;
+        .topbar {
+            height: 76px;
+            background: #ffffff;
             border-bottom: 1px solid #e6bdb8;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 28px;
+            padding: 0 34px;
             position: sticky;
             top: 0;
             z-index: 50;
         }
 
-        .topbar-left {
+        .brand {
             display: flex;
             align-items: center;
-            gap: 14px;
-        }
-
-        .menu-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-            border: 0;
-            background: transparent;
-            color: #b70011;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s ease;
-        }
-
-        .menu-btn:hover {
-            background: #fbdbd7;
-        }
-
-        .portal-title {
-            color: #b70011;
-            font-size: 18px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .topbar-icon {
-            color: #b70011;
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .topbar-icon:hover {
-            background: #fbdbd7;
-        }
-
-        .topbar-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-            background: #ffdad6;
-            border: 2px solid #e6bdb8;
-            color: #b70011;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 13px;
-        }
-
-        .module-layout {
-            display: flex;
-            min-height: calc(100vh - 64px);
-        }
-
-        .module-sidebar {
-            width: 280px;
-            background: #fff0ee;
-            border-right: 1px solid #e6bdb8;
-            padding: 24px 12px;
-            flex-shrink: 0;
-            position: sticky;
-            top: 64px;
-            height: calc(100vh - 64px);
-            overflow-y: auto;
-        }
-
-        .instructor-block {
-            padding: 0 18px 30px;
-        }
-
-        .instructor-name {
-            font-size: 21px;
+            gap: 10px;
+            font-size: 26px;
             font-weight: 800;
             color: #b70011;
-            margin-bottom: 3px;
         }
 
-        .instructor-role {
-            color: #5c403c;
-            font-size: 12px;
-            margin-bottom: 7px;
-        }
-
-        .verified-line {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            color: #b70011;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .module-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .module-nav a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 13px 16px;
-            border-radius: 12px;
-            color: #5c403c;
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 600;
-            transition: 0.2s ease;
-        }
-
-        .module-nav a:hover {
-            background: #fbdbd7;
-            color: #281715;
-        }
-
-        .module-nav a.active {
+        .role-badge {
             background: #b70011;
-            color: #ffffff;
-            box-shadow: 0 8px 18px rgba(183, 0, 17, 0.14);
+            color: white;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
         }
 
-        .module-main {
-            flex: 1;
-            min-width: 0;
-            padding: 32px;
-        }
-
-        .module-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .breadcrumb {
+        .top-links {
             display: flex;
+            gap: 18px;
             align-items: center;
-            gap: 8px;
-            color: #596373;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .breadcrumb a {
-            color: #596373;
-            text-decoration: none;
-        }
-
-        .breadcrumb a:hover {
-            color: #b70011;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
-        .page-title {
-            font-size: 32px;
-            line-height: 1.15;
-            font-weight: 800;
-            color: #281715;
-            margin: 0 0 6px;
-            letter-spacing: -0.03em;
-        }
-
-        .page-subtitle {
-            color: #5c403c;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .btn-cancel-custom,
-        .btn-save-custom {
-            border-radius: 10px !important;
-            padding: 12px 28px !important;
-            font-weight: 800 !important;
-            font-size: 13px !important;
-            border: 1px solid transparent !important;
+        .top-links a {
+            color: #5c403c;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
         }
 
-        .btn-cancel-custom {
-            background: transparent !important;
-            color: #555f6f !important;
-        }
-
-        .btn-cancel-custom:hover {
-            background: #ffe9e6 !important;
-        }
-
-        .btn-save-custom {
-            background: #b70011 !important;
-            color: #ffffff !important;
-            border-color: #b70011 !important;
-            box-shadow: 0 10px 22px rgba(183, 0, 17, 0.14);
-        }
-
-        .btn-save-custom:hover {
-            filter: brightness(1.06);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 8fr) minmax(320px, 4fr);
-            gap: 32px;
-            align-items: start;
-        }
-
-        .left-column,
-        .right-column {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .panel {
-            background: #ffffff;
-            border: 1px solid #e6bdb8;
-            border-radius: 16px;
-            box-shadow: 0 8px 22px rgba(40, 23, 21, 0.04);
-            padding: 28px;
-        }
-
-        .panel-title {
+        .top-links a.active {
             color: #b70011;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            padding-bottom: 14px;
-            margin-bottom: 22px;
-            border-bottom: 1px solid #e6bdb8;
+            border-bottom: 2px solid #b70011;
+            padding-bottom: 8px;
         }
 
-        .field-group {
-            margin-bottom: 24px;
-        }
-
-        .field-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .field-label {
+        .profile {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 12px;
-            color: #5c403c;
-            font-size: 13px;
-            font-weight: 800;
-            margin-bottom: 10px;
+            white-space: nowrap;
         }
 
-        .required-text,
-        .validator-custom {
-            color: #ba1a1a;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .module-input,
-        .module-select,
-        .module-textarea {
-            width: 100%;
-            border: 1px solid #916f6b !important;
-            background: #fff8f7 !important;
-            color: #281715 !important;
-            border-radius: 10px !important;
-            padding: 14px 16px !important;
-            font-size: 15px !important;
-            outline: none !important;
-            box-shadow: none !important;
-            transition: 0.2s ease;
-        }
-
-        .module-input:focus,
-        .module-select:focus,
-        .module-textarea:focus {
-            border-color: #b70011 !important;
-            box-shadow: 0 0 0 4px rgba(183, 0, 17, 0.10) !important;
-        }
-
-        .module-textarea {
-            min-height: 320px;
-            resize: vertical;
-            line-height: 1.55;
-        }
-
-        .notes-panel {
-            background: #fff8f7;
-            border: 1px solid #e6bdb8;
-            border-radius: 16px;
-            padding: 26px;
-            box-shadow: 0 8px 22px rgba(40, 23, 21, 0.04);
-        }
-
-        .notes-title {
-            color: #b70011;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            margin-bottom: 12px;
-        }
-
-        .notes-text {
-            color: #5c403c;
-            line-height: 1.65;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .cover-upload {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .cover-file {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            z-index: 5;
-            cursor: pointer;
-        }
-
-        .cover-box {
-            aspect-ratio: 16 / 9;
-            width: 100%;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 2px dashed #e6bdb8;
-            background: #fff0ee;
-            position: relative;
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #b70011;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.2s ease;
+            overflow: hidden;
+            border: 1px solid #e6bdb8;
         }
 
-        .cover-upload:hover .cover-box {
-            border-color: #b70011;
-        }
-
-        .cover-preview-img {
-            position: absolute;
-            inset: 0;
+        .profile-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: none;
+            border-radius: 50%;
         }
 
-        .cover-placeholder-bg {
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(to top, rgba(0,0,0,0.50), rgba(0,0,0,0.12)),
-                radial-gradient(circle at 45% 45%, #f8fafc 0 13%, transparent 14%),
-                linear-gradient(135deg, #111827, #6b7280);
-            opacity: 0.82;
-        }
-
-        .cover-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            color: #ffffff;
-            pointer-events: none;
-        }
-
-        .cover-content .material-symbols-outlined {
-            color: #ffdad6;
-            font-size: 44px;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .cover-content strong {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 3px;
-        }
-
-        .cover-content small {
-            color: #ffedea;
-            font-size: 11px;
-        }
-
-        .quick-actions {
+        .layout {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding-top: 6px;
+            flex: 1;
         }
 
-        .btn-add-lesson-custom,
-        .btn-export-custom {
-            width: 100%;
-            border-radius: 10px !important;
-            padding: 14px 18px !important;
-            font-weight: 800 !important;
-            font-size: 13px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 8px !important;
+        .sidebar {
+            width: 260px;
+            min-height: calc(100vh - 76px);
+            background: #ffffff;
+            border-right: 1px solid #e6bdb8;
+            padding: 28px 18px;
+            position: sticky;
+            top: 76px;
         }
 
-        .btn-add-lesson-custom {
-            background: #dc2626 !important;
-            border-color: #dc2626 !important;
-            color: #fff6f5 !important;
+        .sidebar-heading {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #916f6b;
+            font-weight: 800;
+            margin: 18px 12px 10px;
         }
 
-        .btn-export-custom {
-            background: #ffffff !important;
-            border: 1px solid #916f6b !important;
-            color: #281715 !important;
-        }
-
-        .btn-export-custom:hover {
-            background: #fff0ee !important;
-        }
-
-        .ai-card {
-            background: #dc2626;
-            color: #fff6f5;
-            border-radius: 16px;
-            padding: 26px;
-            box-shadow: 0 12px 26px rgba(220, 38, 38, 0.22);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .ai-card::after {
-            content: "auto_awesome";
-            font-family: 'Material Symbols Outlined';
-            position: absolute;
-            right: -18px;
-            bottom: -36px;
-            font-size: 120px;
-            opacity: 0.12;
-        }
-
-        .ai-head {
+        .side-link {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 14px;
-            position: relative;
-            z-index: 1;
+            padding: 13px 15px;
+            border-radius: 10px;
+            color: #5c403c;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 6px;
         }
 
-        .ai-head .material-symbols-outlined {
-            font-size: 34px;
+        .side-link:hover {
+            background: #fff1ef;
+            color: #b70011;
         }
 
-        .ai-title {
-            font-size: 22px;
-            line-height: 1.1;
+        .side-link.active {
+            background: #b70011;
+            color: white;
+        }
+
+        .help-box {
+            background: #b70011;
+            color: white;
+            border-radius: 18px;
+            padding: 22px;
+            margin-top: 35px;
+        }
+
+        .help-box h6 {
             font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .help-box p {
+            font-size: 14px;
+            opacity: .9;
+            margin-bottom: 14px;
+        }
+
+        .help-box button {
+            width: 100%;
+            border: none;
+            background: white;
+            color: #b70011;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 800;
+        }
+
+        .main {
+            flex: 1;
+            padding: 42px 48px;
+        }
+
+        .back-link {
+            color: #b70011;
+            text-decoration: none;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 22px;
+        }
+
+        .back-link:hover {
+            color: #8b000a;
+            text-decoration: underline;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .page-header p {
+            color: #545f72;
             margin: 0;
         }
 
-        .ai-text {
+        .form-card,
+        .side-card {
+            background: white;
+            border: 1px solid #e6bdb8;
+            border-radius: 16px;
+            padding: 26px;
+        }
+
+        .form-card h2,
+        .side-card h3 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            font-weight: 800;
+            color: #121c2c;
+        }
+
+        .required {
+            color: #b70011;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid #e6bdb8;
+            border-radius: 10px;
+            padding: 11px 13px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #b70011;
+            box-shadow: 0 0 0 0.18rem rgba(183, 0, 17, 0.12);
+        }
+
+        .upload-box {
+            border: 2px dashed #e6bdb8;
+            background: #fff8f7;
+            border-radius: 16px;
+            padding: 26px;
+            text-align: center;
+        }
+
+        .upload-box i {
+            font-size: 36px;
+            color: #b70011;
+        }
+
+        .cover-preview {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid #e6bdb8;
+            margin-top: 16px;
+        }
+
+        .status-pill {
+            background: #eeeeee;
+            color: #545f72;
+            border: 1px solid #d7d7d7;
+            padding: 7px 12px;
+            border-radius: 16px;
             font-size: 13px;
-            line-height: 1.55;
-            margin: 0 0 16px;
-            opacity: 0.92;
-            position: relative;
-            z-index: 1;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .ai-progress {
-            height: 4px;
-            background: rgba(255,255,255,0.22);
-            border-radius: 999px;
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
+        .btn-aidify {
+            background: #b70011;
+            color: white;
+            border: 1px solid #b70011;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .ai-progress-bar {
-            height: 100%;
-            width: 98%;
+        .btn-aidify:hover {
+            background: #8b000a;
+            color: white;
+        }
+
+        .btn-outline-aidify {
+            background: white;
+            color: #5c403c;
+            border: 1px solid #e6bdb8;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-outline-aidify:hover {
+            background: #fff1ef;
+            color: #b70011;
+            border-color: #b70011;
+        }
+
+        .btn-secondary-aidify {
+            background: #545f72;
+            color: white;
+            border: 1px solid #545f72;
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-bar {
+            background: white;
+            border: 1px solid #e6bdb8;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+        }
+
+        .check-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: #b70011;
+            margin-top: 3px;
+        }
+
+        .check-item span {
+            color: #545f72;
+            font-size: 14px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 9px;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background: #e6bdb8;
+        }
+
+        .timeline-step {
+            position: relative;
+            margin-bottom: 26px;
+        }
+
+        .timeline-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -29px;
+            top: 2px;
+            width: 20px;
+            height: 20px;
             background: #ffffff;
-            border-radius: 999px;
+            border: 4px solid #e6bdb8;
+            border-radius: 50%;
         }
 
-        .validation-box {
-            border-radius: 14px !important;
-            border: 1px solid #ba1a1a !important;
-            background: #ffdad6 !important;
-            color: #93000a !important;
+        .timeline-step.active .timeline-dot {
+            background: #b70011;
+            border-color: #ffdad6;
+        }
+
+        .timeline-title {
+            font-weight: 800;
+            color: #545f72;
+        }
+
+        .timeline-step.active .timeline-title {
+            color: #b70011;
+        }
+
+        .timeline-text {
+            font-size: 13px;
+            color: #545f72;
+            margin-top: 3px;
+        }
+
+        .info-box {
+            background: #ffdad6;
+            color: #5c403c;
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-box {
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
             font-weight: 700;
         }
 
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+        .message-success {
+            background: #d8f3e7;
+            color: #198754;
+            border: 1px solid #9bd9b8;
         }
 
-        @media (max-width: 1100px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .module-sidebar {
-                width: 240px;
-            }
+        .message-error {
+            background: #ffe1e4;
+            color: #b70011;
+            border: 1px solid #ffb4ab;
         }
 
-        @media (max-width: 850px) {
-            .module-layout {
-                display: block;
+        @media (max-width: 992px) {
+            .sidebar {
+                display: none;
             }
 
-            .module-sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                top: 0;
+            .main {
+                padding: 28px 20px;
             }
 
-            .module-nav {
-                flex-direction: row;
-                overflow-x: auto;
-            }
-
-            .module-nav a {
-                white-space: nowrap;
-            }
-
-            .module-main {
-                padding: 22px 16px;
-            }
-
-            .page-header {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .module-topbar {
-                padding: 0 16px;
-            }
-
-            .portal-title {
-                font-size: 16px;
-            }
-
-            .instructor-block {
-                padding-bottom: 18px;
+            .top-links {
+                display: none;
             }
         }
     </style>
+</head>
 
-    <div class="module-page">
+<body>
+    <form id="form1" runat="server" enctype="multipart/form-data">
+        <div class="instructor-shell">
 
-        <!-- Top App Bar -->
-        <header class="module-topbar">
-            <div class="topbar-left">
-                <button type="button" class="menu-btn">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-                <h1 class="portal-title">Instructor Portal</h1>
-            </div>
-
-            <div class="topbar-right">
-                <span class="topbar-icon">
-                    <span class="material-symbols-outlined" style="font-size:19px;">notifications</span>
-                </span>
-                <div class="topbar-avatar">M</div>
-            </div>
-        </header>
-
-        <div class="module-layout">
-
-            <!-- Sidebar -->
-            <aside class="module-sidebar">
-                <div class="instructor-block">
-                    <div class="instructor-name"><%: Aidify_assigment.AuthHelper.GetName() %></div>
-                    <div class="instructor-role"><%: Aidify_assigment.AuthHelper.GetRole() %></div>
-                    <div class="verified-line">
-                        <span class="material-symbols-outlined" style="font-size:13px;font-variation-settings:'FILL' 1;">verified</span>
-                        Verified Educator
-                    </div>
+            <div class="topbar">
+                <div class="brand">
+                    Aidify
+                    <span class="role-badge">Instructor</span>
                 </div>
 
-                <nav class="module-nav">
-                    <a href="/Instructor/Dashboard.aspx">
-                        <span class="material-symbols-outlined">dashboard</span>
-                        Dashboard
-                    </a>
+                <div class="top-links">
+                    <a href="../Dashboard.aspx">Dashboard</a>
+                    <a href="List.aspx" class="active">Modules</a>
+                    <a href="../Lessons/List.aspx">Lessons</a>
+                    <a href="../Materials/Upload.aspx">Materials</a>
+                    <a href="../Quizzes/List.aspx">Quizzes</a>
+                    <a href="../Performance.aspx">Performance</a>
+                    <a href="../Challenges.aspx">Challenges</a>
+                    <a href="../Events.aspx">Events</a>
+                </div>
 
-                    <a class="active" href="/Instructor/Modules/Edit.aspx">
-                        <span class="material-symbols-outlined">school</span>
-                        My Modules
-                    </a>
-
-                    <a href="/Instructor/Materials/Upload.aspx">
-                        <span class="material-symbols-outlined">description</span>
-                        Materials
-                    </a>
-
-                    <a href="/Instructor/Quizzes/Edit.aspx">
-                        <span class="material-symbols-outlined">quiz</span>
-                        Quizzes
-                    </a>
-                </nav>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="module-main">
-                <div class="module-container">
-
-                    <!-- Breadcrumb + Header -->
-                    <div class="breadcrumb">
-                        <a href="/Instructor/Modules/Edit.aspx">Modules</a>
-                        <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
-                        <span style="color:#281715;">Edit Module</span>
+                <div class="profile">
+                    <div class="text-end d-none d-md-block">
+                        <div class="fw-bold">Dr. Smith</div>
+                        <small class="text-muted">Instructor</small>
                     </div>
+
+                    <div class="avatar">
+                        <img class="profile-img"
+                             alt="Instructor Profile"
+                             src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=160&q=80" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="layout">
+                <aside class="sidebar">
+                    <div class="sidebar-heading">Main Menu</div>
+
+                    <a href="../Dashboard.aspx" class="side-link">
+                        <i class="bi bi-grid"></i> Dashboard
+                    </a>
+
+                    <a href="List.aspx" class="side-link active">
+                        <i class="bi bi-journal-bookmark"></i> Modules
+                    </a>
+
+                    <a href="../Lessons/List.aspx" class="side-link">
+                        <i class="bi bi-book"></i> Lessons
+                    </a>
+
+                    <a href="../Materials/Upload.aspx" class="side-link">
+                        <i class="bi bi-folder2-open"></i> Materials
+                    </a>
+
+                    <a href="../Quizzes/List.aspx" class="side-link">
+                        <i class="bi bi-ui-checks"></i> Quizzes
+                    </a>
+
+                    <div class="sidebar-heading">Monitoring</div>
+
+                    <a href="../Performance.aspx" class="side-link">
+                        <i class="bi bi-graph-up"></i> Performance
+                    </a>
+
+                    <a href="../Discussions.aspx" class="side-link">
+                        <i class="bi bi-chat-dots"></i> Discussions
+                    </a>
+
+                    <a href="../Challenges.aspx" class="side-link">
+                        <i class="bi bi-trophy"></i> Challenges
+                    </a>
+
+                    <a href="../Events.aspx" class="side-link">
+                        <i class="bi bi-calendar-event"></i> Events
+                    </a>
+
+                    <div class="help-box">
+                        <h6><i class="bi bi-question-circle me-2"></i>Need Help?</h6>
+                        <p>Check the instructor guide for help with module creation.</p>
+                        <button type="button">Read Guide</button>
+                    </div>
+                </aside>
+
+                <main class="main">
+
+                    <a href="List.aspx" class="back-link">
+                        <i class="bi bi-arrow-left"></i> Back to My Modules
+                    </a>
 
                     <div class="page-header">
-                        <div>
-                            <h2 class="page-title">Module Configuration</h2>
-                            <p class="page-subtitle">Refine the curriculum and metadata for your clinical training program.</p>
-                            <asp:Label ID="lblModuleStatus" runat="server" CssClass="page-subtitle d-block mt-1"></asp:Label>
-                        </div>
-
-                        <div class="header-actions">
-                            <asp:Button ID="btnCancel" runat="server"
-                                Text="Cancel"
-                                CssClass="btn btn-cancel-custom"
-                                CausesValidation="false"
-                                OnClick="btnCancel_Click" />
-
-                            <asp:Button ID="btnSaveModule" runat="server"
-                                Text="Save Changes"
-                                CssClass="btn btn-save-custom"
-                                OnClick="btnSaveModule_Click" />
-                        </div>
+                        <h1><asp:Label ID="lblPageTitle" runat="server" Text="Create Module"></asp:Label></h1>
+                        <p>Build a structured first aid learning module for learners.</p>
                     </div>
 
+                    <asp:Label ID="lblModuleStatus" runat="server" Visible="false"></asp:Label>
+
                     <asp:HiddenField ID="hfModuleId" runat="server" />
-                    <asp:ValidationSummary ID="vsModule" runat="server" CssClass="alert validation-box mb-4" DisplayMode="BulletList" />
+                    <asp:HiddenField ID="hfExistingCoverImage" runat="server" />
 
-                    <div class="form-grid">
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="form-card mb-4">
+                                <h2><i class="bi bi-pencil-square text-danger me-2"></i>Module Details</h2>
 
-                        <!-- Left Column -->
-                        <section class="left-column">
-
-                            <div class="panel">
-                                <div class="panel-title">Primary Content</div>
-
-                                <div class="field-group">
-                                    <asp:Label ID="lblModuleTitle" runat="server"
-                                        AssociatedControlID="txtModuleTitle"
-                                        CssClass="field-label">
-                                        <span>Module Title</span>
-                                        <span class="required-text">* Required</span>
-                                    </asp:Label>
-
-                                    <asp:TextBox ID="txtModuleTitle" runat="server"
-                                        CssClass="module-input"
-                                        MaxLength="200"
-                                        placeholder="e.g., Trauma Management"></asp:TextBox>
-
-                                    <asp:RequiredFieldValidator ID="rfvModuleTitle" runat="server"
-                                        ControlToValidate="txtModuleTitle"
-                                        CssClass="validator-custom"
-                                        Display="Dynamic"
-                                        ErrorMessage="Module title is required."></asp:RequiredFieldValidator>
+                                <div class="mb-3">
+                                    <label class="form-label">Module Title <span class="required">*</span></label>
+                                    <asp:TextBox ID="txtModuleTitle" runat="server" CssClass="form-control" placeholder="e.g., Advanced Life Support (ALS)"></asp:TextBox>
                                 </div>
 
-                                <div class="field-group">
-                                    <asp:Label ID="lblModuleDescription" runat="server"
-                                        AssociatedControlID="txtModuleDescription"
-                                        CssClass="field-label">
-                                        <span>Description (Multiline)</span>
-                                    </asp:Label>
-
-                                    <asp:TextBox ID="txtModuleDescription" runat="server"
-                                        CssClass="module-textarea"
-                                        TextMode="MultiLine"
-                                        Rows="12"
-                                        placeholder="Write the module description here..."></asp:TextBox>
-                                </div>
-                            </div>
-
-                            <div class="notes-panel">
-                                <div class="notes-title">Instructor Internal Notes</div>
-                                <p class="notes-text">
-                                    Ensure that all video materials are updated to reflect the 2024 International Trauma Life Support (ITLS) guidelines.
-                                    The final quiz must include at least 15 case-study questions based on recent clinical trials.
-                                </p>
-                            </div>
-
-                        </section>
-
-                        <!-- Right Column -->
-                        <aside class="right-column">
-
-                            <div class="panel">
-                                <div class="panel-title">Module Settings</div>
-
-                                <div class="field-group">
-                                    <asp:Label ID="lblDifficulty" runat="server"
-                                        AssociatedControlID="ddlDifficulty"
-                                        CssClass="field-label">
-                                        <span>Difficulty Level</span>
-                                        <span class="required-text">* Required</span>
-                                    </asp:Label>
-
-                                    <asp:DropDownList ID="ddlDifficulty" runat="server" CssClass="module-select">
-                                        <asp:ListItem Value="">Select Difficulty</asp:ListItem>
-                                        <asp:ListItem Value="Beginner">Beginner</asp:ListItem>
-                                        <asp:ListItem Value="Intermediate">Intermediate</asp:ListItem>
-                                        <asp:ListItem Value="Advanced">Advanced</asp:ListItem>
-                                    </asp:DropDownList>
-
-                                    <asp:RequiredFieldValidator ID="rfvDifficulty" runat="server"
-                                        ControlToValidate="ddlDifficulty"
-                                        InitialValue=""
-                                        CssClass="validator-custom"
-                                        Display="Dynamic"
-                                        ErrorMessage="Difficulty is required."></asp:RequiredFieldValidator>
+                                <div class="mb-3">
+                                    <label class="form-label">Description <span class="required">*</span></label>
+                                    <asp:TextBox ID="txtDescription" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="4" placeholder="Describe the learning objectives, emergency topic, and expected outcomes."></asp:TextBox>
                                 </div>
 
-                                <div class="field-group">
-                                    <asp:Label ID="lblModuleStatusLabel" runat="server"
-                                        AssociatedControlID="ddlModuleStatus"
-                                        CssClass="field-label">
-                                        <span>Module Status</span>
-                                    </asp:Label>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Difficulty <span class="required">*</span></label>
+                                        <asp:DropDownList ID="ddlDifficulty" runat="server" CssClass="form-select">
+                                            <asp:ListItem Text="Select Difficulty" Value=""></asp:ListItem>
+                                            <asp:ListItem Text="Beginner" Value="Beginner"></asp:ListItem>
+                                            <asp:ListItem Text="Intermediate" Value="Intermediate"></asp:ListItem>
+                                            <asp:ListItem Text="Advanced" Value="Advanced"></asp:ListItem>
+                                        </asp:DropDownList>
+                                    </div>
 
-                                    <asp:DropDownList ID="ddlModuleStatus" runat="server" CssClass="module-select">
-                                        <asp:ListItem Value="Draft">Draft</asp:ListItem>
-                                        <asp:ListItem Value="Submit for Review">Submit for Review</asp:ListItem>
-                                    </asp:DropDownList>
-                                </div>
-
-                                <div class="field-group">
-                                    <asp:Label ID="lblCoverImage" runat="server"
-                                        AssociatedControlID="fuCoverImage"
-                                        CssClass="field-label">
-                                        <span>Cover Image</span>
-                                    </asp:Label>
-
-                                    <div class="cover-upload">
-                                        <asp:FileUpload ID="fuCoverImage" runat="server"
-                                            CssClass="cover-file"
-                                            onchange="previewCoverImage(this)" />
-
-                                        <div class="cover-box">
-                                            <div id="coverPreviewPlaceholderBg" class="cover-placeholder-bg"></div>
-
-                                            <asp:Image ID="imgCoverPreview" runat="server"
-                                                CssClass="cover-preview-img"
-                                                AlternateText="Module Preview" />
-
-                                            <div id="coverPreviewOverlay" class="cover-placeholder-bg" style="display:none;"></div>
-
-                                            <div id="coverPreviewPlaceholder" class="cover-content">
-                                                <span class="material-symbols-outlined">cloud_upload</span>
-                                                <strong>Change Cover Image</strong>
-                                                <small>16:9 aspect ratio recommended</small>
-                                            </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Preview Module</label>
+                                        <div class="form-control d-flex align-items-center gap-2">
+                                            <asp:CheckBox ID="chkIsPreview" runat="server" />
+                                            <span>Allow this module to be previewed</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="quick-actions">
-                                    <asp:Button ID="btnSaveAndAddLesson" runat="server"
-                                        Text="Save & Add Lesson"
-                                        CssClass="btn btn-add-lesson-custom"
-                                        OnClick="btnSaveAndAddLesson_Click" />
+                                <div class="mb-3">
+                                    <label class="form-label">Cover Image</label>
 
-                                    <button type="button" class="btn btn-export-custom">
-                                        Export Draft (PDF)
-                                    </button>
+                                    <div class="upload-box">
+                                        <i class="bi bi-cloud-arrow-up"></i>
+                                        <p class="fw-bold mb-1">Upload JPG or PNG cover image</p>
+                                        <small class="text-muted">Recommended size: 1200x600px</small>
+                                        <div class="mt-3">
+                                            <asp:FileUpload ID="fuCover" runat="server" CssClass="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <asp:Image ID="imgCoverPreview" runat="server" CssClass="cover-preview" Visible="false" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label me-2">Current Status:</label>
+                                    <span class="status-pill">
+                                        <i class="bi bi-pencil-square"></i>
+                                        <asp:Label ID="lblCurrentStatus" runat="server" Text="Draft"></asp:Label>
+                                    </span>
+                                    <div>
+                                        <small class="text-muted">Published status is controlled by Admin approval.</small>
+                                    </div>
+                                </div>
+
+                                <hr />
+
+                                <div class="mb-3">
+                                    <label class="form-label">Learning Objectives</label>
+
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">1</span>
+                                        <asp:TextBox ID="txtObjective1" runat="server" CssClass="form-control" placeholder="Understand first response steps for the selected emergency topic."></asp:TextBox>
+                                    </div>
+
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">2</span>
+                                        <asp:TextBox ID="txtObjective2" runat="server" CssClass="form-control" placeholder="Identify correct safety and prevention actions."></asp:TextBox>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <span class="input-group-text">3</span>
+                                        <asp:TextBox ID="txtObjective3" runat="server" CssClass="form-control" placeholder="Apply the response protocol through scenario-based learning."></asp:TextBox>
+                                    </div>
+
+                                    <small class="text-muted">These are kept in the page for UI completeness. Database storage can be added later if needed.</small>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label">Tags</label>
+                                    <asp:TextBox ID="txtTags" runat="server" CssClass="form-control" placeholder="CPR, trauma, wound care"></asp:TextBox>
+                                    <small class="text-muted">Tags are currently UI-only unless the database gets a Tags table later.</small>
                                 </div>
                             </div>
 
-                            <div class="ai-card">
-                                <div class="ai-head">
-                                    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
-                                    <h3 class="ai-title">AI Audit Ready</h3>
-                                </div>
+                            <div class="action-bar">
+                                <a href="List.aspx" class="btn-outline-aidify">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </a>
 
-                                <p class="ai-text">
-                                    Module content matches current medical standards. 98% compliance score against the latest clinical protocols.
-                                </p>
+                                <asp:Button ID="btnSaveDraft" runat="server"
+                                    Text="Save Draft"
+                                    CssClass="btn-outline-aidify"
+                                    OnClick="btnSaveDraft_Click" />
 
-                                <div class="ai-progress">
-                                    <div class="ai-progress-bar"></div>
+                                <asp:Button ID="btnSaveAndAddLesson" runat="server"
+                                    Text="Save and Add Lesson"
+                                    CssClass="btn-secondary-aidify"
+                                    OnClick="btnSaveAndAddLesson_Click" />
+
+                                <asp:Button ID="btnSubmitForReview" runat="server"
+                                    Text="Submit for Review"
+                                    CssClass="btn-aidify"
+                                    OnClick="btnSubmitForReview_Click" />
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="side-card mb-4">
+                                <h3>Instructor Checklist</h3>
+
+                                <label class="check-item">
+                                    <input type="checkbox" />
+                                    <span>Use a clear module title</span>
+                                </label>
+
+                                <label class="check-item">
+                                    <input type="checkbox" />
+                                    <span>Add measurable learning objectives</span>
+                                </label>
+
+                                <label class="check-item">
+                                    <input type="checkbox" />
+                                    <span>Choose the correct difficulty</span>
+                                </label>
+
+                                <label class="check-item">
+                                    <input type="checkbox" />
+                                    <span>Upload a relevant cover image</span>
+                                </label>
+
+                                <label class="check-item">
+                                    <input type="checkbox" />
+                                    <span>Add lessons before submitting for review</span>
+                                </label>
+
+                                <div class="mt-3 p-3 rounded" style="background:#fff8f7; border:1px solid #e6bdb8;">
+                                    <small class="text-muted">Make sure your content is educational and does not replace professional medical training.</small>
                                 </div>
                             </div>
 
-                        </aside>
+                            <div class="side-card mb-4">
+                                <h3>Status Timeline</h3>
 
+                                <div class="timeline">
+                                    <div class="timeline-step active">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-title">Draft</div>
+                                        <div class="timeline-text">Currently being edited. Not visible to learners.</div>
+                                    </div>
+
+                                    <div class="timeline-step">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-title">Pending Review</div>
+                                        <div class="timeline-text">Submitted to Admin for content approval.</div>
+                                    </div>
+
+                                    <div class="timeline-step">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-title">Published</div>
+                                        <div class="timeline-text">Visible to enrolled learners after approval.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-box">
+                                <i class="bi bi-info-circle fs-4"></i>
+                                <div>
+                                    <strong>Need Help?</strong>
+                                    <p class="mb-0 small">Use clear emergency response language and add lessons before submitting.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
-    </div>
 
-    <script type="text/javascript">
-        function previewCoverImage(input) {
-            var file = input.files && input.files[0];
-            var preview = document.getElementById('<%= imgCoverPreview.ClientID %>');
-            var placeholder = document.getElementById('coverPreviewPlaceholder');
-            var placeholderBg = document.getElementById('coverPreviewPlaceholderBg');
-            var overlay = document.getElementById('coverPreviewOverlay');
-
-            if (!file || !file.type || file.type.indexOf('image/') !== 0) {
-                if (preview) {
-                    preview.src = '';
-                    preview.style.display = 'none';
-                }
-
-                if (placeholder) {
-                    placeholder.style.display = '';
-                }
-
-                if (placeholderBg) {
-                    placeholderBg.style.display = '';
-                }
-
-                if (overlay) {
-                    overlay.style.display = 'none';
-                }
-
-                return;
-            }
-
-            var url = URL.createObjectURL(file);
-
-            if (preview) {
-                preview.src = url;
-                preview.style.display = 'block';
-                preview.onload = function () {
-                    URL.revokeObjectURL(url);
-                };
-            }
-
-            if (placeholder) {
-                placeholder.style.display = 'none';
-            }
-
-            if (placeholderBg) {
-                placeholderBg.style.display = 'none';
-            }
-
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
-        }
-    </script>
-
-</asp:Content>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </form>
+</body>
+</html>

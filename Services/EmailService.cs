@@ -10,11 +10,17 @@ namespace Aidify_assigment
         {
             var user = ConfigurationManager.AppSettings["SmtpUser"];
             var pass = ConfigurationManager.AppSettings["SmtpPass"];
+
             using (var client = new SmtpClient("smtp.gmail.com", 587))
             {
                 client.Credentials = new NetworkCredential(user, pass);
-                client.EnableSsl   = true;
-                var msg = new MailMessage(user, to, subject, htmlBody) { IsBodyHtml = true };
+                client.EnableSsl = true;
+
+                var msg = new MailMessage(user, to, subject, htmlBody)
+                {
+                    IsBodyHtml = true
+                };
+
                 client.Send(msg);
             }
         }

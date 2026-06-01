@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Web;
 using System.Web.Routing;
 using Microsoft.AspNet.FriendlyUrls;
 
@@ -11,7 +8,10 @@ namespace Aidify_assigment
         public static void RegisterRoutes(RouteCollection routes)
         {
             var settings = new FriendlyUrlSettings();
-            settings.AutoRedirectMode = RedirectMode.Permanent;
+
+            // IMPORTANT: Prevent FriendlyUrls from redirecting .aspx WebMethod calls
+            settings.AutoRedirectMode = RedirectMode.Off;
+
             routes.EnableFriendlyUrls(settings);
         }
     }

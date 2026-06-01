@@ -3,439 +3,451 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
 <style>
-    .aidify-navbar,
-    .aidify-footer {
-        display: none !important;
-    }
+    .aidify-navbar, .aidify-footer { display:none!important; }
+    body { background-color:#f9f9f9; }
 
-    body {
-        background-color: #f9f9f9;
-    }
-
-    /* ── TOPBAR ── */
     .approval-topbar {
-        height: 70px;
-        background: #ffffff;
-        border-bottom: 1px solid #e2e2e2;
-        display: flex;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 50;
-    }
-
-    .approval-brand {
-        color: #E53935;
-        font-size: 22px;
-        font-weight: 800;
-        text-decoration: none;
+        height:70px; background:#fff; border-bottom:1px solid #e2e2e2;
+        display:flex; align-items:center; position:sticky; top:0; z-index:50;
     }
 
     .approval-nav a {
-        color: #3d2a28;
-        text-decoration: none;
-        margin-left: 22px;
-        font-weight: 600;
-        font-size: 14px;
+        color:#3d2a28; text-decoration:none; margin-left:22px;
+        font-weight:600; font-size:14px;
     }
 
     .approval-nav a.active {
-        color: #E53935;
-        border-bottom: 2px solid #E53935;
-        padding-bottom: 6px;
+        color:#E53935; border-bottom:2px solid #E53935; padding-bottom:6px;
     }
 
-    .topbar-login {
-        border: 1.5px solid #ccc;
-        background: #fff;
-        color: #333;
-        font-weight: 600;
-        border-radius: 8px;
-        padding: 6px 20px;
-        text-decoration: none;
-        font-size: 14px;
-        margin-right: 8px;
-    }
-
-    .topbar-login:hover {
-        border-color: #E53935;
-        color: #E53935;
-    }
-
-    /* ── PAGE ── */
-    .approval-page {
-        padding: 44px 0 60px;
-        background-color: #f9f9f9;
-    }
+    .approval-page { padding:44px 0 60px; background-color:#f9f9f9; }
 
     .approval-page h1 {
-        font-size: 30px;
-        font-weight: 800;
-        color: #1a1a1a;
-        margin-bottom: 4px;
+        font-size:30px; font-weight:800; color:#1a1a1a; margin-bottom:4px;
     }
 
-    /* ── FILTER BAR ── */
     .filter-bar {
-        background: #f3f3f3;
-        border-radius: 12px;
-        padding: 12px 16px;
-        border: 1px solid #e2e2e2;
-        margin-bottom: 24px;
+        background:#f3f3f3; border-radius:12px; padding:12px 16px;
+        border:1px solid #e2e2e2; margin-bottom:24px;
     }
 
     .filter-btn {
-        background: #ffffff;
-        border: 1px solid #e2e2e2;
-        color: #444;
-        font-weight: 600;
-        font-size: 13px;
-        border-radius: 8px;
-        padding: 6px 16px;
-        margin-right: 6px;
-        cursor: pointer;
-        transition: 0.15s;
+        background:#fff; border:1px solid #e2e2e2; color:#444;
+        font-weight:600; font-size:13px; border-radius:8px;
+        padding:6px 16px; margin-right:6px; cursor:pointer;
     }
 
-    .filter-btn:hover,
-    .filter-btn.active {
-        background: #1f2933;
-        color: #fff;
-        border-color: #1f2933;
+    .filter-btn:hover, .filter-btn.active {
+        background:#1f2933; color:#fff; border-color:#1f2933;
     }
 
     .filter-search {
-        border: 1px solid #e2e2e2;
-        border-radius: 8px;
-        font-size: 13px;
-        height: 36px;
-        padding: 0 12px;
-        width: 240px;
-        outline: none;
+        border:1px solid #e2e2e2; border-radius:8px; font-size:13px;
+        height:36px; padding:0 12px; width:240px; outline:none;
     }
 
-    .filter-search:focus {
-        border-color: #E53935;
-    }
+    .filter-search:focus { border-color:#E53935; }
 
-    /* ── CARDS ── */
     .approval-card {
-        background: #ffffff;
-        border: 1px solid #e2e2e2;
-        border-radius: 14px;
-        overflow: hidden;
-        transition: box-shadow 0.2s;
+        background:#fff; border:1px solid #e2e2e2; border-radius:14px;
+        overflow:hidden; transition:box-shadow .2s;
     }
 
-    .approval-card:hover {
-        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-    }
+    .approval-card:hover { box-shadow:0 4px 18px rgba(0,0,0,.08); }
 
     .badge-category {
-        font-size: 10px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
+        font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.8px;
     }
-
-    /* Grey thumbnail box */
-    .preview-thumb {
-        width: 90px;
-        height: 90px;
-        flex-shrink: 0;
-        background: #e8e8e8;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 30px;
-        color: #E53935;
-    }
-
-    /* Side preview for horizontal card */
-    .preview-side {
-        background: #e8e8e8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 52px;
-        color: #E53935;
-        min-height: 180px;
-    }
-
-    /* Comment textarea */
-    .comment-area {
-        border: 1px solid #e2e2e2;
-        border-radius: 8px;
-        font-size: 13px;
-        resize: none;
-        width: 100%;
-        padding: 10px 12px;
-        color: #555;
-        background: #fafafa;
-    }
-
-    .comment-area:focus {
-        border-color: #E53935;
-        outline: none;
-        background: #fff;
-    }
-
-    /* Author chip */
-    .author-chip {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        color: white;
-        font-weight: 700;
-        font-size: 11px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .chip-red    { background: #E53935; }
-    .chip-teal   { background: #0d9488; }
-    .chip-blue   { background: #2563eb; }
-    .chip-purple { background: #7c3aed; }
-
-    /* Buttons */
-    .btn-sm-outline-grey {
-        border: 1px solid #d0d0d0;
-        background: #fff;
-        color: #444;
-        border-radius: 7px;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 6px 14px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        text-decoration: none;
-    }
-
-    .btn-sm-outline-grey:hover { border-color: #888; }
 
     .btn-sm-outline-danger {
-        border: 1px solid #fca5a5;
-        background: #fff;
-        color: #E53935;
-        border-radius: 7px;
-        font-size: 13px;
-        font-weight: 600;
-        padding: 6px 14px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
+        border:1px solid #fca5a5; background:#fff; color:#E53935;
+        border-radius:7px; font-size:13px; font-weight:600;
+        padding:6px 14px; cursor:pointer; display:inline-flex;
+        align-items:center; gap:5px; text-decoration:none;
     }
 
-    .btn-sm-outline-danger:hover { background: #fff5f5; }
+    .btn-sm-outline-danger:hover { background:#fff5f5; }
 
     .btn-sm-approve {
-        background: #E53935;
-        color: #fff;
-        border: none;
-        border-radius: 7px;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 6px 14px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
+        background:#E53935; color:#fff; border:none; border-radius:7px;
+        font-size:13px; font-weight:700; padding:6px 14px;
+        cursor:pointer; display:inline-flex; align-items:center;
+        gap:5px; text-decoration:none;
     }
 
-    .btn-sm-approve:hover { background: #c62828; }
+    .btn-sm-approve:hover { background:#c62828; color:#fff; }
 
-    /* ── PAGINATION ── */
     .pagination-bar {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
-        margin-top: 36px;
+        display:flex; justify-content:center; align-items:center;
+        gap:6px; margin-top:36px;
     }
 
     .page-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        border: 1px solid #e2e2e2;
-        background: #fff;
-        color: #444;
-        font-weight: 600;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        text-decoration: none;
-        transition: 0.15s;
+        width:36px; height:36px; border-radius:8px; border:1px solid #e2e2e2;
+        background:#fff; color:#444; font-weight:600; font-size:14px;
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; text-decoration:none;
     }
 
-    .page-btn:hover { border-color: #E53935; color: #E53935; }
-    .page-btn.active { background: #E53935; color: #fff; border-color: #E53935; }
-    .page-btn.dots { border: none; background: none; cursor: default; color: #aaa; }
+    .page-btn:hover { border-color:#E53935; color:#E53935; }
+    .page-btn.active { background:#E53935; color:#fff; border-color:#E53935; }
+    .page-btn:disabled { opacity:.45; cursor:not-allowed; }
 
-    /* ── FOOTER ── */
+    
+    .approval-logo{
+        width:42px;
+        height:42px;
+        object-fit:contain;
+    }
+
+    .approval-brand {
+        display:flex;
+        align-items:center;
+        gap:12px;
+        color:#E53935;
+        font-size:22px;
+        font-weight:800;
+        text-decoration:none;
+    }
     .approval-footer {
-        background: #f3f3f3;
-        border-top: 1px solid #e2e2e2;
-        padding: 28px 0 16px;
+        background:#f3f3f3; border-top:1px solid #e2e2e2; padding:28px 0 16px;
     }
 
     .approval-footer .footer-brand {
-        color: #E53935;
-        font-weight: 800;
-        font-size: 17px;
+        color:#E53935; font-weight:800; font-size:17px;
     }
 
     .approval-footer a {
-        color: #555;
-        text-decoration: none;
-        font-size: 13px;
+        color:#555; text-decoration:none; font-size:13px;
     }
 
-    .approval-footer a:hover { color: #E53935; }
+    .approval-footer a:hover { color:#E53935; }
 
-    @media (max-width: 768px) {
-        .approval-nav { display: none; }
+    @media (max-width:768px) {
+        .approval-nav { display:none; }
+    }
+
+    .approval-dropdown{
+        text-decoration:none;
+        color:#1f2937;
+        font-weight:700;
+        font-size:18px;
+        display:flex;
+        align-items:center;
+        gap:6px;
+    }
+
+    .approval-dropdown:hover{
+        color:#E53935;
+    }
+
+    .dropdown-menu{
+        min-width:180px;
+        border-radius:12px;
     }
 </style>
 
-<!-- ── TOPBAR ── -->
 <header class="approval-topbar">
     <div class="container d-flex justify-content-between align-items-center">
 
-        <a href="../Dashboard.aspx" class="approval-brand" style="display:flex; align-items:center; gap:10px;">
-            Aidify
-            <span style="background:#db322f; color:#fff; font-size:11px; padding:3px 9px; border-radius:20px; font-weight:700;">ADMIN</span>
+        <a href="../Dashboard.aspx" class="approval-brand">
+
+            <img src="<%= ResolveUrl("~/Images/aidify-kit.png") %>"
+                 alt="Aidify Logo"
+                 class="approval-logo" />
+
+            <span>Aidify</span>
+
         </a>
 
         <nav class="approval-nav">
             <a href="../Dashboard.aspx">Dashboard</a>
             <a href="../Users/List.aspx">Users</a>
-            <a href="../Roles.aspx">Roles</a>
-            <a href="ManagePublicPages.aspx">Public Pages</a>
             <a href="ApprovalQueue.aspx" class="active">Approvals</a>
             <a href="../Analytics.aspx">Analytics</a>
         </nav>
 
-        <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-bell fs-5"></i>
-            <div class="text-end d-none d-md-block">
-                <div class="fw-bold" style="font-size:14px;"><%: Aidify_assigment.AuthHelper.GetName() %></div>
-                <small class="text-muted"><%: Aidify_assigment.AuthHelper.GetRole() %></small>
-            </div>
-            <div style="width:42px; height:42px; border-radius:50%; background:#E53935; color:white; display:flex; align-items:center; justify-content:center; font-weight:800;">A</div>
-        
+        <div class="dropdown">
+
+            <a href="#"
+               class="approval-dropdown"
+               data-bs-toggle="dropdown"
+               aria-expanded="false">
+
+                Admin
+                <i class="bi bi-chevron-down"></i>
+
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+
+                <li>
+                    <a class="dropdown-item"
+                       href="../../Account/Profile.aspx">
+                        <i class="bi bi-person me-2"></i>
+                        Profile
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item text-danger"
+                       href="../../Auth/Logout.aspx">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Logout
+                    </a>
+                </li>
+
+            </ul>
+
         </div>
 
     </div>
 </header>
 
-<!-- ── MAIN ── -->
 <main class="approval-page">
     <div class="container">
 
         <div class="mb-4">
             <h1>Content Approval Queue</h1>
             <p class="text-muted" style="font-size:15px;">
-                Review and manage pending medical training modules and assessments.
+                Review and manage pending modules and events submitted for approval.
             </p>
         </div>
 
-        <!-- Filter Bar -->
         <div class="filter-bar d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div>
-                <button class="filter-btn active">All Requests (12)</button>
-                <button class="filter-btn">First Aid (8)</button>
-                <button class="filter-btn">Quizzes (4)</button>
+                <button type="button" class="filter-btn active" id="btnAllRequests">All Requests (0)</button>
+                <button type="button" class="filter-btn" id="btnModules">Modules (0)</button>
+                <button type="button" class="filter-btn" id="btnEvents">Events (0)</button>
             </div>
+
             <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-search text-muted" style="font-size:13px;"></i>
-                <input type="text" class="filter-search" placeholder="Search by author or topic..." />
+                <input type="text" id="approvalSearchBox" class="filter-search" placeholder="Search by author or topic..." />
             </div>
         </div>
 
-        <!-- Cards — populated from DB via WebMethod -->
         <div class="row g-4" id="moduleCardsContainer">
             <div class="col-12 text-center text-muted py-5">Loading pending modules…</div>
         </div>
 
-        <!-- Pagination -->
-        <div class="pagination-bar">
-            <a class="page-btn">&lsaquo;</a>
-            <a class="page-btn active">1</a>
-            <a class="page-btn">2</a>
-            <a class="page-btn">3</a>
-            <span class="page-btn dots">...</span>
-            <a class="page-btn">&rsaquo;</a>
-        </div>
+        <div class="pagination-bar" id="approvalPagination"></div>
 
     </div>
 </main>
 
 <script type="text/javascript">
-function loadPendingModules() {
-    $.ajax({
-        type: 'POST', url: 'ApprovalQueue.aspx/GetPendingModules',
-        data: '{}', contentType: 'application/json; charset=utf-8', dataType: 'json',
-        success: function (r) {
-            var modules   = r.d;
-            var container = document.getElementById('moduleCardsContainer');
-            if (!modules || modules.length === 0) {
-                container.innerHTML = '<div class="col-12 text-center text-muted py-5">' +
-                    '<i class="bi bi-check-circle fs-1 d-block mb-3"></i>' +
-                    'No modules awaiting review — inbox is clear!</div>';
-                return;
+    var allModules = [];
+    var allEvents = [];
+    var currentView = "all";
+    var currentPage = 1;
+    var pageSize = 4;
+
+    function loadPendingModules() {
+        $.ajax({
+            type: 'POST',
+            url: 'ApprovalQueue.aspx/GetPendingModules',
+            data: '{}',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (r) {
+                allModules = r.d || [];
+                currentPage = 1;
+                updateCounts();
+                renderModules();
+            },
+            error: function () {
+                document.getElementById('moduleCardsContainer').innerHTML =
+                    '<div class="col-12 text-danger text-center py-5">Failed to load pending modules.</div>';
             }
-            var html = '';
-            for (var i = 0; i < modules.length; i++) {
-                var m  = modules[i];
-                var dt = new Date(parseInt(m.submittedAt.replace('/Date(', '').replace(')/', '')));
-                var dateStr = dt.toISOString().slice(0, 10);
-                html +=
-                    '<div class="col-lg-6">' +
-                    '<div class="approval-card p-4 h-100">' +
-                        '<div class="d-flex justify-content-between align-items-start mb-2">' +
-                            '<span class="badge-category text-danger">Pending Review</span>' +
-                            '<small class="text-muted">Submitted: ' + esc(dateStr) + '</small>' +
-                        '</div>' +
-                        '<h3 class="h5 fw-bold mb-1">' + esc(m.title) + '</h3>' +
-                        '<p class="text-muted small mb-1">Difficulty: <strong>' + esc(m.difficultyLevel || '—') + '</strong></p>' +
-                        '<p class="text-muted small mb-3">Author: <strong>' + esc(m.createdByName) + '</strong></p>' +
-                        '<div class="d-flex flex-wrap gap-2">' +
-                            '<a href="ApprovalQueue.aspx?action=approve&id=' + m.moduleId + '" ' +
-                               'class="btn-sm-approve" onclick="return confirm(\'Approve ' + esc(m.title.replace(/'/g,"")) + '?\');">' +
-                                '<i class="bi bi-check-circle"></i> Approve' +
-                            '</a>' +
-                            '<a href="ApprovalQueue.aspx?action=reject&id=' + m.moduleId + '" ' +
-                               'class="btn-sm-outline-danger" onclick="return confirm(\'Reject and return to Draft?\');">' +
-                                '<i class="bi bi-x-circle"></i> Reject' +
-                            '</a>' +
-                        '</div>' +
-                    '</div>' +
-                    '</div>';
+        });
+    }
+
+    function loadPendingEvents() {
+        $.ajax({
+            type: 'POST',
+            url: 'ApprovalQueue.aspx/GetPendingEvents',
+            data: '{}',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (r) {
+                allEvents = r.d || [];
+                updateCounts();
+                renderModules();
             }
-            container.innerHTML = html;
-        },
-        error: function () {
-            document.getElementById('moduleCardsContainer').innerHTML =
-                '<div class="col-12 text-danger text-center py-5">Failed to load pending modules.</div>';
+        });
+    }
+
+    function updateCounts() {
+
+        document.getElementById('btnModules').textContent =
+            'Modules (' + allModules.length + ')';
+
+        document.getElementById('btnEvents').textContent =
+            'Events (' + allEvents.length + ')';
+
+        document.getElementById('btnAllRequests').textContent =
+            'All Requests (' + (allModules.length + allEvents.length) + ')';
+    }
+
+    function getFilteredModules() {
+
+        var search =
+            document.getElementById('approvalSearchBox')
+                .value
+                .toLowerCase();
+
+        var items = [];
+
+        if (currentView === "modules")
+            items = allModules;
+
+        else if (currentView === "events")
+            items = allEvents;
+
+        else
+            items = allModules.concat(allEvents);
+
+        return items.filter(function (m) {
+
+            return String(m.title || '')
+                .toLowerCase()
+                .includes(search)
+
+                ||
+
+                String(m.createdByName || '')
+                    .toLowerCase()
+                    .includes(search);
+
+        });
+    }
+
+    function renderModules() {
+        var modules = getFilteredModules();
+        var container = document.getElementById('moduleCardsContainer');
+
+        if (!modules || modules.length === 0) {
+            container.innerHTML =
+                '<div class="col-12 text-center text-muted py-5">' +
+                '<i class="bi bi-check-circle fs-1 d-block mb-3"></i>' +
+                'No requests awaiting review.</div>';
+
+            document.getElementById('approvalPagination').innerHTML = '';
+            return;
         }
+
+        var totalPages = Math.ceil(modules.length / pageSize);
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        var start = (currentPage - 1) * pageSize;
+        var pageModules = modules.slice(start, start + pageSize);
+
+        var html = '';
+
+        for (var i = 0; i < pageModules.length; i++) {
+            var m = pageModules[i];
+            var isEvent = m.itemType === "Event";
+            var dt = new Date(parseInt(m.submittedAt.replace('/Date(', '').replace(')/', '')));
+            var dateStr = dt.toLocaleDateString('en-MY');
+
+            html +=
+                '<div class="col-lg-6">' +
+                '<div class="approval-card p-4 h-100">' +
+                '<div class="d-flex justify-content-between align-items-start mb-2">' +
+                '<span class="badge-category text-danger">Pending Review</span>' +
+                '<small class="text-muted">Submitted: ' + esc(dateStr) + '</small>' +
+                '</div>' +
+
+                '<h3 class="h5 fw-bold mb-1">' + esc(m.title) + '</h3>' +
+                (isEvent
+                    ? '<p class="text-muted small mb-1">Location: <strong>' +
+                    esc(m.location || '-') +
+                    '</strong></p>'
+                    : '<p class="text-muted small mb-1">Difficulty: <strong>' +
+                    esc(m.difficultyLevel || '-') +
+                    '</strong></p>') +
+                '<p class="text-muted small mb-3">Author: <strong>' + esc(m.createdByName) + '</strong></p>' +
+
+                '<div class="d-flex flex-wrap gap-2">' +
+                '<a href="ApprovalQueue.aspx?action=approve&type=' +
+                (isEvent ? 'event' : 'module') +
+                '&id=' + m.itemId +
+                '" class="btn-sm-approve" onclick="return confirm(\'Approve this request?\');">' +
+                '<i class="bi bi-check-circle"></i> Approve' +
+                '</a>' +
+
+                '<a href="ApprovalQueue.aspx?action=reject&type=' +
+                (isEvent ? 'event' : 'module') +
+                '&id=' + m.itemId +
+                '" class="btn-sm-outline-danger" onclick="return confirm(\'Reject and return to Draft?\');">' +
+                '<i class="bi bi-x-circle"></i> Reject' +
+                '</a>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+
+        container.innerHTML = html;
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        var html = '';
+
+        html += '<button type="button" class="page-btn" ' +
+            (currentPage === 1 ? 'disabled' : '') +
+            ' onclick="currentPage--; renderModules();">&lsaquo;</button>';
+
+        for (var i = 1; i <= totalPages; i++) {
+            html += '<button type="button" class="page-btn ' +
+                (i === currentPage ? 'active' : '') +
+                '" onclick="currentPage=' + i + '; renderModules();">' + i + '</button>';
+        }
+
+        html += '<button type="button" class="page-btn" ' +
+            (currentPage === totalPages ? 'disabled' : '') +
+            ' onclick="currentPage++; renderModules();">&rsaquo;</button>';
+
+        document.getElementById('approvalPagination').innerHTML = html;
+    }
+
+    function esc(s) {
+        return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    $(document).ready(function () {
+        loadPendingModules();
+        loadPendingEvents();
+
+        $('#btnAllRequests').click(function () {
+            currentView = "all";
+            currentPage = 1;
+            renderModules();
+        });
+
+        $('#btnModules').click(function () {
+            currentView = "modules";
+            currentPage = 1;
+            renderModules();
+        });
+
+        $('#btnEvents').click(function () {
+            currentView = "events";
+            currentPage = 1;
+            renderModules();
+        });
+
+        $('#approvalSearchBox').on('input', function () {
+            currentPage = 1;
+            renderModules();
+        });
     });
-}
-function esc(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-$(document).ready(loadPendingModules);
 </script>
 
-<!-- ── FOOTER ── -->
 <footer class="approval-footer">
     <div class="container">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
@@ -443,14 +455,10 @@ $(document).ready(loadPendingModules);
                 <div class="footer-brand">Aidify</div>
                 <p class="text-muted small mb-0">Administrative control center for the Aidify learning platform.</p>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <a href="../Dashboard.aspx">Dashboard</a>
-                <span class="text-muted">|</span>
-                <a href="#">Privacy Policy</a>
-                <span class="text-muted">|</span>
-                <a href="#">Terms of Service</a>
-            </div>
+
+            
         </div>
+
         <hr class="mt-1 mb-2" />
         <p class="text-muted small mb-0 text-center">© 2026 Aidify Admin Panel. Educational use only.</p>
     </div>
